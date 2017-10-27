@@ -9,6 +9,7 @@ import com.fasterxml.uuid.EthernetAddress;
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.NoArgGenerator;
 import java.nio.ByteBuffer;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -16,6 +17,9 @@ import java.util.UUID;
  * @author zhao0677
  */
 public class UtilsHelper {
+    
+    static final long NUM_100NS_INTERVALS_SINCE_UUID_EPOCH = 0x01b21dd213814000L;
+    
     public static UUID getUUIDBasedOnTime(){
         NoArgGenerator timeBasedGenerator = Generators.timeBasedGenerator();
         return timeBasedGenerator.generate();
@@ -51,5 +55,10 @@ public class UtilsHelper {
         Long low = byteBuffer.getLong();
 
         return new UUID(high, low);
+    }
+    
+    public static Date getDateFromUUID(UUID uuid) {
+        long time = (uuid.timestamp() - NUM_100NS_INTERVALS_SINCE_UUID_EPOCH) / 10000;
+        return new Date(time);
     }
 }
