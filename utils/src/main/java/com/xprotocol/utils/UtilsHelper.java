@@ -5,6 +5,7 @@
  */
 package com.xprotocol.utils;
 
+import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.uuid.EthernetAddress;
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.NoArgGenerator;
@@ -21,8 +22,9 @@ public class UtilsHelper {
     static final long NUM_100NS_INTERVALS_SINCE_UUID_EPOCH = 0x01b21dd213814000L;
     
     public static UUID getUUIDBasedOnTime(){
-        NoArgGenerator timeBasedGenerator = Generators.timeBasedGenerator();
-        return timeBasedGenerator.generate();
+        return UUIDs.timeBased();
+//        NoArgGenerator timeBasedGenerator = Generators.timeBasedGenerator();
+//        return timeBasedGenerator.generate();
     }
     
     public static UUID getUUIDBasedOnEthernet() {
@@ -43,20 +45,31 @@ public class UtilsHelper {
 
         return bb.array();
     }
-
+    
     /**
      * From https://gist.github.com/jeffjohnson9046/c663dd22bbe6bb0b3f5e
      * @param bytes
-     * @return 
+     * @return UUID
      */
     public static UUID getUUIDFromBytes(byte[] bytes) {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
-        Long high = byteBuffer.getLong();
-        Long low = byteBuffer.getLong();
 
-        return new UUID(high, low);
+        return UUID.nameUUIDFromBytes(bytes);
     }
     
+    /**
+     * From https://gist.github.com/jeffjohnson9046/c663dd22bbe6bb0b3f5e
+     * @param String UUIDStr
+     * @return UUID
+     */
+    public static UUID getUUIDFromString(String UUIDStr) {
+        return UUID.fromString(UUIDStr);
+    }
+    
+    /**
+     * From https://support.datastax.com/hc/en-us/articles/204226019-Converting-TimeUUID-Strings-to-Dates
+     * @param uuid
+     * @return date
+     */
     public static Date getDateFromUUID(UUID uuid) {
         long time = (uuid.timestamp() - NUM_100NS_INTERVALS_SINCE_UUID_EPOCH) / 10000;
         return new Date(time);

@@ -5,11 +5,10 @@
  */
 package com.xprotocol.cassandra.repository;
 
-import com.xprotocol.cassandra.model.UserDetails;
+import com.xprotocol.cassandra.model.UserProtocol;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.cassandra.repository.CassandraRepository;
-import org.springframework.data.cassandra.repository.Query;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -17,9 +16,9 @@ import org.springframework.stereotype.Repository;
  * @author Tao Zhao
  */
 @Repository
-public interface UserDetailsRepository extends CassandraRepository<UserDetails> {
+public interface UserProtocolRepository extends CassandraRepository<UserProtocol> {
 //    @Query("select * from user_details where user_id = ?0 LIMIT ?1 ")
-    List<UserDetails> findUserDetailsByUserId(int userId);
+    List<UserProtocol> findUserProtocolByUserUUID(UUID userUUID);
     
-    UUID deleteByUserDetailsId(UUID userDetailsId);
+    UUID deleteUserProtocolByUserProtocolUUID(UUID userProtocolUUID);
 }
