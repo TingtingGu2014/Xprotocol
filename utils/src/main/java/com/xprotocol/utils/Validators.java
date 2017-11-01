@@ -25,7 +25,7 @@ public class Validators {
         return (null == str || str.equals(""));
     }
     
-    public static boolean isValidUUID(String uuidStr){
+    public static boolean isValidUUIDString(String uuidStr){
         Pattern pattern = Pattern.compile(UUID_PATTERN, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(uuidStr);
         return matcher.matches();        

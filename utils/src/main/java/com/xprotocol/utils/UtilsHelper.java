@@ -5,10 +5,13 @@
  */
 package com.xprotocol.utils;
 
+import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.uuid.EthernetAddress;
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.NoArgGenerator;
+import com.xprotocol.utils.exceptions.UUIDStringConversionException;
 import java.nio.ByteBuffer;
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -16,9 +19,11 @@ import java.util.UUID;
  * @author zhao0677
  */
 public class UtilsHelper {
+    
+    static final long NUM_100NS_INTERVALS_SINCE_UUID_EPOCH = 0x01b21dd213814000L;
+    
     public static UUID getUUIDBasedOnTime(){
-        NoArgGenerator timeBasedGenerator = Generators.timeBasedGenerator();
-        return timeBasedGenerator.generate();
+        return UUIDs.timeBased();
     }
     
     public static UUID getUUIDBasedOnEthernet() {
@@ -39,17 +44,52 @@ public class UtilsHelper {
 
         return bb.array();
     }
-
+    
     /**
      * From https://gist.github.com/jeffjohnson9046/c663dd22bbe6bb0b3f5e
      * @param bytes
-     * @return 
+     * @return UUID
      */
     public static UUID getUUIDFromBytes(byte[] bytes) {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
-        Long high = byteBuffer.getLong();
-        Long low = byteBuffer.getLong();
 
-        return new UUID(high, low);
+        return UUID.nameUUIDFromBytes(bytes);
+    }
+    
+    /**
+     * From https://gist.github.com/jeffjohnson9046/c663dd22bbe6bb0b3f5e
+     * @param UUIDStr
+     * @return UUID
+     * @throws com.xprotocol.utils.exceptions.UUIDStringConversionException
+     */
+    public static UUID getUUIDFromString(String UUIDStr) throws UUIDStringConversionException {
+        UUID uuid;
+        try{
+            uuid = UUID.fromString(UUIDStr);
+        }
+        catch(Exception ex){
+            uuid = UUID.fromString(UUIDStringFormat(UUIDStr));
+        }
+        return uuid;
+    }
+    
+    /**
+     * From https://support.datastax.com/hc/en-us/articles/204226019-Converting-TimeUUID-Strings-to-Dates
+     * @param uuid
+     * @return date
+     */
+    public static Date getDateFromUUID(UUID uuid) {
+        long time = (uuid.timestamp() - NUM_100NS_INTERVALS_SINCE_UUID_EPOCH) / 10000;
+        return new Date(time);
+    }
+    
+    public static String UUIDStringFormat(String UUIDStr) throws UUIDStringConversionException{
+        String UUIDStr2 = java.util.UUID.fromString(UUIDStr.replaceFirst( 
+            "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5")).toString();
+        if(Validators.isValidUUIDString(UUIDStr2)){
+            return UUIDStr2;
+        }
+        else{
+            throw new UUIDStringConversionException("Cannot convert string: '"+UUIDStr+"' to standard UUID string.");
+        }
     }
 }
