@@ -82,5 +82,43 @@ CREATE TABLE IF NOT EXISTS xprotocol.user_comment (
 
     PRIMARY KEY (user_uuid, user_comment_uuid)
 
-) WITH CLUSTERING ORDER BY (user_comment_uuid DESC); 
+) WITH CLUSTERING ORDER BY (user_comment_uuid DESC);
 
+
+CREATE TABLE IF NOT EXISTS xprotocol.protocol_by_user (
+
+    user_protocol_uuid timeuuid,
+
+    user_uuid timeuuid,
+
+    title text,
+
+    PRIMARY KEY (user_protocol_uuid)
+
+); 
+
+
+CREATE TABLE IF NOT EXISTS xprotocol.project_by_user (
+
+    user_project_uuid timeuuid,
+
+    user_uuid timeuuid,
+
+    title text,
+
+    PRIMARY KEY (user_project_uuid)
+
+);
+
+
+CREATE TABLE IF NOT EXISTS xprotocol.comment_by_user (
+
+    user_comment_uuid timeuuid,
+
+    user_uuid timeuuid,
+
+    path text,
+
+    PRIMARY KEY (user_comment_uuid)
+
+); 

@@ -178,7 +178,7 @@ public class UserController {
                 }
             }
             Map<String, Object> userProfileMap = new HashMap<>();
-            if(!Validators.isValidUUID(userUUIDStr)){
+            if(!Validators.isValidUUIDString(userUUIDStr)){
                 throw new InvalidUUIDException("Invalid user UUID: "+userUUIDStr);
             }
             User user = userSrv.findUserByUUID(userUUIDStr);
@@ -218,7 +218,7 @@ public class UserController {
         
         try{                       
             Map<String, Object> userProfileMap = new HashMap<>();
-            if(!Validators.isValidUUID(userUUIDStr)){
+            if(!Validators.isValidUUIDString(userUUIDStr)){
                 throw new InvalidUUIDException("Invalid user UUID: "+userUUIDStr);
             }
             User user = userSrv.findUserByUUID(userUUIDStr);
@@ -271,7 +271,7 @@ public class UserController {
         int rowAffected = -1;
         
         try{            
-            if(!Validators.isValidUUID(userUUIDStr)){
+            if(!Validators.isValidUUIDString(userUUIDStr)){
                 throw new InvalidUUIDException("Invalid user UUID: "+userUUIDStr);
             }
             
@@ -350,7 +350,7 @@ public class UserController {
         int rowAffected = -1;
         
         try{            
-            if(!Validators.isValidUUID(userUUIDStr)){
+            if(!Validators.isValidUUIDString(userUUIDStr)){
                 throw new InvalidUUIDException("Invalid user UUID: "+userUUIDStr);
             }
             

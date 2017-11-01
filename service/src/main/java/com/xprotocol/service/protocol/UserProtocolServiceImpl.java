@@ -5,7 +5,11 @@
  */
 package com.xprotocol.service.protocol;
 
+import com.xprotocol.cassandra.model.UserComment;
+import com.xprotocol.cassandra.model.UserProject;
 import com.xprotocol.cassandra.model.UserProtocol;
+import com.xprotocol.cassandra.repository.UserCommentRepository;
+import com.xprotocol.cassandra.repository.UserProjectRepository;
 import com.xprotocol.cassandra.repository.UserProtocolRepository;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +30,22 @@ public class UserProtocolServiceImpl implements UserProtocolService {
     @Autowired
     UserProtocolRepository protocolRepo;
     
+    @Autowired
+    UserCommentRepository commentRepo;
+    
+    @Autowired
+    UserProjectRepository projectRepo;
+    
+    @Override
+    public UserComment createComment(UUID userCommentUUID, UUID userUUID, String content, String path, String protocolTitle) {
+        return commentRepo.save(new UserComment(userCommentUUID, userUUID, content, path, protocolTitle));
+    }
+    
+    @Override
+    public UserProject createProject(UUID userProjectUUID, UUID userUUID, String title, String description, Set<UUID> protocolUUIDs, Set<String> protocolTitles, Set<String> keywords) {
+        return projectRepo.save(new UserProject(userProjectUUID, userUUID, title, description, protocolUUIDs, protocolTitles, keywords));
+    }
+    
     @Override
     public UserProtocol createProtocol(UUID userProtocolUUID, UUID userUUID, String title, String body, Set<UUID> projectUUIDs, 
                                         Set<String> projectTitles, Set<String> files, Map<String, String> comments, Set<String> versions, Set<String> keywords) {
@@ -33,7 +53,12 @@ public class UserProtocolServiceImpl implements UserProtocolService {
     }
     
     @Override
-    public List<UserProtocol> findProtocolByUserUUID(UUID userUUID){ 
+    public Iterable<UserProtocol> findProtocolByUserUUID(UUID userUUID){ 
         return protocolRepo.findUserProtocolByUserUUID(userUUID);
+    }
+    
+    @Override
+    public UserProtocol findProtocolByUserUUIDAndProtocolUUID(UUID userUUID, UUID userProtocolUUID) {
+        return protocolRepo.findUserProtocolByUserUUIDAndUserProtocolUUID(userUUID, userProtocolUUID);
     }
 }

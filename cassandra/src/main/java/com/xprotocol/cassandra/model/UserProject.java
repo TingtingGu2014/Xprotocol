@@ -25,7 +25,7 @@ public class UserProject {
     
     @PrimaryKeyColumn (name="user_project_uuid", type = PrimaryKeyType.CLUSTERED)
     @CassandraType(type = DataType.Name.UUID)
-    private UUID userProjectUUID = UUIDs.timeBased();
+    private UUID userProjectUUID;
     
     @PrimaryKeyColumn (name = "user_uuid", type = PrimaryKeyType.PARTITIONED)
     private UUID userUUID;
@@ -104,7 +104,8 @@ public class UserProject {
         this.keywords = keywords;
     }
 
-    public UserProject(UUID userUUID, String title, String description, Set<UUID> protocolUUIDs, Set<String> protocolTitles, Set<String> keywords) {
+    public UserProject(UUID userProjectUUID, UUID userUUID, String title, String description, Set<UUID> protocolUUIDs, Set<String> protocolTitles, Set<String> keywords) {
+        this.userProjectUUID = userProjectUUID;
         this.userUUID = userUUID;
         this.title = title;
         this.description = description;

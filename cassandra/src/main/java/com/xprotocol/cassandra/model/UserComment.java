@@ -25,7 +25,7 @@ public class UserComment {
     
     @PrimaryKeyColumn (name="user_comment_uuid", type = PrimaryKeyType.CLUSTERED)
     @CassandraType(type = DataType.Name.UUID)
-    private UUID userCommentUUID = UUIDs.timeBased();
+    private UUID userCommentUUID;
     
     @PrimaryKeyColumn (name = "user_uuid", type = PrimaryKeyType.PARTITIONED)
     private UUID userUUID;

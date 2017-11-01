@@ -9,6 +9,7 @@ import com.datastax.driver.core.utils.UUIDs;
 import com.fasterxml.uuid.EthernetAddress;
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.NoArgGenerator;
+import com.xprotocol.utils.exceptions.UUIDStringConversionException;
 import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.UUID;
@@ -23,8 +24,6 @@ public class UtilsHelper {
     
     public static UUID getUUIDBasedOnTime(){
         return UUIDs.timeBased();
-//        NoArgGenerator timeBasedGenerator = Generators.timeBasedGenerator();
-//        return timeBasedGenerator.generate();
     }
     
     public static UUID getUUIDBasedOnEthernet() {
@@ -58,11 +57,19 @@ public class UtilsHelper {
     
     /**
      * From https://gist.github.com/jeffjohnson9046/c663dd22bbe6bb0b3f5e
-     * @param String UUIDStr
+     * @param UUIDStr
      * @return UUID
+     * @throws com.xprotocol.utils.exceptions.UUIDStringConversionException
      */
-    public static UUID getUUIDFromString(String UUIDStr) {
-        return UUID.fromString(UUIDStr);
+    public static UUID getUUIDFromString(String UUIDStr) throws UUIDStringConversionException {
+        UUID uuid;
+        try{
+            uuid = UUID.fromString(UUIDStr);
+        }
+        catch(Exception ex){
+            uuid = UUID.fromString(UUIDStringFormat(UUIDStr));
+        }
+        return uuid;
     }
     
     /**
@@ -73,5 +80,16 @@ public class UtilsHelper {
     public static Date getDateFromUUID(UUID uuid) {
         long time = (uuid.timestamp() - NUM_100NS_INTERVALS_SINCE_UUID_EPOCH) / 10000;
         return new Date(time);
+    }
+    
+    public static String UUIDStringFormat(String UUIDStr) throws UUIDStringConversionException{
+        String UUIDStr2 = java.util.UUID.fromString(UUIDStr.replaceFirst( 
+            "(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5")).toString();
+        if(Validators.isValidUUIDString(UUIDStr2)){
+            return UUIDStr2;
+        }
+        else{
+            throw new UUIDStringConversionException("Cannot convert string: '"+UUIDStr+"' to standard UUID string.");
+        }
     }
 }
