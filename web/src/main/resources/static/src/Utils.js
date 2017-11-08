@@ -252,3 +252,90 @@ export function getAllUserRoles() {
         console.log(error);
     }); 
 }
+
+export function getUserProtocol(userUUID, protocolUUID){
+    
+    if(isEmpty(protocolUUID)){
+        alert('The protocol UUID is empty!')
+        return false
+    }
+    
+    var url = ''
+    if(isEmpty(userUUID)){
+        url = '/api/protocols/'+protocolUUID
+    }
+    else{
+        url = '/api/users/' + userUUID +'/protocols/'+protocolUUID
+    }
+    
+    return axios({
+        method: 'get',
+        url: url,
+        dataType: 'json',
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+    })
+    .then( (response) => {
+        var status = response.status;
+        if(status == 200 || status == "200"){              
+            return response.data
+        }
+        else{
+            alert("status " + status + ", cannot get the roles!");
+        }                                   
+    })
+    .catch( (error) => {
+        console.log(error);
+    }); 
+}
+
+export function saveUserProtocol(protocol){
+    
+    if(isEmpty(protocol)){
+        alert('The protocol data is empty!')
+        return false
+    }
+    
+    var protocolUUID = protocol.protocolUUID
+    var userUUID = protocol.userUUID
+    delete protocol.loggedIn
+    delete protocol.max_height
+    delete protocol.max_width
+    delete protocol.min_height
+    delete protocol.min_width 
+    
+    if(isEmpty(protocolUUID)){
+        alert('The protocol UUID is empty!')
+        return false
+    }
+    
+//    var url = '/api/users/' + userUUID +'/protocols/'+protocolUUID;
+    
+    var url = ''
+    if(isEmpty(userUUID)){
+        url = '/api/protocols/'+protocolUUID
+    }
+    else{
+        url = '/api/users/' + userUUID +'/protocols/'+protocolUUID
+    }
+    
+    return axios({
+        method: 'post',
+        url: url,
+        dataType: 'json',
+        data: protocol,
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+    })
+    .then( (response) => {
+        var status = response.status;
+        if(status == 200 || status == "200"){              
+            return response.data
+        }
+        else{
+            alert("status " + status + ", cannot get the roles!");
+        }                                   
+    })
+    .catch( (error) => {
+        console.log(error);
+    });
+    
+}

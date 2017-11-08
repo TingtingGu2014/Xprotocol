@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
  * @author Tao Zhao
  */
 @Repository
-public interface CommentByUserRepository1 extends CassandraRepository<CommentByUser> {
+public interface CommentByUserRepository extends CassandraRepository<CommentByUser> {
 //    @Query("select * from user_details where user_id = ?0 LIMIT ?1 ")
     
 }

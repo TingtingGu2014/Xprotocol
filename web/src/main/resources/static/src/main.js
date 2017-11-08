@@ -12,7 +12,8 @@ Vue.component('table-column', TableColumn);
  
 import App from './App.vue'
 import routejs from './Router.js'
-import userModule from './userModule.js';
+import userModule from './UserModule.js';
+import protocolModule from './ProtocolModule.js'
 
 var Utils = require('./Utils')
 
@@ -25,6 +26,7 @@ const router = new VueRouter({
 const store = new Vuex.Store({
     modules: {
         userModule : userModule,
+        protocolModule : protocolModule,
     },
 });
 

@@ -1,12 +1,7 @@
 <template id="editor-template">
     <div class="container">
         <form method="post">
-            <h3 style="font-weight: bold">{{heading}}</h3>
-            <textarea v-bind:id="editorName"></textarea>
-            <br>
-            <button type="button" class="btn btn-outline-success btn-lg">
-                <span style="font-weight: bold">Save</span>
-            </button>
+            <textarea v-bind:id="editorName" v-model="body"></textarea>   
         </form>
     </div>
 </template>     
@@ -15,9 +10,13 @@
             
     export default {
         
-        props: {
-            editorName: String,
-            heading: String,
+        props: {            
+            editorName: String,            
+            body: String,
+            max_height: Number,
+            max_width: Number,
+            min_height: Number,
+            min_width: Number,
         },
         data: function () {
             return {
@@ -25,6 +24,7 @@
             }
         },    
         mounted: function() {
+            var vm = this
             tinymce.init({
                 selector: '#'+this.editorName,
                 plugins: [
@@ -35,11 +35,20 @@
                 toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright ' +
                          ' alignjustify | bullist numlist outdent indent | link image | print preview media fullpage ' +
                          ' | forecolor backcolor emoticons | code ',
-                max_height: 500,
-                max_width: 500,
-                min_height: 300,
-                min_width: 400 
+                max_height: this.max_height,
+                max_width: this.max_width,
+                min_height: this.min_height,
+                min_width: this.min_width, 
+                init_instance_callback: function (editor) {
+                    editor.on('blur', function (e) {
+                        e.preventDefault()
+                        var content = editor.getContent(self.value)                        
+                        vm.$emit('content-change', content)
+                    });
+                }
             });
+            
+            tinymce.on
         },
         computed: {
             

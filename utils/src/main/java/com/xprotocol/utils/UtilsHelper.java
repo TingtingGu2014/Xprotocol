@@ -52,7 +52,11 @@ public class UtilsHelper {
      */
     public static UUID getUUIDFromBytes(byte[] bytes) {
 
-        return UUID.nameUUIDFromBytes(bytes);
+        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+        Long high = byteBuffer.getLong();
+        Long low = byteBuffer.getLong();
+  
+        return new UUID(high, low);
     }
     
     /**
