@@ -4,7 +4,7 @@
         <Protocol
             :editorName = "editorName"
             :userUUID = "userUUID"
-            :protocolUUID = "protocolUUID"
+            :userProtocolUUID = "userProtocolUUID"
         >            
         </Protocol>
     </div>
@@ -21,7 +21,7 @@
       data: function(){
         return {
           name: 'Home',
-          protocolUUID: '70b99490-bdff-11e7-abbd-8d88b42d3590',
+          userProtocolUUID: '70b99490-bdff-11e7-abbd-8d88b42d3590',
           userUUID: '70b99491-bdff-11e7-abbd-8d88b42d3590',
           editorName: 'homeProtocolEditor',
           loggedIn: loggedIn,

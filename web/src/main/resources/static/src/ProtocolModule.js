@@ -10,7 +10,7 @@ const protocolModule = {
   // This makes your getters, mutations, and actions accessed by, eg: 'myModule/myModularizedNumber' instead of mounting getters, mutations, and actions to the root namespace.
   namespaced: true,
   state: {
-      protocols: [],
+      protocols: {},
   },
   getters: {    
         getProtocols: state => state.protocols,
@@ -18,9 +18,15 @@ const protocolModule = {
             return state.protocols[userUUID]
         },
         getProtocolsByUserUUIDANDProtocolUUID: state => (userUUID, protocolUUID) => {
-            var protocols = state.protocols[userUUID]
-            if(!Utils.isEmpty(protocols)){
-                return protocols[protocolUUID]
+            var protocols = state.protocols
+            console.log('loading protocol from store...\n')
+            console.log(state)
+            if(Utils.isEmpty(protocols)){
+                return null
+            }
+            var userProtocols = protocols[userUUID]
+            if(!Utils.isEmpty(userProtocols)){
+                return userProtocols[protocolUUID]
             }
             return null
         }
@@ -35,13 +41,17 @@ const protocolModule = {
     setProtocolByUserUUIDANDProtocolUUID(state, protocol) {
         var protocols = state.protocols
         if(Utils.isEmpty(protocolsByUser)){
-            protocols = []
+            protocols = {}
         }
         var protocolsByUser = protocols[protocol.userUUID]
         if(Utils.isEmpty(protocolsByUser)){
-            protocolsByUser = []
+            protocolsByUser = {}
         }
         protocolsByUser[protocol.userProtocolUUID] = protocol
+        protocols[protocol.userUUID] = protocolsByUser;
+        state.protocols = protocols
+        console.log('store state ...')
+        console.log(state)
     },
   }
 }

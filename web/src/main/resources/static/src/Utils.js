@@ -253,19 +253,19 @@ export function getAllUserRoles() {
     }); 
 }
 
-export function getUserProtocol(userUUID, protocolUUID){
+export function getUserProtocol(userUUID, userProtocolUUID){
     
-    if(isEmpty(protocolUUID)){
+    if(isEmpty(userProtocolUUID)){
         alert('The protocol UUID is empty!')
         return false
     }
     
     var url = ''
     if(isEmpty(userUUID)){
-        url = '/api/protocols/'+protocolUUID
+        url = '/api/protocols/'+userProtocolUUID
     }
     else{
-        url = '/api/users/' + userUUID +'/protocols/'+protocolUUID
+        url = '/api/users/' + userUUID +'/protocols/'+userProtocolUUID
     }
     
     return axios({
@@ -295,7 +295,7 @@ export function saveUserProtocol(protocol){
         return false
     }
     
-    var protocolUUID = protocol.protocolUUID
+    var userProtocolUUID = protocol.userProtocolUUID
     var userUUID = protocol.userUUID
     delete protocol.loggedIn
     delete protocol.max_height
@@ -303,19 +303,17 @@ export function saveUserProtocol(protocol){
     delete protocol.min_height
     delete protocol.min_width 
     
-    if(isEmpty(protocolUUID)){
+    if(isEmpty(userProtocolUUID)){
         alert('The protocol UUID is empty!')
         return false
     }
     
-//    var url = '/api/users/' + userUUID +'/protocols/'+protocolUUID;
-    
     var url = ''
     if(isEmpty(userUUID)){
-        url = '/api/protocols/'+protocolUUID
+        url = '/api/protocols/'+userProtocolUUID
     }
     else{
-        url = '/api/users/' + userUUID +'/protocols/'+protocolUUID
+        url = '/api/users/' + userUUID +'/protocols/'+userProtocolUUID
     }
     
     return axios({
