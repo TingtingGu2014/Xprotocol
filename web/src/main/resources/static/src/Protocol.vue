@@ -1,10 +1,13 @@
 <template>
     <div>
-    
         <div class="container">    
             <div class="row">
                 <div class="col">
-                    <br><h4>{{title}}</h4><br>
+                <div class="card " style="margin-top: 100px" v-bind:style="{ height: (Number(height)+320)+'px'}">
+                        <div class="card-block" >
+                    <h4 class="card-header mb-3 text-center" v-bind:style="{}" style="font-weight: bolder; font-size: 15px; color: midnightblue">
+                        <input class="form-control text-center" type="text" v-model="title" id="example-text-input">
+                    </h4>
                     <VueTinymce id='terms' @content-change="contentChange"
                         :body='body' 
                         :max_height='max_height'
@@ -13,26 +16,35 @@
                         :min_width='min_width'
                         :height='height'
                         :width='width'
-                        :showPreview='showPreview'
-                    ></VueTinymce> 
+                    ></VueTinymce>                     
+                    </div>
+                    <div v-if="!preview" class="text-center" style="border-top: lightgray solid thin ">
+                        <a href="#" class="btn" v-on:click="togglePreview">Show Preview</a>
+                    </div>
+                    </div>
                 </div>
 
-                <div class="col" v-if="showPreview">
-                    <div class="card " style="margin-top: 100px" v-bind:style="{width: width+'px', height: (Number(height)+180)+'px'}">
+                <div class="col" v-if="preview">
+                    <div class="card " style="margin-top: 100px" v-bind:style="{width: width+'px', height: (Number(height)+320)+'px'}">
                         <div class="card-block" style="overflow:scroll">
                           <h4 class="card-header mb-3 text-center" style="font-weight: bolder; font-size: 15px; color: midnightblue">{{title}}</h4>
                           <p id="pbody" v-html="body"></p>
+                        </div>
+                        <div v-if="preview" class="text-center">
+                            <a href="#" class="btn" v-on:click="togglePreview">Hide Preview</a>
                         </div>
                     </div>       
                 </div>
             </div>
         </div>
         <br>
-        <button type="button" class="btn btn-outline-success btn-lg"
-            v-on:click.prevent="saveUserProtocol"
-        >
-            <span style="font-weight: bold">Save</span>
-        </button>
+        <div class="text-center">
+            <button type="button" class="btn btn-outline-success btn-lg"
+                v-on:click.prevent="saveUserProtocol"
+            >
+                <span style="font-weight: bold">Save</span>
+            </button>
+        </div>
     </div>
 </template>
 
@@ -68,6 +80,7 @@
             comments: null,
             versions: [],
             keywords: [],
+            preview: this.showPreview ? this.showPreview : true,
         }
     },
     computed: {
@@ -113,12 +126,14 @@
             this.body = content
             $('#pbody').html(content)
         },
+        togglePreview: function(){
+            this.preview = !(this.preview)
+        }
     },
     components: {
         VueTinymce
     },
     created: function() {
-
         var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.userUUID, this.userProtocolUUID)
 
         if(!Utils.isEmpty(protocol)){
@@ -135,7 +150,7 @@
             alert("oops, something happened")
             console.log(err)
         });
-        return false   
+        return false     
     },
 }
 </script>
