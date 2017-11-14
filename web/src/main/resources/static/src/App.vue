@@ -36,15 +36,7 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
-}
-
-#ok {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  
 }
 
 h1, h2 {
@@ -57,12 +49,14 @@ ul {
 }
 
 li {
-  display: inline-block;
-  margin: 0 10px;
+  padding: 0;
+  margin: 0;
+    text-align: left;
 }
 
 a {
   color: #42b983;
+  margin-right: 5px;
 }
 
 table.table-component__table {

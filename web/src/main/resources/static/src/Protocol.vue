@@ -1,14 +1,32 @@
 <template>
-    <div>    
-        <VueTinymce id='terms' @content-change="contentChange"
-            :body='body' 
-            :max_height='max_height'
-            :max_width='max_width'
-            :min_height='min_height'
-            :min_width='min_width'
-            :height='height'
-            :width='width'
-        ></VueTinymce>
+    <div>
+    
+        <div class="container">    
+            <div class="row">
+                <div class="col">
+                    <br><h4>{{title}}</h4><br>
+                    <VueTinymce id='terms' @content-change="contentChange"
+                        :body='body' 
+                        :max_height='max_height'
+                        :max_width='max_width'
+                        :min_height='min_height'
+                        :min_width='min_width'
+                        :height='height'
+                        :width='width'
+                        :showPreview='showPreview'
+                    ></VueTinymce> 
+                </div>
+
+                <div class="col" v-if="showPreview">
+                    <div class="card " style="margin-top: 100px" v-bind:style="{width: width+'px', height: (Number(height)+180)+'px'}">
+                        <div class="card-block" style="overflow:scroll">
+                          <h4 class="card-header mb-3 text-center" style="font-weight: bolder; font-size: 15px; color: midnightblue">{{title}}</h4>
+                          <p id="pbody" v-html="body"></p>
+                        </div>
+                    </div>       
+                </div>
+            </div>
+        </div>
         <br>
         <button type="button" class="btn btn-outline-success btn-lg"
             v-on:click.prevent="saveUserProtocol"
@@ -31,6 +49,7 @@
         userProtocolUUID: String,
         userUUID: String,
         editorName: String,
+        showPreview: Boolean,
     },
     data () {
         return {
@@ -92,14 +111,14 @@
         }),
         contentChange: function(content){
             this.body = content
+            $('#pbody').html(content)
         },
-        changed (editor, content) {}
     },
     components: {
         VueTinymce
     },
     created: function() {
-            
+
         var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.userUUID, this.userProtocolUUID)
 
         if(!Utils.isEmpty(protocol)){
@@ -116,13 +135,11 @@
             alert("oops, something happened")
             console.log(err)
         });
-        return false
+        return false   
     },
-  }
+}
 </script>
 
 <style>
-   p{
-    color: #69C;
-  }
+
 </style>

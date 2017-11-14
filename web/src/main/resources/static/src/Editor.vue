@@ -50,7 +50,19 @@
                 min_height: this.min_height,
                 min_width: this.min_width,
                 init_instance_callback: function (editor) {
-                    editor.on('blur', function (e) {
+                    editor.on('Blur', function (e) {
+                        e.preventDefault()
+                        var content = editor.getContent(self.value) 
+                        vm.$emit('content-blur', content)
+                    });
+                    
+                    editor.on('KeyUp', function (e) {
+                        e.preventDefault()
+                        var content = editor.getContent(self.value) 
+                        vm.$emit('content-change', content)
+                    });
+                    
+                    editor.on('MouseUp', function (e) {
                         e.preventDefault()
                         var content = editor.getContent(self.value) 
                         vm.$emit('content-change', content)
