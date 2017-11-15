@@ -25,7 +25,7 @@ public class UserProtocol {
     
     @PrimaryKeyColumn (name="user_protocol_uuid", type = PrimaryKeyType.CLUSTERED)
     @CassandraType(type = DataType.Name.UUID)
-    private UUID userProtocolUUID = UUIDs.timeBased();
+    private UUID userProtocolUUID;
     
     @PrimaryKeyColumn (name = "user_uuid", type = PrimaryKeyType.PARTITIONED)
     private UUID userUUID;

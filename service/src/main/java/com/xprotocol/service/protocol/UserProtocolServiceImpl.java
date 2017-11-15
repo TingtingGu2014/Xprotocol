@@ -11,6 +11,7 @@ import com.xprotocol.cassandra.model.UserProtocol;
 import com.xprotocol.cassandra.repository.UserCommentRepository;
 import com.xprotocol.cassandra.repository.UserProjectRepository;
 import com.xprotocol.cassandra.repository.UserProtocolRepository;
+import com.xprotocol.service.exceptions.EntityDoesNotExistException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,7 +59,23 @@ public class UserProtocolServiceImpl implements UserProtocolService {
     }
     
     @Override
+    public List<UserProtocol> findProtocolByUserUUID(String userUUIDStr){ 
+        return protocolRepo.findUserProtocolByUserUUID(UUID.fromString(userUUIDStr));
+    }
+    
+    @Override
     public UserProtocol findProtocolByUserUUIDAndProtocolUUID(UUID userUUID, UUID userProtocolUUID) {
         return protocolRepo.findUserProtocolByUserUUIDAndUserProtocolUUID(userUUID, userProtocolUUID);
     }
+    
+    @Override
+    public UserProtocol findProtocolByUserUUIDAndProtocolUUID(String userUUIDStr, String userProtocolUUIDStr) {
+        return protocolRepo.findUserProtocolByUserUUIDAndUserProtocolUUID(UUID.fromString(userUUIDStr), UUID.fromString(userProtocolUUIDStr));
+    }
+    
+    @Override
+    public UserProtocol updateProtocol(UserProtocol protocol) {
+        return protocolRepo.save(protocol);
+    }
+    
 }

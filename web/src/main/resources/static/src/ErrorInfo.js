@@ -16,6 +16,10 @@ const errors =
             "title": "Page Not Found!",
             "message": "Sorry, the page you requested does NOT exist!",
         },
+        "405": {
+            "title": "Method Not Allowed!",
+            "message": "Sorry, the method is NOT allowed!",
+        },
         "500": {
             "title": "Server internal error!",
             "message": "Sorry, the server is not responding, please try again later!",
