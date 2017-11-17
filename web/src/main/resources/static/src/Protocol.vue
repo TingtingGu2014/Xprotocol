@@ -150,7 +150,6 @@
             alert("oops, something happened")
             console.log(err)
         });
-        return false     
     },
 }
 </script>

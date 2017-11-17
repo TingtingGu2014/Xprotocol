@@ -5,14 +5,13 @@
  */
 package com.xprotocol.web.config;
 
-import com.xprotocol.persistence.model.User;
-import com.xprotocol.service.user.UserService;
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Profile;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -21,6 +20,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * @author zhao0677
  */
 public class XprotocolWebUtils {
+    
+    @Autowired
+    private static Environment env;
     
     public static String getContextUrlFromRequest(HttpServletRequest request){
         String contextUrl = request.getServletPath();
@@ -49,5 +51,19 @@ public class XprotocolWebUtils {
             }
         }
         return false;
+    }
+    
+    public static String getEditorFilePath(String editorUploadDirPath, String fileBaseName) throws IOException{
+        String path = null;
+        File upldDirFile = new File(editorUploadDirPath);
+        if(!upldDirFile.isDirectory()){
+            throw new IOException("The editor file upload directory is wrong: "+editorUploadDirPath);
+        }
+        for (File file : upldDirFile.listFiles()) {
+            if(file.getName().contains(fileBaseName)){
+                return file.getAbsolutePath();
+            }
+        }
+        return path;
     }
 }

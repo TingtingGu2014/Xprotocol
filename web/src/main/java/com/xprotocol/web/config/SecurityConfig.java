@@ -64,18 +64,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
-                .antMatchers("/css/**","/images/**","/img/**","/js/**","/dist/**","/src/**").permitAll()
-                .antMatchers("/home","/index.html","/","/index","/error").permitAll()
-                .antMatchers("/login", "/signup", "/api/signUp", "/errors/**", "/api/users/{^[\\\\d]$}/protocols/**").permitAll()
-//                .antMatchers("/users").permitAll()
-                .antMatchers("/api/admin/**").hasAuthority("admin")
-                .anyRequest().authenticated()
-                .and().requestCache().requestCache(new NullRequestCache())
-                .and().httpBasic()
-                .and().formLogin().usernameParameter("email").passwordParameter("password").loginPage("/login").defaultSuccessUrl("/home")
-                .and().logout().logoutSuccessUrl("/home")
-                .and().csrf().requireCsrfProtectionMatcher(csrfRequestMatcher).csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+            .authorizeRequests()
+            .antMatchers("/css/**","/images/**","/img/**","/js/**","/dist/**","/src/**").permitAll()
+            .antMatchers("/home","/index.html","/","/index","/error").permitAll()
+            .antMatchers("/login", "/signup", "/api/signUp", "/errors/**", "/api/users/{^[\\\\d]$}/protocols/**", "/api/editor/images", "/editor/images/**").permitAll()
+            .antMatchers("/api/admin/**").hasAuthority("admin")
+            .anyRequest().authenticated()
+            .and().requestCache().requestCache(new NullRequestCache())
+            .and().httpBasic()
+            .and().formLogin().usernameParameter("email").passwordParameter("password").loginPage("/login").defaultSuccessUrl("/home")
+            .and().logout().logoutSuccessUrl("/home")
+            .and().csrf().requireCsrfProtectionMatcher(csrfRequestMatcher).csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 //                .and().csrf().disable();
     }
 }

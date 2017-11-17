@@ -1,6 +1,6 @@
 <template>
     <div>
-        <br><h4>Check out the newly added protocols!</h4><br>
+        
         <Protocol
             :editorName = "editorName"
             :userUUID = "userUUID"
