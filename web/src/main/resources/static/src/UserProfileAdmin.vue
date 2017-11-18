@@ -289,7 +289,7 @@
             displayRoles: function (event) {
                 Utils.getAllUserRoles()
                 .then((data) => {
-                    alert(data)
+//                    alert(data)
                     this.allRoles = data;
                 })
                 .catch((err) => {
