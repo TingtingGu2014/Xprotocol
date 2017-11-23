@@ -136,7 +136,8 @@ export function signIn(email, password) {
     .then( (response) => {
         var status = response.status;
         if(status == 200 || status == "200"){
-            localStorage.userInfo = JSON.stringify(response.data)      
+            var data = response.data
+            localStorage.userInfo = JSON.stringify(data) 
             document.location.href = '/home'
         }
         else{
@@ -329,11 +330,44 @@ export function saveUserProtocol(protocol){
             return response.data
         }
         else{
-            alert("status " + status + ", cannot get the roles!");
+            alert("status " + status + ", cannot get the protocol information!");
         }                                   
     })
     .catch( (error) => {
         console.log(error);
     });
     
+}
+
+export function getProtocolsByUserUUID(userUUID){
+    if(isEmpty(userUUID)){
+        alert('The user UUID is empty!')
+        return false
+    }
+    
+    return axios({
+        method: 'get',
+        url: '/api/users/'+userUUID+'/protocols',
+        dataType: 'json',
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+    })
+    .then( (response) => {
+        var status = response.status;
+        if(status == 200 || status == "200"){              
+            return response.data
+        }
+        else{
+            alert("status " + status + ", cannot get the protocols!");
+        }                                   
+    })
+    .catch( (error) => {
+        console.log(error);
+    });
+}
+
+export function getTimeUUID(){
+    var UUID = require('uuid-js')
+    var date = new Date().getTime();
+    var uuidFirst = UUID.fromTime(date, false);
+    return uuidFirst.toString()
 }
