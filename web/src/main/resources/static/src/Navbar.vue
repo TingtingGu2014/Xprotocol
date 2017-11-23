@@ -6,23 +6,23 @@
     <a class="navbar-brand" href="#">XProtocol!</a>
 
     <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
-      <ul class="navbar-nav mr-auto mt-2 mt-md-0">
-        <li class="nav-item active my-auto">          
-            <router-link :to="{ name: 'home'}"><span class="fa fa-home"></span> &nbsp;Home</router-link>
-        </li>
-        <li class="nav-item">
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="text" placeholder="Search Protocols">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><i class="fa fa-search"></i></button>
-                <!--<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>-->
-            </form>
-        </li>
-        <li class="nav-item form-inline" v-if="isAdminUser">                       
-            <button class="btn btn-outline-success my-2 my-sm-0" type="button" onclick="location.href = '/admin';"><i class="fa fa-sun-o"></i>&nbsp;Admin</button>
-        </li>
-      </ul>
+        <ul class="navbar-nav mr-auto mt-2 mt-md-0">
+            <li class="nav-item active my-auto">          
+                <router-link :to="{ name: 'home'}"><span class="fa fa-home"></span> &nbsp;Home</router-link>
+            </li>
+            <li class="nav-item">
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Search Protocols">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><i class="fa fa-search">&nbsp;&nbsp;</i></button>
+                    <!--<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>-->
+                </form>
+            </li>
+            <li class="nav-item form-inline" v-if="isAdminUser">                       
+                <button class="btn btn-outline-success my-2 my-sm-0" type="button" onclick="location.href = '/admin';"><i class="fa fa-sun-o"></i>&nbsp;Admin</button>
+            </li>
+        </ul>
         
-      <login-view></login-view>
+        <login-view></login-view>
     </div>
   </nav>
 </template>

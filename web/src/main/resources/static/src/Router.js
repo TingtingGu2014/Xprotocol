@@ -7,6 +7,8 @@ const UserProfileAdmin = resolve => require(['./UserProfileAdmin.vue'], resolve)
 const SignUp = resolve => require(['./SignUp.vue'], resolve);
 const PageNotFound = resolve => require(['./PageNotFound.vue'], resolve);
 const UserList = resolve => require(['./UserList.vue'], resolve);
+const Protocol = resolve => require(['./Protocol.vue'], resolve);
+const ProtocolList = resolve => require(['./ProtocolList.vue'], resolve);
 const Admin = resolve => require(['./Admin.vue'], resolve);
 const Errors = resolve => require(['./Errors.vue'], resolve);
 
@@ -17,6 +19,8 @@ const routes = [
     { path: '/signup' , name: 'signUp', component: SignUp,  meta:{signUpType: 'signup'}},
     { path: '/login' , name: 'login', component: SignUp, meta:{signUpType: 'login'}},
     { path: '/userList', name: 'userList', component: UserList },
+    { path: '/users/:userUUID/protocols', name: 'userProtocolList', component: ProtocolList },
+    { path: '/users/:userUUID/protocols/:userProtocolUUID', name: 'userProtocol', component: Protocol },
     { path: '/admin', name: 'Admin', component: Admin },
     { path: '/home', redirect: '/' },
     { path: '/errors/:errorCode', name: 'errors', component: Errors},
