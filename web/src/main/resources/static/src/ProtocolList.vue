@@ -2,7 +2,7 @@
     
     <div class="container"><br><br>
         <h3>List of Protocols</h3>
-        <router-link :to="{ name: 'userProtocol'}"><span class="fa fa-user"></span>&nbsp;<i class="fa fa-plus-square-o" aria-hidden="true"></i>New Protocol</router-link>
+        <router-link :to="{ path: 'users/'+userUUID+'/protocols/new'}">&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus-square-o" aria-hidden="true"></i>&nbsp;New Protocol</router-link>
         <VueDataTable 
             :tableData = "tableData"
             :tableColumns = "tableColumns"
