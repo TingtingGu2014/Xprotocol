@@ -35,8 +35,12 @@ const protocolModule = {
     setProtocols(state, protocols) {
         state.protocols = protocols
     },
-    setProtocolsByUserUUID(state, protocols) {
-        state.protocols[protocol.userUUID] = protocols
+    setProtocolsByUserUUID(state, userUUID, protocols) {
+        var protocols = state.protocols
+        if(Utils.isEmpty(protocols)){
+            protocols = {}
+        }
+        protocols[userUUID] = protocols
     },
     setProtocolByUserUUIDANDProtocolUUID(state, protocol) {
         var protocols = state.protocols
