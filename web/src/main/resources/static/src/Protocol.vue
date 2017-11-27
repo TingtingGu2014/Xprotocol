@@ -40,18 +40,26 @@
                 </div>
             </div>
             <div class="row">
-                <fieldset class="form-group">
-                    <legend>Protocol Files:</legend>
-                    <ul class="list-group">
-                        <li class="list-group-item" v-if="!files || files.length == 0">There are no file associated with this protocol</li>
-                        <li class="list-group-item" v-else v-for="file in files">{{file}}</li>
-                    </ul>
-                    <div class="form-group">
-                        <label for="uploadFileForProtocol">Example file input</label>
-                        <input type="file" class="form-control-file" id="uploadFileForProtocol">
-                        <button type="button" class="btn btn-primary">Add a new file</button>
-                    </div>
-                </fieldset>
+                <div class="col">
+                <br><br>
+                    <fieldset class="form-group text-center" style="width:100%;">
+                        <legend>Protocol Files:</legend>
+                        <div>
+                            <ul class="list-group">
+                                <li class="list-group-item" v-if="!files || files.length == 0">There are no file associated with this protocol</li>
+                                <li class="list-group-item" v-else v-for="file in files">{{file}}</li>
+                            </ul>
+                            <br><br>
+                        </div>
+                        <div class="form-group">
+                            <form class="form-inline">
+                            <label for="uploadFileForProtocol">Example file input</label>
+                            <input type="file" class="form-control-file" id="uploadFileForProtocol">
+                            <button type="button" class="btn btn-primary">Add a new file</button>
+                            </form>
+                        </div>
+                    </fieldset>
+                </div>
             </div>
         </div>
         <br>
