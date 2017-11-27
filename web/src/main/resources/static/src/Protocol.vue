@@ -2,39 +2,56 @@
     <div>
         <div class="container">    
             <div class="row">
-                <div class="col">
-                <div class="card " style="margin-top: 100px" v-bind:style="{ height: (Number(height)+320)+'px'}">
-                        <div class="card-block" >
-                    <h4 class="card-header mb-3 text-center" v-bind:style="{}" style="font-weight: bolder; font-size: 15px; color: midnightblue">
-                        <input class="form-control text-center" type="text" v-model="title" id="example-text-input">
-                    </h4>
-                    <VueTinymce id='terms' @content-change="contentChange"
-                        :body='body' 
-                        :max_height='max_height'
-                        :max_width='max_width'
-                        :min_height='min_height'
-                        :min_width='min_width'
-                        :height='height'
-                        :width='width'
-                    ></VueTinymce>                     
-                    </div>
-                    <div v-if="!preview" class="text-center" style="border-top: lightgray solid thin ">
-                        <a href="#" class="btn" v-on:click="togglePreview">Show Preview</a>
-                    </div>
+                <div class="col" v-if="showEditor">
+                    <div class="card " style="margin-top: 100px" v-bind:style="{ height: (Number(height)+320)+'px'}">
+                            <div class="card-block" >
+                                <h4 class="card-header mb-3 text-center" v-bind:style="{}" style="font-weight: bolder; font-size: 15px; color: midnightblue">
+                                    <input class="form-control text-center" type="text" v-model="title" id="example-text-input" required>
+                                </h4>
+                                <VueTinymce id='terms' @content-change="contentChange"
+                                    :body='body' 
+                                    :max_height='max_height'
+                                    :max_width='max_width'
+                                    :min_height='min_height'
+                                    :min_width='min_width'
+                                    :height='height'
+                                    :width='width'
+                                ></VueTinymce>                     
+                            </div>
+    <!--                    <div v-if="!preview" class="text-center" style="border-top: lightgray solid thin ">
+                            <a href="#" class="btn" v-on:click="toggleEditor">Show Preview</a>
+                        </div>-->
                     </div>
                 </div>
 
-                <div class="col" v-if="preview">
-                    <div class="card " style="margin-top: 100px" v-bind:style="{width: width+'px', height: (Number(height)+320)+'px'}">
+                <div class="col">
+                    <div class="card " style="margin-top: 100px" v-bind:style="{height: (Number(height)+320)+'px'}">
                         <div class="card-block" style="overflow:scroll">
                           <h4 class="card-header mb-3 text-center" style="font-weight: bolder; font-size: 15px; color: midnightblue">{{title}}</h4>
                           <p id="pbody" v-html="body"></p>
                         </div>
-                        <div v-if="preview" class="text-center">
-                            <a href="#" class="btn" v-on:click="togglePreview">Hide Preview</a>
+                        <div class="text-center">
+                            <a href="#" class="btn" v-on:click="toggleEditor">
+                                <span v-if="showEditor">Hide Editor</span>
+                                <span v-else>Show Editor</span>
+                            </a>
                         </div>
                     </div>       
                 </div>
+            </div>
+            <div class="row">
+                <fieldset class="form-group">
+                    <legend>Protocol Files:</legend>
+                    <ul class="list-group">
+                        <li class="list-group-item" v-if="!files || files.length == 0">There are no file associated with this protocol</li>
+                        <li class="list-group-item" v-else v-for="file in files">{{file}}</li>
+                    </ul>
+                    <div class="form-group">
+                        <label for="uploadFileForProtocol">Example file input</label>
+                        <input type="file" class="form-control-file" id="uploadFileForProtocol">
+                        <button type="button" class="btn btn-primary">Add a new file</button>
+                    </div>
+                </fieldset>
             </div>
         </div>
         <br>
@@ -74,7 +91,7 @@
                 comments: null,
                 versions: [],
                 keywords: [],
-                preview: true,
+                showEditor: false,
             }
         },
         computed: {
@@ -90,10 +107,20 @@
                 var protocolData = JSON.parse(JSON.stringify(this.$data))
                 protocolData.userUUID = this.userUUID
                 protocolData.userProtocolUUID = this.userProtocolUUID
+                
+                if(Utils.isEmpty(protocolData.title)){
+                    alert('Protocol titile cannot be empty!')
+                    return false;
+                }
+                
+                if(protocolData.userProtocolUUID === 'new'){
+                    protocolData.userProtocolUUID = Utils.getTimeUUID()
+                }
 
                 Utils.saveUserProtocol(protocolData)
                 .then((data) => {
                     this.resetUserProfile(data)
+                    document.location.href = '/home'
                 })
                 .catch((err) => {
                     alert("oops, something happened")
@@ -120,8 +147,8 @@
                 this.body = content
                 $('#pbody').html(content)
             },
-            togglePreview: function(){
-                this.preview = !(this.preview)
+            toggleEditor: function(){
+                this.showEditor = !(this.showEditor)
             }
         },
         components: {
@@ -129,15 +156,23 @@
         },
         created: function() {
             
-            var userUUID = this.$route.params.userUUID
-            if(Utils.isEmpty(userUUID)){
-                var message = 'User UUID cannot be empty!'
-                alert(message)
-                sessionStorage.errorMessage = message
-                document.location.href = '/errors/400'
-                return false
+            try{
+                var userUUID = this.$route.params.userUUID
+                if(Utils.isEmpty(userUUID)){
+                    throw new EmptyUserUUIDException(400, 'User UUID cannot be empty!')
+                }
+            }
+            catch(exception){
+                if (e instanceof EmptyUserUUIDException) {
+                    sessionStorage.errorMessage = message
+                    document.location.href = '/errors/400'
+                    return false
+                } else {
+                    return false;
+                }
             }
             
+            // When userProtocolUUID == 'new' this is a new protocol
             var userProtocolUUID = this.$route.params.userProtocolUUID
             if(Utils.isEmpty(userProtocolUUID) || userProtocolUUID == 'new'){
                 return false
@@ -164,5 +199,7 @@
 </script>
 
 <style>
-
+.card {
+    border: 2px solid lightblue;
+}
 </style>

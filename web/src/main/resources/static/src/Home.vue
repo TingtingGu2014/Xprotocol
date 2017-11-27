@@ -1,7 +1,7 @@
 <template>
     <div>
         
-        <ProtocolList 
+        <ProtocolList v-if="loggedIn"
             :userUUID = "userUUID"
         >            
         </ProtocolList>
@@ -33,10 +33,7 @@
       data: function(){
         return {
             name: 'Home',
-//            userProtocolUUID: '70b99490-bdff-11e7-abbd-8d88b42d3590',
-            userUUID: userUUID, //'70b99491-bdff-11e7-abbd-8d88b42d3590',
-//            editorName: 'homeProtocolEditor',
-//            showPreview: true,
+            userUUID: userUUID, 
             loggedIn: loggedIn,
         }
       },
