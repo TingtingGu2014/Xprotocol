@@ -47,18 +47,36 @@
         }),
         },
         beforeMount: function(){
-            var protocolList = this.getProtocolsByUserUUID(this.userUUID)
+        
+            var userUUID = this.userUUID
+            
+            if(Utils.isEmpty(userUUID)){
+                var message = 'User UUID cannot be empty!'
+                alert(message)
+                sessionStorage.errorMessage = message
+                document.location.href = '/errors/400'
+                return false
+            }
+            
+            var protocolList = this.getProtocolsByUserUUID(userUUID)
 
             if(!Utils.isEmpty(protocolList)){
                 this.tableData = protocolList
                 return false
             }
 
-            Utils.getProtocolsByUserUUID(this.userUUID)
+            Utils.getProtocolsByUserUUID(userUUID)
             .then((data) => {
                 console.log(data)
+                if(!Utils.isEmpty(data)){
+                    for(var i = 0; i < data.length; i++){
+                        var row = data[i]
+                        var title = '<a href="/users/' + row.userUUID + '/protocols/' + row.userProtocolUUID + '" >' + row.title + '</a>'
+                        row.title = title
+                    }
+                }
                 this.tableData = data
-                this.setProtocolsByUserUUID(this.userUUID, data)
+                this.setProtocolsByUserUUID(userUUID, data)
             })
             .catch((err) => {
                 alert("oops, something happened")
