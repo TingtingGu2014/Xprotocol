@@ -12,14 +12,12 @@ import com.xprotocol.utils.Validators;
 import com.xprotocol.web.exceptions.IncompleteUserProtocolInformationException;
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,7 +47,7 @@ public class UserProtocolController {
         this.userSrv = userSrv;
     }
 
-    @RequestMapping(value="/api/users/{userUUIDStr}/protocols")
+    @RequestMapping(value="/api/users/{userUUIDStr}/protocols", method=RequestMethod.GET)
     public List<UserProtocol> findAllProtocolsByUser(HttpServletRequest request, @PathVariable("userUUIDStr") String userUUIDStr){
         return protocolSrv.findProtocolByUserUUID(userUUIDStr);
     }
@@ -118,6 +116,9 @@ public class UserProtocolController {
             }
             else if(Validators.isEmptyString(userProtocolUUIDStr)){
                 throw new IncompleteUserProtocolInformationException("The user protocol UUID is empty!");
+            }
+            else if(null == protocol || Validators.isEmptyString(protocol.getTitle())){
+                throw new IncompleteUserProtocolInformationException("The protocol data or title is empty!");
             }
             protocol = protocolSrv.updateProtocol(protocol);
         }
