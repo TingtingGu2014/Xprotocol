@@ -8,7 +8,9 @@
                                 <h4 class="card-header mb-3 text-center" v-bind:style="{}" style="font-weight: bolder; font-size: 15px; color: midnightblue">
                                     <input class="form-control text-center" type="text" v-model="title" id="example-text-input" required>
                                 </h4>
-                                <VueTinymce id='terms' @content-change="contentChange"
+                                <VueTinymce id='terms' 
+                                    @content-change="contentChange"
+                                    @editor-file-uploaded="editorFileUploaded"
                                     :body='body' 
                                     :max_height='max_height'
                                     :max_width='max_width'
@@ -53,9 +55,9 @@
                         </div>
                         <div class="form-group">
                             <form class="form-inline">
-                            <label for="uploadFileForProtocol">Example file input</label>
+                            <label for="uploadFileForProtocol">Select a file to upload:&nbsp;&nbsp;</label>
                             <input type="file" class="form-control-file" id="uploadFileForProtocol">
-                            <button type="button" class="btn btn-primary">Add a new file</button>
+                            <button type="button" class="btn btn-primary"><i class="fa fa-upload" aria-hidden="true"></i>&nbsp;&nbsp;Add a new file</button>
                             </form>
                         </div>
                     </fieldset>
@@ -154,6 +156,9 @@
             contentChange: function(content){
                 this.body = content
                 $('#pbody').html(content)
+            },
+            editorFileUploaded: function(content){
+                this.files.push(content)
             },
             toggleEditor: function(){
                 this.showEditor = !(this.showEditor)
