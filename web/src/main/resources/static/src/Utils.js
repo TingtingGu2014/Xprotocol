@@ -296,18 +296,29 @@ export function saveUserProtocol(protocol){
         return false
     }
     
-    var userProtocolUUID = protocol.userProtocolUUID
     var userUUID = protocol.userUUID
+    var userProtocolUUID = protocol.userProtocolUUID
+    
+    try{
+        if(isEmpty(userUUID)){
+            throw new exceptions.EmptyUserUUIDException(400, 'User UUID cannot be empty!')
+        }
+        else if(isEmpty(userProtocolUUID)){
+            throw new exceptions.EmptyUserProtocolUUIDException(400, 'User UUID cannot be empty!')
+        }
+    }
+    catch(exception){
+        sessionStorage.errorMessage = exception.message
+        document.location.href = '/errors/400'
+        return false
+    }
+    
     delete protocol.loggedIn
     delete protocol.max_height
     delete protocol.max_width
     delete protocol.min_height
     delete protocol.min_width 
-    
-    if(isEmpty(userProtocolUUID)){
-        alert('The protocol UUID is empty!')
-        return false
-    }
+
     
     var url = ''
     if(isEmpty(userUUID)){
