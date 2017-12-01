@@ -131,7 +131,7 @@
                         
                         // ** trigger the uploaded file event for the protocol object **
                         var originalFileName = $('#filePickerName').val()                        
-                        var fileName = json.location+'____'+originalFileName                        
+                        var fileName = json.location+'____'+originalFileName+','                        
                         console.log('file name = '+fileName)                    
                         vm.$emit('editor-file-uploaded', fileName)
                     

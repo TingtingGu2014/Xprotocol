@@ -35,7 +35,7 @@
     var Utils = require('./Utils')
     var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
     var userInfo = null
-    if(loggedIn === false){
+    if(loggedIn !== true){
         localStorage.userInfo = null
     }
     else {

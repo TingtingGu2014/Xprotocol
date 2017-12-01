@@ -49,7 +49,7 @@
                         <div>
                             <ul class="list-group">
                                 <li class="list-group-item" v-if="!files || files.length == 0">There are no file associated with this protocol</li>
-                                <li class="list-group-item" v-else v-for="file in files">{{file}}</li>
+                                <li class="list-group-item" v-else v-for="file in displayFiles " v-html="file"></li>
                             </ul>
                             <br><br>
                         </div>
@@ -110,6 +110,28 @@
                 getProtocolsByUserUUID: 'protocolModule/getProtocolsByUserUUID',
                 getProtocolsByUserUUIDANDProtocolUUID: 'protocolModule/getProtocolsByUserUUIDANDProtocolUUID',
             }),
+            displayFiles: function(){
+                var files = this.files
+                var fileHtmls = []
+                if(!Utils.isEmpty(files)){
+                    for(var i = 0; i < files.length; i++){
+                        var fileArr = files[i].split('____')
+                        var originalName = fileArr[1]
+                        var currentName = fileArr[0]
+                        var fileRowHtml = '<span>' + originalName + '</span>'
+                        var originalNameArr = originalName.split('.')
+                        var fileExtension = ''
+                        if(originalNameArr.length === 2){
+                            fileExtension = originalNameArr[1].toLowerCase()
+                            if(Utils.imageExtensions.indexOf(fileExtension) >= 0){
+                                fileRowHtml += '&nbsp;&nbsp;&nbsp;&nbsp;<img src=\"' + currentName + '\" alt=\"Cannot display\" width=\"80\" height=\"80\" >'
+                                fileHtmls.push(fileRowHtml)
+                            }
+                        }
+                    }
+                }
+                return fileHtmls
+            },
         },
         methods: {
             saveUserProtocol: function(event){
@@ -158,11 +180,15 @@
                 $('#pbody').html(content)
             },
             editorFileUploaded: function(content){
+                if(Utils.isEmpty(this.files)){
+                    this.files = []
+                }
                 this.files.push(content)
             },
             toggleEditor: function(){
                 this.showEditor = !(this.showEditor)
-            }
+            },
+            
         },
         components: {
             VueTinymce
@@ -187,7 +213,8 @@
             
             // When userProtocolUUID == 'new' this is a new protocol
             var userProtocolUUID = this.$route.params.userProtocolUUID
-            if(Utils.isEmpty(userProtocolUUID) || userProtocolUUID == 'new'){
+            if(userProtocolUUID == 'new'){
+                this.showEditor = true
                 return false
             }
             
@@ -213,6 +240,9 @@
 
 <style>
 .card {
-    border: 2px solid lightblue;
+    border: 1px groove add8e6;
+    padding: 0 1.4em 1.4em!important;
+    margin: 0 0 1.5em!important;
+    box-shadow: 0 0 0 0 #000;
 }
 </style>

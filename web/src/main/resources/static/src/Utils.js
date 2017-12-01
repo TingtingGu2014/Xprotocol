@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 
+export const imageExtensions = ['bmp','tif','tiff','gif','jpeg','jpg','jif','jfif','jp2','jpx','j2k','j2c','pcd','png','pdf']
 
 export function isEmpty(obj){
     return obj === null || typeof obj === 'undefined' || obj === '';
@@ -381,4 +382,9 @@ export function getTimeUUID(){
     var date = new Date().getTime();
     var uuidFirst = UUID.fromTime(date, false);
     return uuidFirst.toString()
+}
+
+// ** https://github.com/coobird/thumbnailator **
+export function getFileLinkByProtocolUUID(protocolUUID, fileName){
+    return window.location.hostname + '/protocols/' + protocolUUID + '/files/' + fileName
 }
