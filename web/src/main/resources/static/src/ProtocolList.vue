@@ -4,7 +4,7 @@
         <h3>List of Protocols</h3>
         <router-link :to="{ path: 'users/'+userUUID+'/protocols/new'}">&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus-square-o" aria-hidden="true"></i>&nbsp;New Protocol</router-link>
         <VueDataTable 
-            :tableData = "tableData"
+            :tableData = "tableDataForDisplay"
             :tableColumns = "tableColumns"
             :showFilter = "showFilter"
         ></VueDataTable>
@@ -39,6 +39,17 @@
                 getProtocolsByUserUUID: 'protocolModule/getProtocolsByUserUUID',
                 getProtocolsByUserUUIDANDProtocolUUID: 'protocolModule/getProtocolsByUserUUIDANDProtocolUUID',
             }),
+            tableDataForDisplay: function(){
+                var data = this.tableData
+                if(!Utils.isEmpty(data)){
+                    for(var i = 0; i < data.length; i++){
+                        var row = data[i]
+                        var title = '<a href="/users/' + row.userUUID + '/protocols/' + row.userProtocolUUID + '" >' + row.title + '</a>'
+                        row.title = title
+                    }
+                }
+                return data
+            }
         },
         methods: {
             ...mapMutations({
@@ -60,21 +71,15 @@
             
             var protocolList = this.getProtocolsByUserUUID(userUUID)
 
-            if(!Utils.isEmpty(protocolList)){
+            if(!Utils.isEmpty(protocolList)){                
+                console.log(protocolList)
                 this.tableData = protocolList
                 return false
             }
 
             Utils.getProtocolsByUserUUID(userUUID)
             .then((data) => {
-                console.log(data)
-                if(!Utils.isEmpty(data)){
-                    for(var i = 0; i < data.length; i++){
-                        var row = data[i]
-                        var title = '<a href="/users/' + row.userUUID + '/protocols/' + row.userProtocolUUID + '" >' + row.title + '</a>'
-                        row.title = title
-                    }
-                }
+                console.log(data)                
                 this.tableData = data
                 this.setProtocolsByUserUUID(userUUID, data)
             })
