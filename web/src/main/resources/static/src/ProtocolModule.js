@@ -51,10 +51,6 @@ const protocolModule = {
         protocols[userUUID] = data
     },
     setProtocolByUserUUIDANDProtocolUUID(state, protocol) {
-        console.log(protocol.userUUID)
-        $.each(protocol, function(key, value){
-            console.log('\n '+key+' = '+value)
-        })
         var protocols = state.protocols
         if(Utils.isEmpty(protocolsByUser)){
             protocols = {}

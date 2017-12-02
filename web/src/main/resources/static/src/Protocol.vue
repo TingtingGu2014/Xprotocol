@@ -140,13 +140,19 @@
                 protocolData.userUUID = this.userUUID
                 protocolData.userProtocolUUID = this.userProtocolUUID
                 
+                if(Utils.isEmpty(protocolData.userUUID) || protocolData.userUUID === 'new'){
+                    alert('User UUID cannot be empty!')
+                    return false;
+                }
+                
                 if(Utils.isEmpty(protocolData.title)){
                     alert('Protocol titile cannot be empty!')
                     return false;
                 }
                 
-                if(protocolData.userProtocolUUID === 'new'){
-                    protocolData.userProtocolUUID = Utils.getTimeUUID()
+                if(Utils.isEmpty(protocolData.userProtocolUUID) || protocolData.userProtocolUUID === 'new'){
+                    alert('Protocol UUID cannot be empty!')
+                    return false;
                 }
 
                 Utils.saveUserProtocol(protocolData)
@@ -214,6 +220,7 @@
             // When userProtocolUUID == 'new' this is a new protocol
             var userProtocolUUID = this.$route.params.userProtocolUUID
             if(userProtocolUUID == 'new'){
+                this.userProtocolUUID = Utils.getTimeUUID()
                 this.showEditor = true
                 return false
             }
