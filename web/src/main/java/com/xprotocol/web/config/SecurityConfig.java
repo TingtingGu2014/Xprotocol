@@ -68,13 +68,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/css/**","/images/**","/img/**","/js/**","/dist/**","/src/**").permitAll()
             .antMatchers("/home","/index.html","/","/index","/error").permitAll()
             .antMatchers("/login", "/signup", "/api/signUp", "/errors/**", "/api/users/{^[\\\\d]$}/protocols/**", "/api/editor/images", "/editor/images/**").permitAll()
+            .antMatchers("/api/invalidsession", "/api/sessionexpires").permitAll()
             .antMatchers("/api/admin/**").hasAuthority("admin")
             .anyRequest().authenticated()
             .and().requestCache().requestCache(new NullRequestCache())
             .and().httpBasic()
             .and().formLogin().usernameParameter("email").passwordParameter("password").loginPage("/login").defaultSuccessUrl("/home")
-            .and().logout().logoutSuccessUrl("/home")
-            .and().csrf().requireCsrfProtectionMatcher(csrfRequestMatcher).csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+            .and().logout().logoutSuccessUrl("/home")            
+            .and().csrf().requireCsrfProtectionMatcher(csrfRequestMatcher).csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            .and().sessionManagement().invalidSessionUrl("/api/invalidsession").maximumSessions(2).expiredUrl("/api/sessionexpires");
 //                .and().csrf().disable();
     }
 }

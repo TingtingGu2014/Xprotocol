@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -65,5 +66,17 @@ public class LoginController {
         loggedIn.setPath("/");
         response.addCookie(loggedIn);        
     }
-    
+   
+    @RequestMapping(value = {"/api/invalidsession", "/api/sessionexpires"})
+    public void sessionManagement(HttpServletResponse response) {
+        Cookie loggedIn = new Cookie("loggedIn", "");
+        loggedIn.setMaxAge(0);
+        loggedIn.setPath("/");
+        response.addCookie(loggedIn);   
+        try {
+            response.sendError(440, "The session is either expired or invalid!");
+        } catch (IOException ex) {
+            Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }
