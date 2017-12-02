@@ -5,12 +5,16 @@
  */
 package com.xprotocol.web.config;
 
+import com.xprotocol.persistence.model.User;
+import com.xprotocol.service.ApplicationContextProvider;
+import com.xprotocol.service.user.UserService;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +40,12 @@ public class XprotocolWebUtils {
         return (org.springframework.security.core.userdetails.User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
     
+    public static User getCurrentXprotocolUser(){
+        ApplicationContext context = ApplicationContextProvider.getApplicationContext();
+        UserService  userSrv = (UserService)context.getBean("userServiceImpl");
+        return userSrv.findUserByEmail(getCurrentSessionUser().getUsername());
+    }
+    
     public static Collection<GrantedAuthority> getCurrentSessionUserAuthorities(){
         org.springframework.security.core.userdetails.User currentUser = getCurrentSessionUser();
         return currentUser.getAuthorities();
@@ -53,9 +63,9 @@ public class XprotocolWebUtils {
         return false;
     }
     
-    public static String getEditorFilePath(String editorUploadDirPath, String fileBaseName) throws IOException{
+    public static String getEditorFilePath(String editorUploadDirPath, String userUUID, String fileBaseName) throws IOException{
         String path = null;
-        File upldDirFile = new File(editorUploadDirPath);
+        File upldDirFile = new File(editorUploadDirPath + File.separator + userUUID);
         if(!upldDirFile.isDirectory()){
             throw new IOException("The editor file upload directory is wrong: "+editorUploadDirPath);
         }

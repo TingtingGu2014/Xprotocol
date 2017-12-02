@@ -6,10 +6,13 @@
 package com.xprotocol.web.mvc;
 
 import com.xprotocol.cassandra.model.UserProtocol;
+import com.xprotocol.persistence.model.User;
 import com.xprotocol.service.user.UserService;
 import com.xprotocol.service.protocol.UserProtocolService;
 import com.xprotocol.utils.Validators;
+import com.xprotocol.web.config.XprotocolWebUtils;
 import com.xprotocol.web.exceptions.IncompleteUserProtocolInformationException;
+import com.xprotocol.web.exceptions.UserNotLoggedInException;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
@@ -65,9 +68,14 @@ public class UserProtocolController {
                                         @PathVariable("userProtocolUUIDStr") String userProtocolUUIDStr,
                                         HttpServletResponse response
                                         )
-    {
+    {        
         UserProtocol protocol = new UserProtocol();
         try{
+            User currentUser = XprotocolWebUtils.getCurrentXprotocolUser();
+            if(null == currentUser){
+                throw new UserNotLoggedInException("You have to log in to upload files!");
+            }
+        
             if(Validators.isEmptyString(userUUIDStr)){            
                 throw new IncompleteUserProtocolInformationException("The user UUID cannot be empty!");
             }
@@ -78,7 +86,14 @@ public class UserProtocolController {
         }
         catch(IncompleteUserProtocolInformationException ex){
             try {
-                response.sendError(400, "Incomplete or invalid user registration information!");
+                response.sendError(400, "Incomplete or invalid user and or protocol information!");
+            } catch (IOException ex1) {
+                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
+        catch(UserNotLoggedInException ex){
+            try {
+                response.sendError(400, "Incomplete or invalid user and or protocol information!");
             } catch (IOException ex1) {
                 Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
             }

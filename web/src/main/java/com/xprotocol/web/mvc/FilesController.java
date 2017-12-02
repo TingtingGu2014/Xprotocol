@@ -5,7 +5,9 @@
  */
 package com.xprotocol.web.mvc;
 
+import com.xprotocol.persistence.model.User;
 import com.xprotocol.web.config.XprotocolWebUtils;
+import com.xprotocol.web.exceptions.UserNotLoggedInException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,6 +17,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
@@ -51,25 +55,32 @@ public class FilesController {
         }
 
         try {
-           saveUploadedFiles(Arrays.asList(uploadfile));
-           String fileName = uploadfile.getOriginalFilename();           
-           location = "/editor/images/"+fileName;
+            User currentUser = XprotocolWebUtils.getCurrentXprotocolUser();
+            String userUUID = currentUser.getUserUUID();
+            if(null == currentUser){
+                throw new UserNotLoggedInException("You have to log in to be able to upload files!");
+            }
+            saveUploadedFiles(Arrays.asList(uploadfile), userUUID);
+            String fileName = uploadfile.getOriginalFilename();           
+            location = "/editor/images/"+userUUID+"/"+fileName;
         } catch (IOException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (UserNotLoggedInException ex) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
         return new ResponseEntity("{\"location\":\"" + location +"\"}", new HttpHeaders(), HttpStatus.OK);
 
     }
 
-    @RequestMapping(value = "/editor/images/{imageId}", method = RequestMethod.GET)
-    public ResponseEntity<byte[]> downloadEditorImage(@PathVariable("imageId") String imageId) {
+    @RequestMapping(value = "/editor/images/{userUUID}/{imageId}", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> downloadEditorImage(@PathVariable("userUUID") String userUUID, @PathVariable("imageId") String imageId) {
         
         HttpHeaders headers = new HttpHeaders();
         ResponseEntity<byte[]> responseEntity = null;
         InputStream in = null;
         try{
-            String filePath = XprotocolWebUtils.getEditorFilePath(editorImgUploadPath, imageId);
+            String filePath = XprotocolWebUtils.getEditorFilePath(editorImgUploadPath, userUUID, imageId);
             File uploadedFile = new File(filePath);
             in = new FileInputStream(uploadedFile);
             byte[] media = IOUtils.toByteArray(in);
@@ -134,17 +145,22 @@ public class FilesController {
 //    }
 
     //save file
-    private void saveUploadedFiles(List<MultipartFile> files) throws IOException {
+    private void saveUploadedFiles(List<MultipartFile> files, String userUUID) throws IOException {
         
         for (MultipartFile file : files) {
 
             if (file.isEmpty()) {
                 continue;
             }
-            
+
             byte[] bytes = file.getBytes();            
             String fileName = file.getOriginalFilename();
-            Path path = Paths.get(editorImgUploadPath + fileName);
+            String fileFolderPath = editorImgUploadPath + File.separator + userUUID;
+            File fileFolderPathFile = new File(fileFolderPath);
+            if(!fileFolderPathFile.exists()){
+                fileFolderPathFile.mkdirs();
+            }
+            Path path = Paths.get(fileFolderPath + File.separator + fileName);
             Files.write(path, bytes);
         }
     }
