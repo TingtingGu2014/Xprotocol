@@ -25,9 +25,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
  */
 public class XprotocolWebUtils {
     
-    @Autowired
-    private static Environment env;
-    
     public static String getContextUrlFromRequest(HttpServletRequest request){
         String contextUrl = request.getServletPath();
         if(!contextUrl.startsWith("/") && contextUrl.contains("/")){
@@ -63,17 +60,29 @@ public class XprotocolWebUtils {
         return false;
     }
     
-    public static String getEditorFilePath(String editorUploadDirPath, String userUUID, String fileBaseName) throws IOException{
+    public static String getEditorFilePath(String editorUploadDirPath, String userUUID, String userProtocolUUID, String fileBaseName) throws IOException{
         String path = null;
-        File upldDirFile = new File(editorUploadDirPath + File.separator + userUUID);
+        File upldDirFile = new File(editorUploadDirPath + File.separator + userUUID + File.separator + userProtocolUUID);
         if(!upldDirFile.isDirectory()){
-            throw new IOException("The editor file upload directory is wrong: "+editorUploadDirPath);
+            throw new IOException("The editor file upload directory is wrong: "+editorUploadDirPath+"/"+userUUID+"/"+userProtocolUUID);
         }
         for (File file : upldDirFile.listFiles()) {
             if(file.getName().contains(fileBaseName)){
                 return file.getAbsolutePath();
             }
         }
+        
+        // If cannot find, try the temp file folder
+        File tempUpldDirFile = new File(editorUploadDirPath + File.separator + userUUID + File.separator + userProtocolUUID + File.separator + "temp");
+        if(!tempUpldDirFile.isDirectory()){
+            throw new IOException("The editor file upload directory is wrong: "+editorUploadDirPath+"/"+userUUID+"/"+userProtocolUUID+"/temp");
+        }
+        for (File file : tempUpldDirFile.listFiles()) {
+            if(file.getName().contains(fileBaseName)){
+                return file.getAbsolutePath();
+            }
+        }
+        
         return path;
     }
 }

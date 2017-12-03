@@ -8,9 +8,10 @@
                                 <h4 class="card-header mb-3 text-center" v-bind:style="{}" style="font-weight: bolder; font-size: 15px; color: midnightblue">
                                     <input class="form-control text-center" type="text" v-model="title" id="example-text-input" required>
                                 </h4>
-                                <VueTinymce id='terms' 
+                                <VueTinymce 
                                     @content-change="contentChange"
                                     @editor-file-uploaded="editorFileUploaded"
+                                    :id='userProtocolUUID'
                                     :body='body' 
                                     :max_height='max_height'
                                     :max_width='max_width'
@@ -116,7 +117,7 @@
                 if(!Utils.isEmpty(files)){
                     for(var i = 0; i < files.length; i++){
                         var fileArr = files[i].split('____')
-                        var originalName = fileArr[1]
+                        var originalName = fileArr[1].slice(0,-1)
                         var currentName = fileArr[0]
                         var fileRowHtml = '<span>' + originalName + '</span>'
                         var originalNameArr = originalName.split('.')

@@ -111,7 +111,7 @@
                     var csrf = Utils.readCookie('XSRF-TOKEN')
                     xhr = new XMLHttpRequest();
                     xhr.withCredentials = false;                    
-                    xhr.open('POST', '/api/editor/images');
+                    xhr.open('POST', '/api/editor/images/'+vm.id);
                     xhr.setRequestHeader('X-XSRF-TOKEN', csrf)
 
                     xhr.onload = function() {                      

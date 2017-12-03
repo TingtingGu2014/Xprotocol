@@ -25,6 +25,7 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,16 +43,20 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class FilesController {
     
-    @Value("${editor.imgUploadPath}")
-    private String editorImgUploadPath;
+    @Value("${editor.fileUploadPath}")
+    private String editorFileUploadPath;
     
-    @PostMapping("/api/editor/images")
-    public ResponseEntity<?> uploadEditorImage(@RequestParam("file") MultipartFile uploadfile) {
+    @PostMapping("/api/editor/images/{protocolUUID}")
+    public ResponseEntity<?> uploadEditorImage(@RequestParam("file") MultipartFile uploadfile, @PathVariable("protocolUUID") String userProtocolUUID) {
         
         String location = null;
 
         if (uploadfile.isEmpty()) {
             return new ResponseEntity("please select a file!", HttpStatus.BAD_REQUEST);
+        }
+        
+        if (StringUtils.isEmpty(userProtocolUUID)) {
+            return new ResponseEntity("The id of the image is empty!", HttpStatus.BAD_REQUEST);
         }
 
         try {
@@ -60,9 +65,9 @@ public class FilesController {
             if(null == currentUser){
                 throw new UserNotLoggedInException("You have to log in to be able to upload files!");
             }
-            saveUploadedFiles(Arrays.asList(uploadfile), userUUID);
+            saveUploadedFiles(Arrays.asList(uploadfile), userUUID, userProtocolUUID);
             String fileName = uploadfile.getOriginalFilename();           
-            location = "/editor/images/"+userUUID+"/"+fileName;
+            location = "/editor/images/"+userUUID+"/"+userProtocolUUID+"/"+fileName;
         } catch (IOException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (UserNotLoggedInException ex) {
@@ -73,14 +78,17 @@ public class FilesController {
 
     }
 
-    @RequestMapping(value = "/editor/images/{userUUID}/{imageId}", method = RequestMethod.GET)
-    public ResponseEntity<byte[]> downloadEditorImage(@PathVariable("userUUID") String userUUID, @PathVariable("imageId") String imageId) {
+    @RequestMapping(value = "/editor/images/{userUUID}/{userProtocolUUID}/{imageId}", method = RequestMethod.GET)
+    public ResponseEntity<byte[]> downloadEditorImage(
+            @PathVariable("userUUID") String userUUID, 
+            @PathVariable("userProtocolUUID") String userProtocolUUID,
+            @PathVariable("imageId") String imageId) {
         
         HttpHeaders headers = new HttpHeaders();
         ResponseEntity<byte[]> responseEntity = null;
         InputStream in = null;
         try{
-            String filePath = XprotocolWebUtils.getEditorFilePath(editorImgUploadPath, userUUID, imageId);
+            String filePath = XprotocolWebUtils.getEditorFilePath(editorFileUploadPath, userUUID, userProtocolUUID, imageId);
             File uploadedFile = new File(filePath);
             in = new FileInputStream(uploadedFile);
             byte[] media = IOUtils.toByteArray(in);
@@ -145,7 +153,7 @@ public class FilesController {
 //    }
 
     //save file
-    private void saveUploadedFiles(List<MultipartFile> files, String userUUID) throws IOException {
+    private void saveUploadedFiles(List<MultipartFile> files, String userUUID, String userProtocolUUID) throws IOException {
         
         for (MultipartFile file : files) {
 
@@ -155,7 +163,7 @@ public class FilesController {
 
             byte[] bytes = file.getBytes();            
             String fileName = file.getOriginalFilename();
-            String fileFolderPath = editorImgUploadPath + File.separator + userUUID;
+            String fileFolderPath = editorFileUploadPath + File.separator + userUUID + File.separator + userProtocolUUID + File.separator + "temp";
             File fileFolderPathFile = new File(fileFolderPath);
             if(!fileFolderPathFile.exists()){
                 fileFolderPathFile.mkdirs();
