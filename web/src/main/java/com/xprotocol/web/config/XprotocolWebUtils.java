@@ -8,16 +8,25 @@ package com.xprotocol.web.config;
 import com.xprotocol.persistence.model.User;
 import com.xprotocol.service.ApplicationContextProvider;
 import com.xprotocol.service.user.UserService;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLConnection;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.util.StringUtils;
 
 /**
  *
@@ -60,7 +69,7 @@ public class XprotocolWebUtils {
         return false;
     }
     
-    public static String getEditorFilePath(String editorUploadDirPath, String userUUID, String userProtocolUUID, String fileBaseName) throws IOException{
+    public static String getProtocolFilePath(String editorUploadDirPath, String userUUID, String userProtocolUUID, String fileBaseName) throws IOException{
         String path = null;
         File upldDirFile = new File(editorUploadDirPath + File.separator + userUUID + File.separator + userProtocolUUID);
         if(!upldDirFile.isDirectory()){
@@ -84,5 +93,47 @@ public class XprotocolWebUtils {
         }
         
         return path;
+    }
+    
+    public static void downloadFileFromServer(HttpServletResponse response, String downloadPath, String originalName) throws IOException{
+        
+        OutputStream outputStream = null;
+        InputStream inputStream =  null;
+        
+        File file = new File(downloadPath);
+        if(!file.exists()){
+             String errorMessage = "Sorry. The file you are looking for does not exist";
+             System.out.println(errorMessage);
+             outputStream = response.getOutputStream();
+             outputStream.write(errorMessage.getBytes(Charset.forName("UTF-8")));
+             response.sendError(404, "Cannot find the file to download!");
+             return;
+        }
+
+        String mimeType= URLConnection.guessContentTypeFromName(file.getName());
+        if(mimeType==null){
+            System.out.println("mimetype is not detectable, will take default");
+            mimeType = "application/octet-stream";
+        }
+        
+        String name = StringUtils.isEmpty(originalName) ? file.getName() : originalName;
+        response.setContentType(mimeType);
+        /* "Content-Disposition : inline" will show viewable types [like images/text/pdf/anything viewable by browser] right on browser 
+            while others(zip e.g) will be directly downloaded [may provide save as popup, based on your browser setting.]*/
+        response.setHeader("Content-Disposition", String.format("attachment; filename=\"" + name +"\""));
+
+
+        /* "Content-Disposition : attachment" will be directly download, may provide save as popup, based on your browser setting*/
+        //response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", file.getName()));
+
+        response.setContentLength((int)file.length());
+
+        inputStream = new BufferedInputStream(new FileInputStream(file));
+
+        //Copy bytes from source to destination(outputstream in this example), closes both streams.
+        FileCopyUtils.copy(inputStream, response.getOutputStream());
+        
+        inputStream.close();
+        outputStream.close();
     }
 }

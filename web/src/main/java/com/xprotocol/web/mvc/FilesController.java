@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.CacheControl;
@@ -46,8 +47,12 @@ public class FilesController {
     @Value("${editor.fileUploadPath}")
     private String editorFileUploadPath;
     
-    @PostMapping("/api/editor/images/{protocolUUID}")
-    public ResponseEntity<?> uploadEditorImage(@RequestParam("file") MultipartFile uploadfile, @PathVariable("protocolUUID") String userProtocolUUID) {
+    @PostMapping("/api/users/{userUUID}/protocols/{protocolUUID}/files")
+    public ResponseEntity<?> uploadEditorImage(
+            @RequestParam("file") MultipartFile uploadfile, 
+            @PathVariable("userUUID") String userUUID, 
+            @PathVariable("protocolUUID") String userProtocolUUID) 
+    {
         
         String location = null;
 
@@ -61,13 +66,16 @@ public class FilesController {
 
         try {
             User currentUser = XprotocolWebUtils.getCurrentXprotocolUser();
-            String userUUID = currentUser.getUserUUID();
             if(null == currentUser){
+                throw new UserNotLoggedInException("You have to log in to be able to upload files!");
+            }
+            String currentUserUUID = currentUser.getUserUUID();
+            if(null == currentUserUUID || !currentUserUUID.equals(userUUID)){
                 throw new UserNotLoggedInException("You have to log in to be able to upload files!");
             }
             saveUploadedFiles(Arrays.asList(uploadfile), userUUID, userProtocolUUID);
             String fileName = uploadfile.getOriginalFilename();           
-            location = "/editor/images/"+userUUID+"/"+userProtocolUUID+"/"+fileName;
+            location = "/api/users/"+userUUID+"/protocols/"+userProtocolUUID+"/files/"+fileName;
         } catch (IOException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (UserNotLoggedInException ex) {
@@ -78,25 +86,21 @@ public class FilesController {
 
     }
 
-    @RequestMapping(value = "/editor/images/{userUUID}/{userProtocolUUID}/{imageId}", method = RequestMethod.GET)
-    public ResponseEntity<byte[]> downloadEditorImage(
+    @RequestMapping(value = "/api/users/{userUUID}/protocols/{userProtocolUUID}/files/{fileName}", method = RequestMethod.GET)
+    public void downloadEditorImage(
+            HttpServletResponse response,
             @PathVariable("userUUID") String userUUID, 
             @PathVariable("userProtocolUUID") String userProtocolUUID,
-            @PathVariable("imageId") String imageId) {
+            @PathVariable("fileName") String fileName,
+            @RequestParam(value = "name", required = false) String originalName ) {
         
-        HttpHeaders headers = new HttpHeaders();
-        ResponseEntity<byte[]> responseEntity = null;
         InputStream in = null;
         try{
-            String filePath = XprotocolWebUtils.getEditorFilePath(editorFileUploadPath, userUUID, userProtocolUUID, imageId);
-            File uploadedFile = new File(filePath);
-            in = new FileInputStream(uploadedFile);
-            byte[] media = IOUtils.toByteArray(in);
-            headers.setCacheControl(CacheControl.noCache().getHeaderValue());
-            responseEntity = new ResponseEntity<>(media, headers, HttpStatus.OK);
+            String filePath = XprotocolWebUtils.getProtocolFilePath(editorFileUploadPath, userUUID, userProtocolUUID, fileName);
+            XprotocolWebUtils.downloadFileFromServer(response, filePath, originalName);
         }
         catch(IOException ex){
-            
+            ex.printStackTrace();
         }
         finally{
             if(in != null){
@@ -104,12 +108,12 @@ public class FilesController {
                     in.close();
                 }
                 catch(IOException ioex){
-                    ;
+                    ioex.printStackTrace();
                 }
             }
         }
-        return responseEntity;
     }
+   
     // 3.1.2 Multiple file upload
 //    @PostMapping("/api/editor/images")
 //    public ResponseEntity<?> uploadFileMulti(@RequestParam("files") MultipartFile[] uploadfiles) {

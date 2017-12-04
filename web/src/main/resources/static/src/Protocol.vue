@@ -12,6 +12,7 @@
                                     @content-change="contentChange"
                                     @editor-file-uploaded="editorFileUploaded"
                                     :id='userProtocolUUID'
+                                    :userUUID='userUUID'
                                     :body='body' 
                                     :max_height='max_height'
                                     :max_width='max_width'
@@ -67,7 +68,7 @@
         </div>
         <br>
         <div class="text-center">
-            <button type="button" class="btn btn-outline-success btn-lg"
+            <button type="button" class="btn btn-outline-success btn-lg protocolUpdt"
                 v-on:click.prevent="saveUserProtocol"
             >
                 <span style="font-weight: bold">Save</span>
@@ -117,7 +118,7 @@
                 if(!Utils.isEmpty(files)){
                     for(var i = 0; i < files.length; i++){
                         var fileArr = files[i].split('____')
-                        var originalName = fileArr[1].slice(0,-1)
+                        var originalName = fileArr[1]
                         var currentName = fileArr[0]
                         var fileRowHtml = '<span>' + originalName + '</span>'
                         var originalNameArr = originalName.split('.')
@@ -125,7 +126,9 @@
                         if(originalNameArr.length === 2){
                             fileExtension = originalNameArr[1].toLowerCase()
                             if(Utils.imageExtensions.indexOf(fileExtension) >= 0){
-                                fileRowHtml += '&nbsp;&nbsp;&nbsp;&nbsp;<img src=\"' + currentName + '\" alt=\"Cannot display\" width=\"80\" height=\"80\" >'
+                                fileRowHtml += '&nbsp;&nbsp;&nbsp;&nbsp;<img src=\"' + currentName + '\" alt=\"File not found\" width=\"80\" height=\"80\" >' + 
+                                                '&nbsp;&nbsp;&nbsp;&nbsp;<a href="' + currentName + '?name='+originalName+'" class="btn btn-secondary" target="_blank">Download</a>' +
+                                                '&nbsp;&nbsp;&nbsp;&nbsp;<button id="' + currentName + '" type="button" class="btn btn-secondary imgDelBtn">Delete</button>'
                                 fileHtmls.push(fileRowHtml)
                             }
                         }
@@ -243,6 +246,12 @@
                 console.log(err)
             });
         },
+        updated: function(){
+            $(".imgDelBtn").click(function(){
+                var location = ($this).attr('id')
+                Utils.deleteProtocolFile(this.userUUID, this.userProtocolUUID, location)
+            })
+        },
     }
 </script>
 
@@ -252,5 +261,13 @@
     padding: 0 1.4em 1.4em!important;
     margin: 0 0 1.5em!important;
     box-shadow: 0 0 0 0 #000;
+}
+
+.container {
+    margin-top: 15px;
+}
+
+.protocolUpdt{
+    margin-bottom: 15px;
 }
 </style>

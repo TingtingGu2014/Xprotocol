@@ -17,6 +17,7 @@
                 type: String,
                 required: true
             },
+            userUUID: String,
             body: {
                 type: String,
                 default: ''
@@ -58,7 +59,6 @@
                 image_advtab: true,
                 automatic_uploads: true,
                 file_picker_types: 'image', 
-                images_upload_url: '/api/editor/images',
                 images_reuse_filename: true,
                 style_formats: [
                     {title: 'Image Left', selector: 'img', styles: {
@@ -111,7 +111,7 @@
                     var csrf = Utils.readCookie('XSRF-TOKEN')
                     xhr = new XMLHttpRequest();
                     xhr.withCredentials = false;                    
-                    xhr.open('POST', '/api/editor/images/'+vm.id);
+                    xhr.open('POST', '/api/users/'+vm.userUUID+'/protocols/'+vm.id+'/files');
                     xhr.setRequestHeader('X-XSRF-TOKEN', csrf)
 
                     xhr.onload = function() {                      
@@ -131,7 +131,7 @@
                         
                         // ** trigger the uploaded file event for the protocol object **
                         var originalFileName = $('#filePickerName').val()                        
-                        var fileName = json.location+'____'+originalFileName+','                        
+                        var fileName = json.location+'____'+originalFileName                        
                         console.log('file name = '+fileName)                    
                         vm.$emit('editor-file-uploaded', fileName)
                     
