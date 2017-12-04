@@ -22,9 +22,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private DataSource dataSource;
     
-    private RequestMatcher csrfRequestMatcher = new RequestMatcher() {
+    private final RequestMatcher csrfRequestMatcher = new RequestMatcher() {
 
-      private AntPathRequestMatcher[] requestMatchers = {
+      private final AntPathRequestMatcher[] requestMatchers = {
 //          new AntPathRequestMatcher("/"),
 //          new AntPathRequestMatcher("/home"),
 //          new AntPathRequestMatcher("/dist/**"),
@@ -36,7 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
       public boolean matches(HttpServletRequest request) {
         // If the request match one url the CSFR protection will be disabled
         for (AntPathRequestMatcher rm : requestMatchers) {
-          if (rm.matches(request)) { return true; }
+          if (rm.matches(request) && !request.getMethod().equalsIgnoreCase("get")) { return true; }
         }
         return false;
       } // method matches
@@ -67,7 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
             .antMatchers("/css/**","/images/**","/img/**","/js/**","/dist/**","/src/**").permitAll()
             .antMatchers("/home","/index.html","/","/index","/error").permitAll()
-            .antMatchers("/login", "/signup", "/api/signUp", "/errors/**", "/api/users/{^[\\\\d]$}/protocols/**", "/api/editor/images", "/editor/images/**").permitAll()
+            .antMatchers("/login", "/signup", "/api/signUp", "/errors/**", "/api/users/{^[\\\\d]$}/protocols/**").permitAll()
             .antMatchers("/api/invalidsession", "/api/sessionexpires").permitAll()
             .antMatchers("/api/admin/**").hasAuthority("admin")
             .anyRequest().authenticated()
