@@ -23,6 +23,8 @@ const routes = [
     { path: '/users/:userUUID/protocols/:userProtocolUUID', name: 'userProtocol', component: Protocol },
     { path: '/admin', name: 'Admin', component: Admin },
     { path: '/home', redirect: '/' },
+    { path: '/invalidsession', redirect: 'errors/440'},
+    { path: '/expiredsession', redirect: 'errors/440'},
     { path: '/errors/:errorCode', name: 'errors', component: Errors},
     { path: "*", component: PageNotFound }
 ]

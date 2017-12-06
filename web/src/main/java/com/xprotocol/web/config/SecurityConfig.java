@@ -76,7 +76,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and().formLogin().usernameParameter("email").passwordParameter("password").loginPage("/login").defaultSuccessUrl("/home")
             .and().logout().logoutSuccessUrl("/home")            
             .and().csrf().requireCsrfProtectionMatcher(csrfRequestMatcher).csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-            .and().sessionManagement().invalidSessionUrl("/api/invalidsession").maximumSessions(2).expiredUrl("/api/sessionexpires");
+            .and().sessionManagement().invalidSessionUrl("/invalidsession").maximumSessions(2).expiredUrl("/expiredsession");
 //                .and().csrf().disable();
     }
 }
