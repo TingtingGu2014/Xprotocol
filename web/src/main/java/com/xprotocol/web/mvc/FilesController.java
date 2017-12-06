@@ -7,6 +7,7 @@ package com.xprotocol.web.mvc;
 
 import com.xprotocol.persistence.model.User;
 import com.xprotocol.web.config.XprotocolWebUtils;
+import com.xprotocol.web.exceptions.InvalidProtocolFileException;
 import com.xprotocol.web.exceptions.UserNotLoggedInException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -48,7 +49,7 @@ public class FilesController {
     private String editorFileUploadPath;
     
     @PostMapping("/api/users/{userUUID}/protocols/{protocolUUID}/files")
-    public ResponseEntity<?> uploadEditorImage(
+    public ResponseEntity<?> uploadProtocolFiles(
             @RequestParam("file") MultipartFile uploadfile, 
             @PathVariable("userUUID") String userUUID, 
             @PathVariable("protocolUUID") String userProtocolUUID) 
@@ -111,6 +112,29 @@ public class FilesController {
                     ioex.printStackTrace();
                 }
             }
+        }
+    }
+    
+    @RequestMapping(value="/api/users/{userUUID}/protocols/{userProtocolUUID}/files/{fileName}", method= RequestMethod.DELETE)
+    public void deleteProtocolFiles(HttpServletResponse response,
+            @PathVariable("userUUID") String userUUID, 
+            @PathVariable("userProtocolUUID") String userProtocolUUID,
+            @PathVariable("fileName") String fileName) throws IOException{
+        try {
+            String filePath = XprotocolWebUtils.getProtocolFilePath(editorFileUploadPath, userUUID, userProtocolUUID, fileName);
+            File protocolFile = new File(filePath);
+            if(!protocolFile.exists() || protocolFile.isDirectory()){
+                throw new InvalidProtocolFileException("Protocol file does not exist or it is a directory!");
+            }
+            protocolFile.delete();
+        } catch (IOException ex) {
+            try {
+                response.sendError(400, "File IO issue: " + ex.getMessage());
+            } catch (IOException ex1) {
+                Logger.getLogger(FilesController.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        } catch (InvalidProtocolFileException ex) {
+            response.sendError(400, "Invalid protocol file: " + ex.getMessage());
         }
     }
    
