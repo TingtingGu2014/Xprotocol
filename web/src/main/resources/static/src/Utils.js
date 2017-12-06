@@ -10,6 +10,15 @@ export function isEmpty(obj){
     return obj === null || typeof obj === 'undefined' || obj === '';
 }
 
+export function removeArrayElementByValue(array, element) {
+    const index = array.indexOf(element)
+    
+    if (index !== -1) {
+        array.splice(index, 1)
+    }
+    return array
+}
+
 // The following three functions are from https://scotch.io/tutorials/easily-create-read-and-erase-cookies-with-jquery 
 export function createCookie(name,value,days) {
     if (days) {
@@ -387,4 +396,48 @@ export function getTimeUUID(){
 // ** https://github.com/coobird/thumbnailator **
 export function getFileLinkByProtocolUUID(protocolUUID, fileName){
     return window.location.hostname + '/protocols/' + protocolUUID + '/files/' + fileName
+}
+
+export function deleteProtocolFile(location){
+    return axios({
+        method: 'delete',
+        url: location,
+        dataType: 'json',
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+    })
+    .then( (response) => {
+        var status = response.status;
+        if(status == 200 || status == "200"){              
+            alert('The file at '+location+' has been successfully deleted!')
+        }
+        else{
+            alert("status " + status + ": cannot delete the file at "+location+"!");
+        }                                   
+    })
+    .catch( (error) => {
+        console.log(error);
+    });
+}
+
+export function uploadFile(url, file, newFileName){
+    var formData = new FormData()
+    formData.append('file', file, newFileName)
+    return axios.post(url, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then( (response) => {
+        var status = response.status;
+        if(status == 200 || status == "200"){              
+            return response.data
+        }
+        else{
+            alert( "Cannot upload the file "+file.name);
+        }                                   
+    })
+    .catch( (error) => {
+        console.log(error);
+    }); 
 }

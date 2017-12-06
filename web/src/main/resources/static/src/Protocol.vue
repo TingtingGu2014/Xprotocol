@@ -47,7 +47,7 @@
                 <div class="col">
                 <br><br>
                     <fieldset class="form-group text-center" style="width:100%;">
-                        <legend>Protocol Files:</legend>
+                        <legend>Protocol Associated Files:</legend>
                         <div>
                             <ul class="list-group">
                                 <li class="list-group-item" v-if="!files || files.length == 0">There are no file associated with this protocol</li>
@@ -59,7 +59,7 @@
                             <form class="form-inline">
                             <label for="uploadFileForProtocol">Select a file to upload:&nbsp;&nbsp;</label>
                             <input type="file" class="form-control-file" id="uploadFileForProtocol">
-                            <button type="button" class="btn btn-primary"><i class="fa fa-upload" aria-hidden="true"></i>&nbsp;&nbsp;Add a new file</button>
+                            <button type="button" class="btn btn-primary" v-on:click.prevent="uploadProtocolFile"><i class="fa fa-upload" aria-hidden="true"></i>&nbsp;&nbsp;Add a new file</button>
                             </form>
                         </div>
                     </fieldset>
@@ -128,7 +128,7 @@
                             if(Utils.imageExtensions.indexOf(fileExtension) >= 0){
                                 fileRowHtml += '&nbsp;&nbsp;&nbsp;&nbsp;<img src=\"' + currentName + '\" alt=\"File not found\" width=\"80\" height=\"80\" >' + 
                                                 '&nbsp;&nbsp;&nbsp;&nbsp;<a href="' + currentName + '?name='+originalName+'" class="btn btn-secondary" target="_blank">Download</a>' +
-                                                '&nbsp;&nbsp;&nbsp;&nbsp;<button id="' + currentName + '" type="button" class="btn btn-secondary imgDelBtn">Delete</button>'
+                                                '&nbsp;&nbsp;&nbsp;&nbsp;<button id="' + currentName + '" type="button" class="btn btn-secondary imgDelBtn" name="'+originalName+'">Delete</button>'
                                 fileHtmls.push(fileRowHtml)
                             }
                         }
@@ -198,7 +198,28 @@
             toggleEditor: function(){
                 this.showEditor = !(this.showEditor)
             },
-            
+            uploadProtocolFile: function(event){
+                var url = '/api/users/' + this.userUUID + '/protocols/' + this.userProtocolUUID + '/files'
+                var files = $("#uploadFileForProtocol").prop("files")
+                var file = files[0]
+                var protocolFiles = this.files
+                if (Utils.isEmpty(file)) {
+                    alert("Please select a files to upload")
+                } else {
+                    var originalName = file.name
+                    var newName = 'blobid' + (new Date()).getTime() + '.' + file.name.split('.').pop()                
+                    Utils.uploadFile(url, file, newName)
+                    .then((data) => {
+                        protocolFiles.push(data['location'] + '____' + originalName)
+                        alert('File ' + originalName + ' has been successfully uploaded!')
+                    })
+                    .catch((err) => {
+                        alert("oops, something happened")
+                        console.log(err)
+                    });
+                }
+                
+            }
         },
         components: {
             VueTinymce
@@ -247,9 +268,16 @@
             });
         },
         updated: function(){
-            $(".imgDelBtn").click(function(){
-                var location = ($this).attr('id')
-                Utils.deleteProtocolFile(this.userUUID, this.userProtocolUUID, location)
+            var files = this.files
+            $(".imgDelBtn").click(function(event){
+                var del = confirm('Are you sure to delete this file?')
+                if(del == false){
+                    return false
+                }                
+                alert('File '+fileName+' will NOT be deleted until you click the save button below!')
+                var location = event.target.id
+                var fileName = event.target.name
+                this.files = Utils.removeArrayElementByValue(files, location+'____'+fileName)
             })
         },
     }
