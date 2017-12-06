@@ -2,44 +2,73 @@
     <div>
         <div class="container">    
             <div class="row">
-                <div class="col">
-                <div class="card " style="margin-top: 100px" v-bind:style="{ height: (Number(height)+320)+'px'}">
-                        <div class="card-block" >
-                    <h4 class="card-header mb-3 text-center" v-bind:style="{}" style="font-weight: bolder; font-size: 15px; color: midnightblue">
-                        <input class="form-control text-center" type="text" v-model="title" id="example-text-input">
-                    </h4>
-                    <VueTinymce id='terms' @content-change="contentChange"
-                        :body='body' 
-                        :max_height='max_height'
-                        :max_width='max_width'
-                        :min_height='min_height'
-                        :min_width='min_width'
-                        :height='height'
-                        :width='width'
-                    ></VueTinymce>                     
-                    </div>
-                    <div v-if="!preview" class="text-center" style="border-top: lightgray solid thin ">
-                        <a href="#" class="btn" v-on:click="togglePreview">Show Preview</a>
-                    </div>
+                <div class="col" v-if="showEditor">
+                    <div class="card " style="margin-top: 100px" v-bind:style="{ height: (Number(height)+320)+'px'}">
+                            <div class="card-block" >
+                                <h4 class="card-header mb-3 text-center" v-bind:style="{}" style="font-weight: bolder; font-size: 15px; color: midnightblue">
+                                    <input class="form-control text-center" type="text" v-model="title" id="example-text-input" required>
+                                </h4>
+                                <VueTinymce 
+                                    @content-change="contentChange"
+                                    @editor-file-uploaded="editorFileUploaded"
+                                    :id='userProtocolUUID'
+                                    :userUUID='userUUID'
+                                    :body='body' 
+                                    :max_height='max_height'
+                                    :max_width='max_width'
+                                    :min_height='min_height'
+                                    :min_width='min_width'
+                                    :height='height'
+                                    :width='width'
+                                ></VueTinymce>                     
+                            </div>
+    <!--                    <div v-if="!preview" class="text-center" style="border-top: lightgray solid thin ">
+                            <a href="#" class="btn" v-on:click="toggleEditor">Show Preview</a>
+                        </div>-->
                     </div>
                 </div>
 
-                <div class="col" v-if="preview">
-                    <div class="card " style="margin-top: 100px" v-bind:style="{width: width+'px', height: (Number(height)+320)+'px'}">
+                <div class="col">
+                    <div class="card " style="margin-top: 100px" v-bind:style="{height: (Number(height)+320)+'px'}">
                         <div class="card-block" style="overflow:scroll">
                           <h4 class="card-header mb-3 text-center" style="font-weight: bolder; font-size: 15px; color: midnightblue">{{title}}</h4>
                           <p id="pbody" v-html="body"></p>
                         </div>
-                        <div v-if="preview" class="text-center">
-                            <a href="#" class="btn" v-on:click="togglePreview">Hide Preview</a>
+                        <div class="text-center">
+                            <a href="#" class="btn" v-on:click="toggleEditor">
+                                <span v-if="showEditor">Hide Editor</span>
+                                <span v-else>Show Editor</span>
+                            </a>
                         </div>
                     </div>       
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                <br><br>
+                    <fieldset class="form-group text-center" style="width:100%;">
+                        <legend>Protocol Associated Files:</legend>
+                        <div>
+                            <ul class="list-group">
+                                <li class="list-group-item" v-if="!files || files.length == 0">There are no file associated with this protocol</li>
+                                <li class="list-group-item" v-else v-for="file in displayFiles " v-html="file"></li>
+                            </ul>
+                            <br><br>
+                        </div>
+                        <div class="form-group">
+                            <form class="form-inline">
+                            <label for="uploadFileForProtocol">Select a file to upload:&nbsp;&nbsp;</label>
+                            <input type="file" class="form-control-file" id="uploadFileForProtocol">
+                            <button type="button" class="btn btn-primary" v-on:click.prevent="uploadProtocolFile"><i class="fa fa-upload" aria-hidden="true"></i>&nbsp;&nbsp;Add a new file</button>
+                            </form>
+                        </div>
+                    </fieldset>
                 </div>
             </div>
         </div>
         <br>
         <div class="text-center">
-            <button type="button" class="btn btn-outline-success btn-lg"
+            <button type="button" class="btn btn-outline-success btn-lg protocolUpdt"
                 v-on:click.prevent="saveUserProtocol"
             >
                 <span style="font-weight: bold">Save</span>
@@ -53,52 +82,184 @@
     import { mapGetters, mapMutations } from 'vuex'
     
     var Utils = require('./Utils')
-    var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
     
-  export default {
-    name: 'example',
-    props: {
-        userProtocolUUID: String,
-        userUUID: String,
-        editorName: String,
-        showPreview: Boolean,
-    },
-    data () {
-        return {
-            loggedIn: loggedIn,
-            max_height: "500",
-            max_width: "600",
-            min_height: "200",
-            min_width: "200",
-            height: "300",
-            width: "500",
-            title: '',
-            body: '',
-            projectUUIDs: [],
-            projectTitles: [],
-            files: [],
-            comments: null,
-            versions: [],
-            keywords: [],
-            preview: this.showPreview ? this.showPreview : true,
-        }
-    },
-    computed: {
-        ...mapGetters({                
-            getProtocols: 'protocolModule/getProtocols',
-            getProtocolsByUserUUID: 'protocolModule/getProtocolsByUserUUID',
-            getProtocolsByUserUUIDANDProtocolUUID: 'protocolModule/getProtocolsByUserUUIDANDProtocolUUID',
-        }),
-    },
-    methods: {
-        saveUserProtocol: function(event){
+    export default {
+        name: 'example',
+        data () {
+            return {
+                userProtocolUUID: this.$route.params.userProtocolUUID,
+                userUUID: this.$route.params.userUUID,
+                max_height: "500",
+                max_width: "600",
+                min_height: "200",
+                min_width: "200",
+                height: "300",
+                width: "500",
+                title: '',
+                body: '',
+                projectUUIDs: [],
+                projectTitles: [],
+                files: [],
+                comments: null,
+                versions: [],
+                keywords: [],
+                showEditor: false,
+            }
+        },
+        computed: {
+            ...mapGetters({                
+                getProtocols: 'protocolModule/getProtocols',
+                getProtocolsByUserUUID: 'protocolModule/getProtocolsByUserUUID',
+                getProtocolsByUserUUIDANDProtocolUUID: 'protocolModule/getProtocolsByUserUUIDANDProtocolUUID',
+            }),
+            displayFiles: function(){
+                var files = this.files
+                var fileHtmls = []
+                if(!Utils.isEmpty(files)){
+                    for(var i = 0; i < files.length; i++){
+                        var fileArr = files[i].split('____')
+                        var originalName = fileArr[1]
+                        var currentName = fileArr[0]
+                        var fileRowHtml = '<span>' + originalName + '</span>'
+                        var originalNameArr = originalName.split('.')
+                        var fileExtension = ''
+                        if(originalNameArr.length === 2){
+                            fileExtension = originalNameArr[1].toLowerCase()
+                            if(Utils.imageExtensions.indexOf(fileExtension) >= 0){
+                                fileRowHtml += '&nbsp;&nbsp;&nbsp;&nbsp;<img src=\"' + currentName + '\" alt=\"File not found\" width=\"80\" height=\"80\" >' + 
+                                                '&nbsp;&nbsp;&nbsp;&nbsp;<a href="' + currentName + '?name='+originalName+'" class="btn btn-secondary" target="_blank">Download</a>' +
+                                                '&nbsp;&nbsp;&nbsp;&nbsp;<button id="' + currentName + '" type="button" class="btn btn-secondary imgDelBtn" name="'+originalName+'">Delete</button>'
+                                fileHtmls.push(fileRowHtml)
+                            }
+                        }
+                    }
+                }
+                return fileHtmls
+            },
+        },
+        methods: {
+            saveUserProtocol: function(event){
 
-            var protocolData = JSON.parse(JSON.stringify(this.$data))
-            protocolData.userUUID = this.userUUID
-            protocolData.userProtocolUUID = this.userProtocolUUID
+                var protocolData = JSON.parse(JSON.stringify(this.$data))
+                protocolData.userUUID = this.userUUID
+                protocolData.userProtocolUUID = this.userProtocolUUID
+                
+                if(Utils.isEmpty(protocolData.userUUID) || protocolData.userUUID === 'new'){
+                    alert('User UUID cannot be empty!')
+                    return false;
+                }
+                
+                if(Utils.isEmpty(protocolData.title)){
+                    alert('Protocol titile cannot be empty!')
+                    return false;
+                }
+                
+                if(Utils.isEmpty(protocolData.userProtocolUUID) || protocolData.userProtocolUUID === 'new'){
+                    alert('Protocol UUID cannot be empty!')
+                    return false;
+                }
 
-            Utils.saveUserProtocol(protocolData)
+                Utils.saveUserProtocol(protocolData)
+                .then((data) => {
+                    this.resetUserProfile(data)
+                    document.location.href = '/home'
+                })
+                .catch((err) => {
+                    alert("oops, something happened")
+                    console.log(err)
+                });
+            },
+            resetUserProfile: function (protocol){
+                this.title = protocol.title
+                this.body = protocol.body
+                this.projectUUIDs = protocol.projectUUIDs
+                this.projectTitles = protocol.projectTitles
+                this.files = protocol.files
+                this.comments = protocol.comments
+                this.versions = protocol.versions
+                this.keywords = protocol.keywords
+                this.setProtocolByUserUUIDANDProtocolUUID(protocol)
+            },
+            ...mapMutations({                                
+                setProtocols: 'protocolModule/setProtocols',
+                setProtocolsByUserUUID: 'protocolModule/setProtocolsByUserUUID',
+                setProtocolByUserUUIDANDProtocolUUID: 'protocolModule/setProtocolByUserUUIDANDProtocolUUID',
+            }),
+            contentChange: function(content){
+                this.body = content
+                $('#pbody').html(content)
+            },
+            editorFileUploaded: function(content){
+                if(Utils.isEmpty(this.files)){
+                    this.files = []
+                }
+                this.files.push(content)
+            },
+            toggleEditor: function(){
+                this.showEditor = !(this.showEditor)
+            },
+            uploadProtocolFile: function(event){
+                var url = '/api/users/' + this.userUUID + '/protocols/' + this.userProtocolUUID + '/files'
+                var files = $("#uploadFileForProtocol").prop("files")
+                var file = files[0]
+                var protocolFiles = this.files
+                if (Utils.isEmpty(file)) {
+                    alert("Please select a files to upload")
+                } else {
+                    var originalName = file.name
+                    var newName = 'blobid' + (new Date()).getTime() + '.' + file.name.split('.').pop()                
+                    Utils.uploadFile(url, file, newName)
+                    .then((data) => {
+                        protocolFiles.push(data['location'] + '____' + originalName)
+                        alert('File ' + originalName + ' has been successfully uploaded!')
+                    })
+                    .catch((err) => {
+                        alert("oops, something happened")
+                        console.log(err)
+                    });
+                }
+                
+            }
+        },
+        components: {
+            VueTinymce
+        },
+        created: function() {
+            
+            try{
+                var userUUID = this.$route.params.userUUID
+                if(Utils.isEmpty(userUUID)){
+                    throw new EmptyUserUUIDException(400, 'User UUID cannot be empty!')
+                }
+            }
+            catch(exception){
+                if (e instanceof EmptyUserUUIDException) {
+                    sessionStorage.errorMessage = message
+                    document.location.href = '/errors/400'
+                    return false
+                } else {
+                    return false;
+                }
+            }
+            
+            // When userProtocolUUID == 'new' this is a new protocol
+            var userProtocolUUID = this.$route.params.userProtocolUUID
+            if(userProtocolUUID == 'new'){
+                this.userProtocolUUID = Utils.getTimeUUID()
+                this.showEditor = true
+                return false
+            }
+            
+            var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.userUUID, this.userProtocolUUID)
+
+            if(!Utils.isEmpty(protocol)){
+                this.resetUserProfile(protocol)
+                return false
+            }
+
+            Utils.getUserProtocol(this.userUUID, this.userProtocolUUID)
             .then((data) => {
+                console.log(data)
                 this.resetUserProfile(data)
             })
             .catch((err) => {
@@ -106,54 +267,35 @@
                 console.log(err)
             });
         },
-        resetUserProfile: function (protocol){
-            this.title = protocol.title
-            this.body = protocol.body
-            this.projectUUIDs = protocol.projectUUIDs
-            this.projectTitles = protocol.projectTitles
-            this.files = protocol.files
-            this.comments = protocol.comments
-            this.versions = protocol.versions
-            this.keywords = protocol.keywords
-            this.setProtocolByUserUUIDANDProtocolUUID(protocol)
+        updated: function(){
+            var files = this.files
+            $(".imgDelBtn").click(function(event){
+                var del = confirm('Are you sure to delete this file?')
+                if(del == false){
+                    return false
+                }                
+                alert('File '+fileName+' will NOT be deleted until you click the save button below!')
+                var location = event.target.id
+                var fileName = event.target.name
+                this.files = Utils.removeArrayElementByValue(files, location+'____'+fileName)
+            })
         },
-        ...mapMutations({                                
-            setProtocols: 'protocolModule/setProtocols',
-            setProtocolsByUserUUID: 'protocolModule/setProtocolsByUserUUID',
-            setProtocolByUserUUIDANDProtocolUUID: 'protocolModule/setProtocolByUserUUIDANDProtocolUUID',
-        }),
-        contentChange: function(content){
-            this.body = content
-            $('#pbody').html(content)
-        },
-        togglePreview: function(){
-            this.preview = !(this.preview)
-        }
-    },
-    components: {
-        VueTinymce
-    },
-    created: function() {
-        var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.userUUID, this.userProtocolUUID)
-
-        if(!Utils.isEmpty(protocol)){
-            this.resetUserProfile(protocol)
-            return false
-        }
-
-        Utils.getUserProtocol(this.userUUID, this.userProtocolUUID)
-        .then((data) => {
-            console.log(data)
-            this.resetUserProfile(data)
-        })
-        .catch((err) => {
-            alert("oops, something happened")
-            console.log(err)
-        });
-    },
-}
+    }
 </script>
 
 <style>
+.card {
+    border: 1px groove add8e6;
+    padding: 0 1.4em 1.4em!important;
+    margin: 0 0 1.5em!important;
+    box-shadow: 0 0 0 0 #000;
+}
 
+.container {
+    margin-top: 15px;
+}
+
+.protocolUpdt{
+    margin-bottom: 15px;
+}
 </style>

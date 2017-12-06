@@ -2,6 +2,7 @@
     <div class="row align-items-center justify-content-center">
         <form method="post">
             <textarea :id="id" v-model="body"></textarea>  
+            <input type="hidden" id="filePickerName" >
         </form>
     </div>
 </template>
@@ -16,6 +17,7 @@
                 type: String,
                 required: true
             },
+            userUUID: String,
             body: {
                 type: String,
                 default: ''
@@ -57,7 +59,6 @@
                 image_advtab: true,
                 automatic_uploads: true,
                 file_picker_types: 'image', 
-                images_upload_url: '/api/editor/images',
                 images_reuse_filename: true,
                 style_formats: [
                     {title: 'Image Left', selector: 'img', styles: {
@@ -98,6 +99,7 @@
                             // call the callback and populate the Title field with the file name
                             cb(blobInfo.blobUri(), { title: file.name });
                         };
+                        $("#filePickerName").val(file.name)
                         reader.readAsDataURL(file);
                     };
 
@@ -105,35 +107,43 @@
                 },
                 
                 images_upload_handler: function (blobInfo, success, failure) {
-                    var xhr, formData;
+                    var xhr, formData, json={};
                     var csrf = Utils.readCookie('XSRF-TOKEN')
                     xhr = new XMLHttpRequest();
                     xhr.withCredentials = false;                    
-                    xhr.open('POST', '/api/editor/images');
+                    xhr.open('POST', '/api/users/'+vm.userUUID+'/protocols/'+vm.id+'/files');
                     xhr.setRequestHeader('X-XSRF-TOKEN', csrf)
 
-                    xhr.onload = function() {
-                      var json;
+                    xhr.onload = function() {                      
 
-                      if (xhr.status != 200) {
-                        failure('HTTP Error: ' + xhr.status);
-                        return;
-                      }
+                        if (xhr.status != 200) {
+                          failure('HTTP Error: ' + xhr.status);
+                          return;
+                        }
 
-                      json = JSON.parse(xhr.responseText);
+                        json = JSON.parse(xhr.responseText);
 
-                      if (!json || typeof json.location != 'string') {
-                        failure('Invalid JSON: ' + xhr.responseText);
-                        return;
-                      }
+                        if (!json || typeof json.location != 'string') {
+                          failure('Invalid JSON: ' + xhr.responseText);
+                          return;
+                        }
                         console.log('location =' + json.location);
-                      success(json.location);
+                        
+                        // ** trigger the uploaded file event for the protocol object **
+                        var originalFileName = $('#filePickerName').val()                        
+                        var fileName = json.location+'____'+originalFileName                        
+                        console.log('file name = '+fileName)                    
+                        vm.$emit('editor-file-uploaded', fileName)
+                    
+                        success(json.location);
                     };
 
                     formData = new FormData();
                     formData.append('file', blobInfo.blob(), blobInfo.filename());
 
                     xhr.send(formData);
+                    
+                    return json.location
                 },
 
                 init_instance_callback: function (editor) {

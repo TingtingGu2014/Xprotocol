@@ -14,6 +14,7 @@ import App from './App.vue'
 import routejs from './Router.js'
 import userModule from './UserModule.js';
 import protocolModule from './ProtocolModule.js'
+import exceptions from './Exceptions.js'
 
 var Utils = require('./Utils')
 
@@ -58,4 +59,6 @@ new Vue({
     store,
     el: '#app',
     render:h => h(App)
-})
+});
+
+Vue.config.devtools = true;

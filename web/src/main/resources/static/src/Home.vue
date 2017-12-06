@@ -1,36 +1,44 @@
 <template>
     <div>
         
-        <Protocol
-            :editorName = "editorName"
+        <ProtocolList v-if="loggedIn"
             :userUUID = "userUUID"
-            :userProtocolUUID = "userProtocolUUID"
-            :showPreview = "showPreview"
         >            
-        </Protocol>
+        </ProtocolList>
+        
     </div>
 </template>
 
 <script>
-    import Protocol from './Protocol.vue'
+    import ProtocolList from './ProtocolList.vue'
     
     var Utils = require('./Utils')
     var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
+    var userInfo = null
+    var userUUID = ''
+
+    if(loggedIn === true) {
+        try{
+            userInfo = JSON.parse(localStorage.userInfo)
+            userUUID = userInfo.userUUID
+        }
+        catch(err) {
+            console.log(err.message)
+            localStorage.userInfo = ''
+        }
+    }
     
     
     export default {
       data: function(){
         return {
-          name: 'Home',
-          userProtocolUUID: '70b99490-bdff-11e7-abbd-8d88b42d3590',
-          userUUID: '70b99491-bdff-11e7-abbd-8d88b42d3590',
-          editorName: 'homeProtocolEditor',
-          showPreview: true,
-          loggedIn: loggedIn,
+            name: 'Home',
+            userUUID: userUUID, 
+            loggedIn: loggedIn,
         }
       },
       components: {
-          Protocol
+          ProtocolList,
       },
       methods: {
         alertName: function(){

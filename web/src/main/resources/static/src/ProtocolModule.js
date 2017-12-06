@@ -15,18 +15,26 @@ const protocolModule = {
   getters: {    
         getProtocols: state => state.protocols,
         getProtocolsByUserUUID: state => (userUUID) => {
-            return state.protocols[userUUID]
+            var protocols = state.protocols
+            console.log('loading protocols by user UUID from store...\n')
+            if(Utils.isEmpty(protocols)){
+                return null
+            }
+            return protocols[userUUID]
         },
         getProtocolsByUserUUIDANDProtocolUUID: state => (userUUID, protocolUUID) => {
             var protocols = state.protocols
             console.log('loading protocol from store...\n')
-            console.log(state)
             if(Utils.isEmpty(protocols)){
                 return null
             }
             var userProtocols = protocols[userUUID]
-            if(!Utils.isEmpty(userProtocols)){
-                return userProtocols[protocolUUID]
+            if(!Utils.isEmpty(userProtocols) && Array.isArray(userProtocols)){
+                for(var i = 0; i < userProtocols.length; i++){
+                    if(userProtocols[i].userProtocolUUID === protocolUUID){
+                        return userProtocols[i]
+                    }
+                }
             }
             return null
         }
@@ -35,8 +43,12 @@ const protocolModule = {
     setProtocols(state, protocols) {
         state.protocols = protocols
     },
-    setProtocolsByUserUUID(state, protocols) {
-        state.protocols[protocol.userUUID] = protocols
+    setProtocolsByUserUUID(state, userUUID, data) {
+        var protocols = state.protocols
+        if(Utils.isEmpty(protocols)){
+            protocols = {}
+        }
+        protocols[userUUID] = data
     },
     setProtocolByUserUUIDANDProtocolUUID(state, protocol) {
         var protocols = state.protocols
@@ -45,13 +57,12 @@ const protocolModule = {
         }
         var protocolsByUser = protocols[protocol.userUUID]
         if(Utils.isEmpty(protocolsByUser)){
-            protocolsByUser = {}
+            protocolsByUser = []
         }
-        protocolsByUser[protocol.userProtocolUUID] = protocol
+        protocolsByUser.push(protocol)
         protocols[protocol.userUUID] = protocolsByUser;
         state.protocols = protocols
-        console.log('store state ...')
-        console.log(state)
+        console.log('protocol has been stored into store.')
     },
   }
 }
