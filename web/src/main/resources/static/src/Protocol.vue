@@ -30,7 +30,7 @@
 
                 <div class="col">
                     <div class="card " style="margin-top: 100px" v-bind:style="{height: (Number(height)+320)+'px'}">
-                        <div class="card-block" style="overflow:scroll">
+                        <div class="card-block">
                           <h4 class="card-header mb-3 text-center" style="font-weight: bolder; font-size: 15px; color: midnightblue">{{title}}</h4>
                           <p id="pbody" v-html="body"></p>
                         </div>
@@ -291,11 +291,23 @@
     box-shadow: 0 0 0 0 #000;
 }
 
+.card-block {
+    overflow: scroll;
+}
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* make scrollbar transparent */
+}
+
 .container {
     margin-top: 15px;
 }
 
 .protocolUpdt{
     margin-bottom: 15px;
+}
+
+#pbody {
+    word-wrap: break-word;
 }
 </style>
