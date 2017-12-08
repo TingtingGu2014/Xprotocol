@@ -65,6 +65,40 @@
                     </fieldset>
                 </div>
             </div>
+            <div class="row">
+                <div class="col">
+                <br><br>
+                    <fieldset class="form-group text-center" style="width:100%;">
+                        <legend>Protocol Key Words:</legend>
+                        <div class="row" v-if="keywords && keywords.length > 0">
+                            <div class="col  col-lg-12" role="group" aria-label="...">
+                                <span  class="col col-lg-4 float-left text-left" v-for="(keyword, index) in keywords" >
+                                    <span style="font-size:1rem; " >
+                                        {{index+1}}.&nbsp;{{keyword}}
+                                    </span>
+                                    <a v-bind:id="keyword" href="#" class="trash-can" v-if="isProtocolAuthor" v-on:click.prevent="removeKeyword">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>                                    
+                                    </a>
+                                </span>                            
+                            </div>
+                            <br>
+                        </div>
+                        
+                        <div v-else>                            
+                            <p style="font-size:2rem;"><span class="badge badge-info">No Keywords for this protocol</span></p>     
+                            <br>
+                        </div>
+                        <div class="form-group text-center" v-if="isProtocolAuthor">
+                            <form class="form-inline">
+                                <p style="font-size:2rem;">
+                                    <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="addKeywordInput">
+                                    <button type="button" class="btn btn-primary" v-on:click.prevent="addKeyword">Add a new keyword</button>
+                                </p>
+                            </form>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
         </div>
         <br>
         <div class="text-center">
@@ -136,6 +170,15 @@
                 }
                 return fileHtmls
             },
+            isProtocolAuthor: function(){
+                var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
+                if(!loggedIn === true){
+                    return false
+                }
+                var userInfo = JSON.parse(localStorage.userInfo)
+                var currentUserUUID = userInfo.userUUID
+                return currentUserUUID == this.userUUID ? true : false
+            }
         },
         methods: {
             saveUserProtocol: function(event){
@@ -219,6 +262,17 @@
                     });
                 }
                 
+            },
+            addKeyword: function(){
+                var addKeywordInputVal = $("#addKeywordInput").val()
+                if(Utils.isEmpty(addKeywordInputVal)){
+                    alert('Please type in a new keyword!')
+                    return false
+                }
+                if(Utils.isEmpty(this.keywords)){
+                    this.keywords = []
+                }
+                this.keywords.push(addKeywordInputVal)
             }
         },
         components: {
