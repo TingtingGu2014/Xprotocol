@@ -43,12 +43,6 @@ public class LoginController {
         resource.put("resource", "here is some resource");
         return resource;
     }
-//
-//    @RequestMapping(value = "/api/logout", method = RequestMethod.GET)
-//    @ResponseStatus(HttpStatus.NO_CONTENT)
-//    public void logout(HttpSession session) {
-//        session.invalidate();
-//    }
     
     @RequestMapping(value = "/api/logout", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.NO_CONTENT)

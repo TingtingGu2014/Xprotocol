@@ -388,9 +388,24 @@ export function getProtocolsByUserUUID(userUUID){
 
 export function getTimeUUID(){
     var UUID = require('uuid-js')
-    var date = new Date().getTime();
-    var uuidFirst = UUID.fromTime(date, false);
-    return uuidFirst.toString()
+    var uuid1 = UUID.create(1);
+    return uuid1.toString()
+}
+
+export function getTimeFromTimeUUID(uuid){
+    var uuid_arr = uuid.split( '-' ),
+    time_str = [
+        uuid_arr[ 2 ].substring( 1 ),
+        uuid_arr[ 1 ],
+        uuid_arr[ 0 ]
+    ].join( '' );
+    var time_int = parseInt( time_str, 16 );
+        
+    var int_time = time_int - 122192928000000000,
+    int_millisec = Math.floor( int_time / 10000 );
+    var date = new Date( int_millisec );
+    console.log(date);
+    return date;
 }
 
 // ** https://github.com/coobird/thumbnailator **

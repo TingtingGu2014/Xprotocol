@@ -91,11 +91,40 @@
                         <div class="form-group text-center" v-if="isProtocolAuthor">
                             <form class="form-inline">
                                 <p style="font-size:2rem;">
+                                    <br>
                                     <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="addKeywordInput">
                                     <button type="button" class="btn btn-primary" v-on:click.prevent="addKeyword">Add a new keyword</button>
                                 </p>
                             </form>
                         </div>
+                    </fieldset>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col">
+                <br><br>
+                    <fieldset class="form-group text-center" style="width:100%;">
+                        <legend>Comments:</legend>
+                        <div v-if="comments && Object.keys(comments).length > 0">
+                            <div class="list-group" v-if="comments && Object.keys(comments).length > 0" v-for="(value, key) in comments">
+                                <span class="list-group-item list-group-item-action flex-column align-items-start borderless">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{getCommentUserNameFromCommentKey(key)}} says:</h5>
+                                        <small>{{getCommentDateFromCommentKey(key)}}</small>
+                                    </div>
+                                    <p class="mb-1" v-html="value"></p>
+                                </span>
+                            </div>
+                        </div>
+                        <form v-if="isLoggedInUser">
+                            <p style="font-size:2rem;">    
+                                <br>
+                                <button type="button" class="btn btn-primary" v-on:click.prevent="addComment" style="margin-bottom: 5px;">Add a comment</button>
+                                <br><br>                                
+                                <textarea class="form-control" id="addCommentInput" rows="5"></textarea>
+                            </p>
+                        </form>
                     </fieldset>
                 </div>
             </div>
@@ -178,6 +207,25 @@
                 var userInfo = JSON.parse(localStorage.userInfo)
                 var currentUserUUID = userInfo.userUUID
                 return currentUserUUID == this.userUUID ? true : false
+            },
+            isLoggedInUser: function(){
+            
+                var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
+                if(!loggedIn === true){
+                    return false
+                }
+                
+                var userInfo = JSON.parse(localStorage.userInfo)
+                if(!userInfo){
+                    return false
+                }
+                
+                var currentUserUUID = userInfo.userUUID
+                if(!currentUserUUID){
+                    return false
+                }
+                
+                return true
             }
         },
         methods: {
@@ -273,13 +321,63 @@
                     this.keywords = []
                 }
                 this.keywords.push(addKeywordInputVal)
-            }
+            },
+            addComment: function(){
+            
+                var addCommentInputVal = $("#addCommentInput").val().replace(/(?:\r\n|\r|\n)/g, '<br/>')
+                if(Utils.isEmpty(addCommentInputVal)){
+                    alert('Please type in something for a new comment!')
+                    return false
+                }
+                if(Utils.isEmpty(this.comments)){
+                    this.comments = {}
+                }
+                var newCommentUUID = Utils.getTimeUUID()
+                
+                var commentUserName = ''
+                var userInfo = JSON.parse(localStorage.userInfo)
+                if(!Utils.isEmpty(userInfo.alias)){
+                    commentUserName = userInfo.alias
+                }
+                else if(!Utils.isEmpty(userInfo.firstName)){
+                    commentUserName = userInfo.firstName
+                    if(!Utils.isEmpty(userInfo.lastName)){
+                        commentUserName += ' ' + userInfo.lastName
+                    }
+                }
+                else {
+                    commentUserName = userInfo.email
+                }
+                
+                var commentKey = userInfo.userUUID + '____' + commentUserName + '____' + newCommentUUID
+                
+                this.$set(this.comments, commentKey, addCommentInputVal)
+                
+                $("#addCommentInput").val('')
+            },
+            // comment key: userUUID____userName____protocolUUID
+            getCommentUserNameFromCommentKey(key){
+                var keyArr = key.split('____')
+                if(!keyArr || keyArr.length != 3){
+                    alert('The comment key: ' + key + ' is wrong!')
+                }
+                return keyArr[1]
+            },
+            getCommentDateFromCommentKey(key){
+                var keyArr = key.split('____')
+                if(!keyArr || keyArr.length != 3){
+                    alert('The comment key: ' + key + ' is wrong!')
+                }
+                var uuid = keyArr[2]
+                var date = Utils.getTimeFromTimeUUID(uuid)
+                return date.toLocaleTimeString() 
+            },
         },
         components: {
             VueTinymce
         },
         created: function() {
-            
+        
             try{
                 var userUUID = this.$route.params.userUUID
                 if(Utils.isEmpty(userUUID)){
@@ -320,6 +418,7 @@
                 alert("oops, something happened")
                 console.log(err)
             });
+            
         },
         updated: function(){
             var files = this.files
@@ -363,5 +462,32 @@
 
 #pbody {
     word-wrap: break-word;
+}
+
+hr {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border: 0;
+  border-top: 2px solid rgb(169, 178, 180);
+}
+/*
+how to css list group border: https://arkuuu.de/blog/bootstrap4-card-heading-list-group
+
+.card > .list-group .list-group-item {
+//    border-left-width: 0;
+//    border-right-width: 0;
+}
+.card > .list-group .list-group-item:last-of-type {
+//    border-bottom-width: 0;
+}
+.card > .list-group .list-group-item:first-of-type {
+//    border-top-width: 0;
+}
+
+*/
+
+.list-group .list-group-item {
+    border-left-width: 0;
+    border-right-width: 0;
 }
 </style>
