@@ -2,33 +2,38 @@
     
     <div class="container"><br><br>
         <h3>List of Protocols</h3>
-        <router-link :to="{ path: 'users/'+userUUID+'/protocols/new'}">&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus-square-o" aria-hidden="true"></i>&nbsp;New Protocol</router-link>
-        <VueDataTable 
-            :tableData = "tableDataForDisplay"
-            :tableColumns = "tableColumns"
-            :showFilter = "showFilter"
-        ></VueDataTable>
+        
+        <b-table :fields="fields" :items="tableDataForDisplay">            
+            <template slot="index" scope="data">
+              {{data.index + 1}}
+            </template>
+            
+            <template slot="title" scope="data">
+                <RouterLink :linkData = "data.value"></RouterLink>                
+            </template>
+
+        </b-table>
     </div>
 </template>
 
 <script>
 
     import { mapGetters, mapMutations } from 'vuex'
-    import VueDataTable from './VueDataTable.vue'
+    import RouterLink from './vuetablecomponents/RouterLink.vue'
     
     var Utils = require('./Utils')
     
     export default {
         data: function() {
             return {
-                tableData: [],
-                tableColumns: [
-                    {show: 'title', label: 'Title', dataType: ''},
-                    {show: 'project_titles', label: 'Projects', dataType: ''},
-                    {show: 'keywords', label: 'Keywords', dataType: ''},
-                    {show: 'versions', label: 'Archived Versions', dataType: ''},
+                fields: [                    
+                    'index',                    
+                    'title',                    
+                    'projects',                    
+                    { key: 'keywords', label: 'Key Words' },                    
+                    { key: 'versions', label: 'Archived Versions' }
                 ],
-                showFilter: true,
+                rawData: [],
             }
         },
         props: {
@@ -40,22 +45,35 @@
                 getProtocolsByUserUUIDANDProtocolUUID: 'protocolModule/getProtocolsByUserUUIDANDProtocolUUID',
             }),
             tableDataForDisplay: function(){
-                var data = this.tableData
-                if(!Utils.isEmpty(data)){
-                    for(var i = 0; i < data.length; i++){
-                        var row = data[i]
-                        var title = '<a href="/users/' + row.userUUID + '/protocols/' + row.userProtocolUUID + '" >' + row.title + '</a>'
-                        row.title = title
+                var items = []
+                if(!Utils.isEmpty(this.rawData)){
+                    for(var i = 0; i < this.rawData.length; i++){
+                        items[i] = {}
+                        var row = this.rawData[i]
+                        $.each(row, function(key, value){
+                            if('title' != key){
+                                items[i][key] = value
+                            }
+                            else{
+                                var templateData = {}
+                                templateData.label = row.title
+                                templateData.name = 'userProtocol'
+                                templateData.params = {}
+                                templateData.params.userUUID = row.userUUID
+                                templateData.params.userProtocolUUID = row.userProtocolUUID
+                                items[i].title = templateData
+                            }
+                        })
                     }
                 }
-                return data
-            }
+                return items
+            },
         },
         methods: {
-            ...mapMutations({
-            setProtocolsByUserUUID: 'protocolModule/setProtocolsByUserUUID',
-            setProtocolByUserUUIDANDProtocolUUID: 'protocolModule/setProtocolByUserUUIDANDProtocolUUID',
-        }),
+                ...mapMutations({
+                setProtocolsByUserUUID: 'protocolModule/setProtocolsByUserUUID',
+                setProtocolByUserUUIDANDProtocolUUID: 'protocolModule/setProtocolByUserUUIDANDProtocolUUID',
+            }),
         },
         beforeMount: function(){
         
@@ -73,14 +91,14 @@
 
             if(!Utils.isEmpty(protocolList)){                
                 console.log(protocolList)
-                this.tableData = protocolList
+                this.rawData = protocolList
                 return false
             }
 
             Utils.getProtocolsByUserUUID(userUUID)
             .then((data) => {
                 console.log(data)                
-                this.tableData = data
+                this.rawData = data
                 this.setProtocolsByUserUUID(userUUID, data)
             })
             .catch((err) => {
@@ -89,7 +107,7 @@
             });
         },
         components: {
-            VueDataTable,
+            RouterLink,
         },
     }
 </script>

@@ -1,14 +1,13 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Vuex from 'vuex'
-import { TableComponent, TableColumn } from 'vue-table-component';
+import BootstrapVue from 'bootstrap-vue'
 import VuePassword from 'vue-password'
 
 Vue.use(VueRouter)
 Vue.use(Vuex)
+Vue.use(BootstrapVue);
 Vue.component(VuePassword)
-Vue.component('table-component', TableComponent);
-Vue.component('table-column', TableColumn);
  
 import App from './App.vue'
 import routejs from './Router.js'
