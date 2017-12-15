@@ -2,17 +2,22 @@
     
     <div class="container"><br><br>
     <h3>List of Users</h3>
-        <VueDataTable 
-            :tableData = "tableData"
-            :tableColumns = "tableColumns"
-            :showFilter = "showFilter"
-        ></VueDataTable>
+        <b-table :fields="fields" :items="tableData">            
+            <template slot="index" scope="data">
+              {{data.index + 1}}
+            </template>
+            
+            <template slot="edit" scope="data">
+                <RouterLink :linkData = "data.value"></RouterLink>                
+            </template>
+
+        </b-table>
     </div>
 </template>
 
 <script>
     
-    import VueDataTable from './VueDataTable.vue'
+    import RouterLink from './vuetablecomponents/RouterLink.vue'
     
     var Utils = require('./Utils')
     
@@ -30,16 +35,15 @@
         data: function() {
             return {
                 tableData: [],
-                tableColumns: [
-                    {show: 'firstName', label: 'First Name', dataType: ''},
-                    {show: 'lastName', label: 'Last Name', dataType: ''},
-                    {show: 'email', label: 'Email', dataType: ''},
-                    {show: 'userUUID', label: 'UUID', dataType: ''},
-                    {show: 'createdDate', label: 'Registeration Date', dataType: 'date:DD/MM/YYYY'},
-                    {show: 'active', label: 'Active', dataType: 'boolean'},
-                    {show: 'edit', label: 'Edit', dataType: ''},
-                ],
-                showFilter: true,
+                fields: [
+                    {key: 'firstName', label: 'First Name'},
+                    {key: 'lastName', label: 'Last Name'},
+                    {key: 'email', label: 'Email'},
+                    {key: 'userUUID', label: 'UUID'},
+                    {key: 'createdDate', label: 'Registeration Date', dataType: 'date:DD/MM/YYYY'},
+                    {key: 'active', label: 'Active', dataType: 'boolean'},
+                    'edit',
+                ],          
             }
         },
         beforeMount: function(){
@@ -56,13 +60,18 @@
                     console.log(data)
                     for(var i in data) {
                         var row = data[i];
-                        row["edit"] = "<a href=\"/admin/userProfile/" + row.userUUID + "\"><span class=\"fa fa-pencil\" aria-hidden=\"true\" ></span></a>";
+                        var editData = {}
+                        editData.name = 'userProfileAdmin'
+                        editData.params = {}
+                        editData.params.userUUID = row.userUUID
+                        editData.label = '<span class=\"fa fa-pencil\" aria-hidden=\"true\" ></span>'
+                        row['edit'] = editData
+//                        row["edit"] = "<a href=\"/admin/userProfile/" + row.userUUID + "\"><span class=\"fa fa-pencil\" aria-hidden=\"true\" ></span></a>";
                     }
                     this.tableData = data
                 }
                 else{
                     alert("not 200");
-//                    this.tableData = data;
                 }                                   
             })
             .catch( (error) => {
@@ -70,7 +79,7 @@
             });  
         },
         components: {
-            VueDataTable,
+            RouterLink,
         },
     }
 </script>

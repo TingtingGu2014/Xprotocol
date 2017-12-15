@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -67,8 +68,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
             .antMatchers("/css/**","/images/**","/img/**","/js/**","/dist/**","/src/**").permitAll()
             .antMatchers("/home","/index.html","/","/index","/error").permitAll()
-            .antMatchers("/login", "/signup", "/api/signUp", "/errors/**", "/api/users/{^[\\\\d]$}/protocols/**").permitAll()
+            .antMatchers("/login", "/signup", "/api/signUp", "/errors/**").permitAll()
             .antMatchers("/api/invalidsession", "/api/sessionexpires").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/users/{^[\\\\d]$}/protocols/**").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/users/{^[\\\\d]$}/protocols").permitAll()
             .antMatchers("/api/admin/**").hasAuthority("admin")
             .anyRequest().authenticated()
             .and().requestCache().requestCache(new NullRequestCache())
@@ -76,7 +79,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .and().formLogin().usernameParameter("email").passwordParameter("password").loginPage("/login").defaultSuccessUrl("/home")
             .and().logout().logoutSuccessUrl("/home")            
             .and().csrf().requireCsrfProtectionMatcher(csrfRequestMatcher).csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-            .and().sessionManagement().invalidSessionUrl("/api/invalidsession").maximumSessions(2).expiredUrl("/api/sessionexpires");
+            .and().sessionManagement().invalidSessionUrl("/invalidsession").maximumSessions(2).expiredUrl("/expiredsession");
 //                .and().csrf().disable();
     }
 }
