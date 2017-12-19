@@ -2,14 +2,14 @@
     
     <div class="container"><br><br>
         <h3>List of Protocols</h3>
-        
+        <router-link :to="{ path: 'users/'+userUUID+'/protocols/new'}">&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus-square-o" aria-hidden="true"></i>&nbsp;New Protocol</router-link>
         <b-table :fields="fields" :items="tableDataForDisplay">            
             <template slot="index" scope="data">
               {{data.index + 1}}
             </template>
             
             <template slot="title" scope="data">
-                <RouterLink :linkData = "data.value"></RouterLink>                
+                <table-router-link :linkData = "data.value"></table-router-link>                
             </template>
 
         </b-table>
@@ -19,7 +19,7 @@
 <script>
 
     import { mapGetters, mapMutations } from 'vuex'
-    import RouterLink from './vuetablecomponents/RouterLink.vue'
+    import TableRouterLink from './vuetablecomponents/TableRouterLink.vue'
     
     var Utils = require('./Utils')
     
@@ -107,7 +107,7 @@
             });
         },
         components: {
-            RouterLink,
+            TableRouterLink,
         },
     }
 </script>

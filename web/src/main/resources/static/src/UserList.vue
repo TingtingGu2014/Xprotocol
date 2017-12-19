@@ -8,7 +8,7 @@
             </template>
             
             <template slot="edit" scope="data">
-                <RouterLink :linkData = "data.value"></RouterLink>                
+                <table-router-link :linkData = "data.value"></table-router-link>                
             </template>
 
         </b-table>
@@ -17,7 +17,7 @@
 
 <script>
     
-    import RouterLink from './vuetablecomponents/RouterLink.vue'
+    import TableRouterLink from './vuetablecomponents/TableRouterLink.vue'
     
     var Utils = require('./Utils')
     
@@ -79,7 +79,7 @@
             });  
         },
         components: {
-            RouterLink,
+            TableRouterLink,
         },
     }
 </script>
