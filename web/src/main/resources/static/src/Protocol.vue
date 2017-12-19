@@ -22,9 +22,6 @@
                                     :width='width'
                                 ></VueTinymce>                     
                             </div>
-    <!--                    <div v-if="!preview" class="text-center" style="border-top: lightgray solid thin ">
-                            <a href="#" class="btn" v-on:click="toggleEditor">Show Preview</a>
-                        </div>-->
                     </div>
                 </div>
 
@@ -34,7 +31,7 @@
                           <h4 class="card-header mb-3 text-center" style="font-weight: bolder; font-size: 15px; color: midnightblue">{{title}}</h4>
                           <p id="pbody" v-html="body"></p>
                         </div>
-                        <div class="text-center">
+                        <div class="text-center" v-if="isProtocolAuthor">
                             <a href="#" class="btn" v-on:click="toggleEditor">
                                 <span v-if="showEditor">Hide Editor</span>
                                 <span v-else>Show Editor</span>
@@ -55,7 +52,7 @@
                             </ul>
                             <br><br>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" v-if="isProtocolAuthor">
                             <form class="form-inline">
                             <label for="uploadFileForProtocol">Select a file to upload:&nbsp;&nbsp;</label>
                             <input type="file" class="form-control-file" id="uploadFileForProtocol">
@@ -130,7 +127,7 @@
             </div>
         </div>
         <br>
-        <div class="text-center">
+        <div class="text-center" v-if="isProtocolAuthor">
             <button type="button" class="btn btn-outline-success btn-lg protocolUpdt"
                 v-on:click.prevent="saveUserProtocol"
             >
@@ -189,9 +186,11 @@
                         if(originalNameArr.length === 2){
                             fileExtension = originalNameArr[1].toLowerCase()
                             if(Utils.imageExtensions.indexOf(fileExtension) >= 0){
-                                fileRowHtml += '&nbsp;&nbsp;&nbsp;&nbsp;<img src=\"' + currentName + '\" alt=\"File not found\" width=\"80\" height=\"80\" >' + 
-                                                '&nbsp;&nbsp;&nbsp;&nbsp;<a href="' + currentName + '?name='+originalName+'" class="btn btn-secondary" target="_blank">Download</a>' +
-                                                '&nbsp;&nbsp;&nbsp;&nbsp;<button id="' + currentName + '" type="button" class="btn btn-secondary imgDelBtn" name="'+originalName+'">Delete</button>'
+                                fileRowHtml += '&nbsp;&nbsp;&nbsp;&nbsp;<img src=\"' + currentName + '\" alt=\"File not found\" width=\"80\" height=\"80\" >' +
+                                               '&nbsp;&nbsp;&nbsp;&nbsp;<a href="' + currentName + '?name='+originalName+'" class="btn btn-secondary" target="_blank">Download</a>'
+                                if(this.isProtocolAuthor){
+                                    fileRowHtml += '&nbsp;&nbsp;&nbsp;&nbsp;<button id="' + currentName + '" type="button" class="btn btn-secondary imgDelBtn" name="'+originalName+'">Delete</button>'
+                                }                                                 
                                 fileHtmls.push(fileRowHtml)
                             }
                         }
@@ -252,7 +251,7 @@
 
                 Utils.saveUserProtocol(protocolData)
                 .then((data) => {
-                    this.resetUserProfile(data)
+                    this.resetUserProtocol(data)
                     document.location.href = '/home'
                 })
                 .catch((err) => {
@@ -260,7 +259,7 @@
                     console.log(err)
                 });
             },
-            resetUserProfile: function (protocol){
+            resetUserProtocol: function (protocol){
                 this.title = protocol.title
                 this.body = protocol.body
                 this.projectUUIDs = protocol.projectUUIDs
@@ -349,11 +348,43 @@
                     commentUserName = userInfo.email
                 }
                 
+                var comment = {}
+                comment.protocolUserUUID = this.userUUID
+                comment.protocolUUID = this.userProtocolUUID
+                comment.commentUUID = newCommentUUID
+                comment.userUUID = userInfo.userUUID
+                comment.protocolTitle = this.title
+                comment.content = addCommentInputVal
+                comment.path = ''
+                
                 var commentKey = userInfo.userUUID + '____' + commentUserName + '____' + newCommentUUID
+                                
+                Utils.saveComment(comment)
+                .then((data) => {
+                    console.log(data)
+                    this.$set(this.comments, commentKey, addCommentInputVal)   
+                    $("#addCommentInput").val('')
+                })
+                .catch((err) => {
+                    alert("oops, something happened")
+                    console.log(err)
+                });
                 
-                this.$set(this.comments, commentKey, addCommentInputVal)
+                var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.userUUID, this.userProtocolUUID)
+                if(Utils.isEmpty(protocol.comments)){
+                    protocol.comments = {}
+                }
+                protocol.comments[commentKey] = addCommentInputVal
                 
-                $("#addCommentInput").val('')
+                Utils.saveUserProtocol(protocol)
+                .then((data) => {
+                    console.log(data)                    
+                })
+                .catch((err) => {
+                    alert("oops, something happened")
+                    console.log(err)
+                });
+                
             },
             // comment key: userUUID____userName____protocolUUID
             getCommentUserNameFromCommentKey(key){
@@ -370,7 +401,7 @@
                 }
                 var uuid = keyArr[2]
                 var date = Utils.getTimeFromTimeUUID(uuid)
-                return date.toLocaleTimeString() 
+                return Utils.outputDateTime(date) 
             },
         },
         components: {
@@ -405,14 +436,14 @@
             var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.userUUID, this.userProtocolUUID)
 
             if(!Utils.isEmpty(protocol)){
-                this.resetUserProfile(protocol)
+                this.resetUserProtocol(protocol)
                 return false
             }
 
             Utils.getUserProtocol(this.userUUID, this.userProtocolUUID)
             .then((data) => {
                 console.log(data)
-                this.resetUserProfile(data)
+                this.resetUserProtocol(data)
             })
             .catch((err) => {
                 alert("oops, something happened")

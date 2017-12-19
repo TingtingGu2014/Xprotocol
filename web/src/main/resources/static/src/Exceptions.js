@@ -15,3 +15,9 @@ export function EmptyDataException(code, message){
     this.code = code
     this.name = 'EmptyDataException'
 }
+
+export function EmptyUserCommentUUIDException(code, message){
+    this.message = message
+    this.code = code
+    this.name = 'EmptyUserCommentUUIDException'
+}

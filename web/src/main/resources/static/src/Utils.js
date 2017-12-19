@@ -360,6 +360,64 @@ export function saveUserProtocol(protocol){
     
 }
 
+export function saveComment(comment){
+    
+    if(isEmpty(comment)){
+        alert('The comment data is empty!')
+        return false
+    }
+    
+    var userUUID = comment.userUUID
+    var commentUUID = comment.commentUUID
+    var protocolUUID = comment.protocolUUID
+    
+    try{
+        if(isEmpty(userUUID)){
+            throw new exceptions.EmptyUserUUIDException(400, 'User UUID cannot be empty!')
+        }
+        else if(isEmpty(protocolUUID)){
+            throw new exceptions.EmptyUserProtocolUUIDException(400, 'Protocol UUID cannot be empty!')
+        }
+        else if(isEmpty(commentUUID)){
+            throw new exceptions.EmptyUserCommentUUIDException(400, 'Comment UUID cannot be empty!')
+        }
+    }
+    catch(exception){
+        sessionStorage.errorMessage = exception.message
+        document.location.href = '/errors/400'
+        return false
+    }
+    
+    var url = ''
+    if(isEmpty(userUUID)){
+        url = '/api/comments/'+commentUUID
+    }
+    else{
+        url = '/api/users/' + userUUID +'/comments/'+commentUUID
+    }
+    
+    return axios({
+        method: 'post',
+        url: url,
+        dataType: 'json',
+        data: comment,
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+    })
+    .then( (response) => {
+        var status = response.status;
+        if(status == 200 || status == "200"){              
+            return response.data
+        }
+        else{
+            alert("status " + status + ", cannot get the comment information!");
+        }                                   
+    })
+    .catch( (error) => {
+        console.log(error);
+    });
+    
+}
+
 export function getProtocolsByUserUUID(userUUID){
     if(isEmpty(userUUID)){
         alert('The user UUID is empty!')
@@ -393,6 +451,7 @@ export function getTimeUUID(){
 }
 
 export function getTimeFromTimeUUID(uuid){
+    var dateFormat = require('dateformat')
     var uuid_arr = uuid.split( '-' ),
     time_str = [
         uuid_arr[ 2 ].substring( 1 ),
@@ -405,7 +464,20 @@ export function getTimeFromTimeUUID(uuid){
     int_millisec = Math.floor( int_time / 10000 );
     var date = new Date( int_millisec );
     console.log(date);
+    dateFormat(date, "dddd, mmmm dS, yyyy, h:MM:ss");
     return date;
+}
+
+export function outputDateTime(date){
+    var monthNames = [
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  ];
+
+  var day = date.getDate();
+  var monthIndex = date.getMonth();
+  var year = date.getFullYear();
+
+  return monthNames[monthIndex] + ' ' + day + ', '+ year + ' ' + date.toLocaleTimeString();
 }
 
 // ** https://github.com/coobird/thumbnailator **

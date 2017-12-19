@@ -5,10 +5,11 @@
  */
 package com.xprotocol.service.protocol;
 
-import com.xprotocol.cassandra.model.UserComment;
+import com.xprotocol.cassandra.model.ProtocolToUser;
+import com.xprotocol.cassandra.model.Comment;
 import com.xprotocol.cassandra.model.UserProject;
 import com.xprotocol.cassandra.model.UserProtocol;
-import com.xprotocol.cassandra.repository.UserCommentRepository;
+import com.xprotocol.cassandra.repository.ProtocolByUserRepository;
 import com.xprotocol.cassandra.repository.UserProjectRepository;
 import com.xprotocol.cassandra.repository.UserProtocolRepository;
 import com.xprotocol.service.exceptions.EntityDoesNotExistException;
@@ -19,6 +20,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
+import com.xprotocol.cassandra.repository.CommentRepository;
 
 /**
  *
@@ -32,14 +34,17 @@ public class UserProtocolServiceImpl implements UserProtocolService {
     UserProtocolRepository protocolRepo;
     
     @Autowired
-    UserCommentRepository commentRepo;
+    CommentRepository commentRepo;
     
     @Autowired
     UserProjectRepository projectRepo;
     
+    @Autowired
+    ProtocolByUserRepository protocolByUserRepo;
+    
     @Override
-    public UserComment createComment(UUID userCommentUUID, UUID userUUID, String content, String path, String protocolTitle) {
-        return commentRepo.save(new UserComment(userCommentUUID, userUUID, content, path, protocolTitle));
+    public Comment updateComment(Comment comment) {
+        return commentRepo.save(comment);
     }
     
     @Override
@@ -78,4 +83,14 @@ public class UserProtocolServiceImpl implements UserProtocolService {
         return protocolRepo.save(protocol);
     }
     
+    // *** ProtocolByUser operations ***
+    @Override
+    public ProtocolToUser updateProtocolByUser(ProtocolToUser protocolByUser){
+        return protocolByUserRepo.save(protocolByUser);
+    }
+    
+    @Override
+    public ProtocolToUser findProtocolByUser(UUID protocolUUID){
+        return protocolByUserRepo.findProtocolToUserByprotocolUUID(protocolUUID);
+    }
 }

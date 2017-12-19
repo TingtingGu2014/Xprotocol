@@ -5,6 +5,8 @@
  */
 package com.xprotocol.web.mvc;
 
+import com.xprotocol.cassandra.model.Comment;
+import com.xprotocol.cassandra.model.ProtocolToUser;
 import com.xprotocol.cassandra.model.UserProtocol;
 import com.xprotocol.persistence.model.User;
 import com.xprotocol.service.user.UserService;
@@ -12,6 +14,7 @@ import com.xprotocol.service.protocol.UserProtocolService;
 import com.xprotocol.utils.UtilsFileHelper;
 import com.xprotocol.utils.Validators;
 import com.xprotocol.web.config.XprotocolWebUtils;
+import com.xprotocol.web.exceptions.IncompleteCommentInformationException;
 import com.xprotocol.web.exceptions.IncompleteUserProtocolInformationException;
 import com.xprotocol.web.exceptions.InvalidProtocolFileNameFormatException;
 import com.xprotocol.web.exceptions.UserNotLoggedInException;
@@ -145,6 +148,11 @@ public class UserProtocolController {
                 throw new IncompleteUserProtocolInformationException("The protocol data or title is empty!");
             }
             protocol = protocolSrv.updateProtocol(protocol);
+            
+            if(null != protocol){
+                ProtocolToUser protocolByUser = new ProtocolToUser(protocol.getUserProtocolUUID(), protocol.getUserUUID(), protocol.getTitle());
+                protocolSrv.updateProtocolByUser(protocolByUser);
+            }
             // Clean up the associted files
             protocolFilesProcess(protocol);
         }
@@ -219,5 +227,47 @@ public class UserProtocolController {
         }
         
         
+    }
+    
+    @RequestMapping(value="/api/users/{userUUIDStr}/comments/{commentUUIDStr}", method=RequestMethod.POST)
+    public Comment updateComment(HttpServletRequest request, 
+                                        @PathVariable("userUUIDStr") String userUUIDStr, 
+                                        @PathVariable("commentUUIDStr") String commentUUIDStr,
+                                        @RequestBody Comment comment,
+                                        HttpServletResponse response
+                                        )
+    {
+        try{
+            User currentUser = XprotocolWebUtils.getCurrentXprotocolUser();
+            if(null == currentUser){
+                throw new UserNotLoggedInException("You have to log in to update comments!");
+            }
+            if(Validators.isEmptyString(userUUIDStr)){            
+                throw new IncompleteCommentInformationException("The user UUID cannot be empty!");
+            }
+            else if(Validators.isEmptyString(commentUUIDStr)){
+                throw new IncompleteCommentInformationException("The comment UUID is empty!");
+            }
+            else if(null == comment || Validators.isEmptyString(comment.getContent())){
+                throw new IncompleteCommentInformationException("The comment body is empty!");
+            }
+            comment = protocolSrv.updateComment(comment);
+            return comment;
+        }
+        catch(UserNotLoggedInException ex){
+            try {
+                response.sendError(403, ex.getMessage());
+            } catch (IOException ex1) {
+                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
+        catch(IncompleteCommentInformationException ex){
+            try {
+                response.sendError(400, "Incomplete or invalid user registration information!"+ex.getMessage());
+            } catch (IOException ex1) {
+                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
+        return null;
     }
 }

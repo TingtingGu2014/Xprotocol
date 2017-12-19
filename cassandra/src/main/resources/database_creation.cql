@@ -68,9 +68,9 @@ CREATE TABLE IF NOT EXISTS xprotocol.user_project (
 ) WITH CLUSTERING ORDER BY (user_project_uuid DESC); 
 
 
-CREATE TABLE IF NOT EXISTS xprotocol.user_comment (
+CREATE TABLE IF NOT EXISTS xprotocol.comment (
 
-    user_comment_uuid timeuuid,
+    comment_uuid timeuuid,
 
     user_uuid timeuuid,
 
@@ -78,22 +78,26 @@ CREATE TABLE IF NOT EXISTS xprotocol.user_comment (
 
     content text,
 
+    protocol_uuid timeuuid,
+
+    protocol_user_uuid timeuuid,
+
     protocol_title varchar,
 
-    PRIMARY KEY (user_uuid, user_comment_uuid)
+    PRIMARY KEY (user_uuid, comment_uuid)
 
-) WITH CLUSTERING ORDER BY (user_comment_uuid DESC);
+) WITH CLUSTERING ORDER BY (comment_uuid DESC);
 
 
-CREATE TABLE IF NOT EXISTS xprotocol.protocol_by_user (
+CREATE TABLE IF NOT EXISTS xprotocol.protocol_to_user (
 
-    user_protocol_uuid timeuuid,
+    protocol_uuid timeuuid,
 
     user_uuid timeuuid,
 
     title text,
 
-    PRIMARY KEY (user_protocol_uuid)
+    PRIMARY KEY (protocol_uuid)
 
 ); 
 
