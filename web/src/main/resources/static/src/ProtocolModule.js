@@ -20,7 +20,16 @@ const protocolModule = {
             if(Utils.isEmpty(protocols)){
                 return null
             }
-            return protocols[userUUID]
+            else{
+                console.log('protocols for user: '+userUUID+':\n')
+                console.log(protocols)
+            }
+            var protocolArr = []
+            var protocolsByUser = protocols[userUUID]
+            for (var protocolUUID in protocolsByUser){
+                protocolArr.push(protocolsByUser[protocolUUID])
+            }
+            return protocolArr
         },
         getProtocolsByUserUUIDANDProtocolUUID: state => (userUUID, protocolUUID) => {
             var protocols = state.protocols
@@ -28,11 +37,12 @@ const protocolModule = {
             if(Utils.isEmpty(protocols)){
                 return null
             }
-            var userProtocols = protocols[userUUID]
-            if(!Utils.isEmpty(userProtocols) && Array.isArray(userProtocols)){
-                for(var i = 0; i < userProtocols.length; i++){
-                    if(userProtocols[i].userProtocolUUID === protocolUUID){
-                        return userProtocols[i]
+
+            var protocolsByUser = protocols[userUUID]
+            if(!Utils.isEmpty(protocolsByUser)){
+                for (var protocolUUIDKey in protocolsByUser){
+                    if(protocolUUID === protocolUUIDKey){
+                        return protocolsByUser[protocolUUIDKey]
                     }
                 }
             }
@@ -43,26 +53,51 @@ const protocolModule = {
     setProtocols(state, protocols) {
         state.protocols = protocols
     },
-    setProtocolsByUserUUID(state, userUUID, data) {
+    setProtocolsByUserUUID(state, protocolsData) {
         var protocols = state.protocols
         if(Utils.isEmpty(protocols)){
             protocols = {}
         }
-        protocols[userUUID] = data
+        try{
+            if(protocolsData instanceof Object){
+                var keys = Object.keys(protocolsData)
+                var userUUID = keys[0]
+                var protocolsByUser = protocols[userUUID]
+                if(Utils.isEmpty(protocolsByUser)){
+                    protocolsByUser = []
+                }
+                protocolsByUser = protocolsData[userUUID]
+                var protocolsByUserInStore = protocols[userUUID]
+                if(Utils.isEmpty(protocolsByUserInStore)){
+                    protocolsByUserInStore = {}
+                }
+                for (var i = 0; i < protocolsByUser.length; i++){
+                    protocolsByUserInStore[protocolsByUser[i].userProtocolUUID] = protocolsByUser[i]
+                }                
+                protocols[userUUID] = protocolsByUserInStore;
+                state.protocols = protocols
+            }
+            else{
+                throw 'ProtocolsData is not an object!'
+            }            
+        }
+        catch(ex){
+            console.log('error: \n' + ex)
+            return null
+        }
     },
     setProtocolByUserUUIDANDProtocolUUID(state, protocol) {
         var protocols = state.protocols
-        if(Utils.isEmpty(protocolsByUser)){
+        if(Utils.isEmpty(protocols)){
             protocols = {}
         }
         var protocolsByUser = protocols[protocol.userUUID]
         if(Utils.isEmpty(protocolsByUser)){
-            protocolsByUser = []
+            protocolsByUser = {}
         }
-        protocolsByUser.push(protocol)
+        protocolsByUser[protocol.userProtocolUUID] = protocol
         protocols[protocol.userUUID] = protocolsByUser;
         state.protocols = protocols
-        console.log('protocol has been stored into store.')
     },
   }
 }

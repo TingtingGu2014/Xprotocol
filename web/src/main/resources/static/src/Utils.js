@@ -7,7 +7,21 @@
 export const imageExtensions = ['bmp','tif','tiff','gif','jpeg','jpg','jif','jfif','jp2','jpx','j2k','j2c','pcd','png','pdf']
 
 export function isEmpty(obj){
-    return obj === null || typeof obj === 'undefined' || obj === '';
+    if(obj === null || typeof obj === 'undefined' || obj === ''){
+        return true
+    }
+    if(obj instanceof Array && obj.length === 0){
+        return true
+    }
+    if(obj instanceof Object){
+        for(var key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                return false;
+            }
+        }
+        return true
+    }
+    return false
 }
 
 export function removeArrayElementByValue(array, element) {

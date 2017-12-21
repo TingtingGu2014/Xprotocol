@@ -99,7 +99,9 @@
             .then((data) => {
                 console.log(data)                
                 this.rawData = data
-                this.setProtocolsByUserUUID(userUUID, data)
+                var protocolsData = {}
+                protocolsData[userUUID] = data
+                this.setProtocolsByUserUUID(protocolsData)
             })
             .catch((err) => {
                 alert("oops, something happened")
