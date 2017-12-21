@@ -99,7 +99,7 @@
             </div>
             
             <div class="row">
-                <div class="col">
+                
                 <br><br>
                     <fieldset class="form-group text-center" style="width:100%;">
                         <legend>Comments:</legend>
@@ -110,7 +110,29 @@
                                         <h5 class="mb-1">{{getCommentUserNameFromCommentKey(key)}} says:</h5>
                                         <small>{{getCommentDateFromCommentKey(key)}}</small>
                                     </div>
-                                    <p class="mb-1" v-html="value"></p>
+                                    <div id="key + '-edit-delete-div'" class="d-flex w-100 justify-content-between" v-if="!hiddenCommentEditors || hiddenCommentEditors.indexOf(key) < 0">
+                                        <span class="mb-1" v-html="value" style="text-align: left"></span>
+                                        <span class="mb-1" style="width: 15%;">
+                                            <a v-bind:id="key + '-edit-show'" href="#" v-on:click.prevent="toggleCommentEditBtn">
+                                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                                            </a>                                            
+                                            <a v-bind:id="key + 'delete'" href="#" v-on:click.prevent="deleteComment">
+                                                <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                            </a>
+                                        </span>
+                                    </div>     
+                                    <div id="key + '-edit-input-div'" class="d-flex w-100 justify-content-between" v-else>
+                                        <span style="width:100%">
+                                            <p><textarea class="form-control" v-bind:id="key + '-editCommentInput'" rows="5">{{value}}</textarea></p>
+                                            <!--<a v-bind:id="key + '-edit-commit'" href="#" v-on:click.prevent="editComment">OK</a>-->
+                                            <b-button v-bind:id="key + '-edit-commit'" :size="sm" :variant="outline-sucess" v-on:click.prevent="updateComment" >
+                                                Commit &nbsp;&nbsp;<i class="fa fa-check" aria-hidden="true"></i>
+                                            </b-button>
+                                            <b-button v-bind:id="key + '-edit-cancel'" :size="sm" :variant="outline-sucess" v-on:click.prevent="toggleCommentEditBtn">
+                                                Cancel&nbsp;&nbsp;<i class="fa fa-undo" aria-hidden="true"></i>
+                                            </b-button>
+                                        </span>
+                                    </div>
                                 </span>
                             </div>
                         </div>
@@ -118,12 +140,12 @@
                             <p style="font-size:2rem;">    
                                 <br>
                                 <button type="button" class="btn btn-primary" v-on:click.prevent="addComment" style="margin-bottom: 5px;">Add a comment</button>
-                                <br><br>                                
+                                <br>                               
                                 <textarea class="form-control" id="addCommentInput" rows="5"></textarea>
                             </p>
                         </form>
                     </fieldset>
-                </div>
+                
             </div>
         </div>
         <br>
@@ -163,7 +185,8 @@
                 comments: null,
                 versions: [],
                 keywords: [],
-                showEditor: false,
+                hiddenCommentEditors: [],
+                showEditor: false,                
             }
         },
         computed: {
@@ -206,7 +229,7 @@
                 var userInfo = JSON.parse(localStorage.userInfo)
                 var currentUserUUID = userInfo.userUUID
                 return currentUserUUID == this.userUUID ? true : false
-            },
+            },            
             isLoggedInUser: function(){
             
                 var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
@@ -225,7 +248,7 @@
                 }
                 
                 return true
-            }
+            },
         },
         methods: {
             saveUserProtocol: function(event){
@@ -403,6 +426,98 @@
                 var date = Utils.getTimeFromTimeUUID(uuid)
                 return Utils.outputDateTime(date) 
             },
+            isCommentAuthor: function(commentKey){
+                var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
+                if(!loggedIn === true){
+                    return false
+                }
+                var userInfo = JSON.parse(localStorage.userInfo)
+                var currentUserUUID = userInfo.userUUID
+                var keyArr = commentKey.split('____')
+                if(!keyArr || keyArr.length != 3){
+                    alert('The comment key: ' + commentKey + ' is wrong!')
+                }
+                var commentUserUUID = keyArr[0]
+                return currentUserUUID == commentUserUUID ? true : false
+            },
+            toggleCommentEditBtn: function(event){
+                var id = event.target.id
+                if(Utils.isEmpty(id)){
+                    id = event.currentTarget.id
+                }
+                var keyArr = id.split('-edit-')
+                var key = keyArr[0]
+                if(id.indexOf('-edit-cancel') > 0){
+                    Utils.removeArrayElementByValue(this.hiddenCommentEditors, key)
+                }
+                else if(id.indexOf('-edit-show') > 0){
+                    if(Utils.isEmpty(this.hiddenCommentEditors)){
+                        this.hiddenCommentEditors = []
+                    }
+                    if(this.hiddenCommentEditors.indexOf(key) < 0){
+                        this.hiddenCommentEditors.push(key)
+                    }
+                }                
+            },          
+            updateComment: function(event){
+                var id = event.target.id
+                if(Utils.isEmpty(id)){
+                    id = event.currentTarget.id
+                }
+                var keyArr = id.split('-edit-')
+                var commentKey = keyArr[0]
+                var val = $("#"+commentKey+"-editCommentInput").val()                
+                
+                var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.userUUID, this.userProtocolUUID)
+                if(Utils.isEmpty(protocol)){
+                    alert("Cannot find the protocol for this comment!")
+                    return false
+                }
+                
+                if(Utils.isEmpty(protocol.comments)){
+                    protocol.comments = {}
+                }
+                protocol.comments[commentKey] = val
+                
+                Utils.saveUserProtocol(protocol)
+                .then((data) => {
+                    console.log(data) 
+                    console.log('Protocol with new comment content saved')
+                })
+                .catch((err) => {
+                    alert("oops, something happened")
+                    console.log(err)
+                });
+                
+                var keyArr = commentKey.split('____')
+                var userInfo = JSON.parse(localStorage.userInfo)
+                var comment = {}
+                comment.protocolUserUUID = this.userUUID
+                comment.protocolUUID = this.userProtocolUUID
+                comment.commentUUID = keyArr[2]
+                comment.userUUID = userInfo.userUUID
+                comment.protocolTitle = this.title
+                comment.content = val
+                comment.path = ''
+                
+                Utils.saveComment(comment)
+                .then((data) => {
+                    console.log(data)
+                    this.$set(this.comments, commentKey, val)   
+                    if(this.hiddenCommentEditors.indexOf(commentKey) >= 0){
+                        Utils.removeArrayElementByValue(this.hiddenCommentEditors, commentKey)
+                    }
+                })
+                .catch((err) => {
+                    alert("oops, something happened")
+                    console.log(err)
+                });
+                
+            },
+            deleteComment: function(event){
+                
+              
+            }
         },
         components: {
             VueTinymce

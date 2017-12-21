@@ -5,7 +5,8 @@
  */
 package com.xprotocol.cassandra.repository;
 
-import com.xprotocol.cassandra.model.ProtocolByUser;
+import com.xprotocol.cassandra.model.ProtocolToUser;
+import java.util.UUID;
 import org.springframework.data.cassandra.repository.CassandraRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Repository;
  * @author Tao Zhao
  */
 @Repository
-public interface ProtocolByUserRepository extends CassandraRepository<ProtocolByUser> {
+public interface ProtocolByUserRepository extends CassandraRepository<ProtocolToUser> {
 //    @Query("select * from user_details where user_id = ?0 LIMIT ?1 ")
-    
+    ProtocolToUser findProtocolToUserByprotocolUUID(UUID protocolUUID);
 }

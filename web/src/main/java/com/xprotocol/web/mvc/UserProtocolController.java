@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
@@ -269,5 +270,47 @@ public class UserProtocolController {
             }
         }
         return null;
+    }
+    
+    @RequestMapping(value="/api/users/{userUUIDStr}/comments/{commentUUIDStr}", method=RequestMethod.DELETE)
+    public void deleteComment(HttpServletRequest request, 
+                                        @PathVariable("userUUIDStr") String userUUIDStr, 
+                                        @PathVariable("commentUUIDStr") String commentUUIDStr,
+                                        HttpServletResponse response
+                                        ) {
+        try{
+            User currentUser = XprotocolWebUtils.getCurrentXprotocolUser();
+            if(null == currentUser){
+                throw new UserNotLoggedInException("You have to log in to delete comments!");
+            }
+            if(Validators.isEmptyString(userUUIDStr)){            
+                throw new IncompleteCommentInformationException("The user UUID cannot be empty!");
+            }
+            else if(Validators.isEmptyString(commentUUIDStr)){
+                throw new IncompleteCommentInformationException("The comment UUID is empty!");
+            }
+            protocolSrv.deleteCommentByUserUUIDAndCommentUUID(UUID.fromString(userUUIDStr), UUID.fromString(commentUUIDStr));
+        }
+        catch(UserNotLoggedInException ex){
+            try {
+                response.sendError(403, ex.getMessage());
+            } catch (IOException ex1) {
+                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
+        catch(IncompleteCommentInformationException ex){
+            try {
+                response.sendError(400, "Incomplete or invalid user registration information!"+ex.getMessage());
+            } catch (IOException ex1) {
+                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
+        catch(Exception ex){
+            try {
+                response.sendError(500, ex.getMessage());
+            } catch (IOException ex1) {
+                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
     }
 }

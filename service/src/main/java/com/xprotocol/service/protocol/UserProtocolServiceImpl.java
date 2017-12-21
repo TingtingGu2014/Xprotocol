@@ -48,6 +48,11 @@ public class UserProtocolServiceImpl implements UserProtocolService {
     }
     
     @Override
+    public void deleteCommentByUserUUIDAndCommentUUID(UUID userUUID, UUID commentUUID){
+        commentRepo.deleteCommentByUserUUIDAndCommentUUID(userUUID, commentUUID);
+    }
+    
+    @Override
     public UserProject createProject(UUID userProjectUUID, UUID userUUID, String title, String description, Set<UUID> protocolUUIDs, Set<String> protocolTitles, Set<String> keywords) {
         return projectRepo.save(new UserProject(userProjectUUID, userUUID, title, description, protocolUUIDs, protocolTitles, keywords));
     }

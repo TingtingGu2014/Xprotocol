@@ -9,7 +9,6 @@ import com.xprotocol.cassandra.model.ProtocolToUser;
 import com.xprotocol.cassandra.model.Comment;
 import com.xprotocol.cassandra.model.UserProject;
 import com.xprotocol.cassandra.model.UserProtocol;
-import com.xprotocol.service.exceptions.EntityDoesNotExistException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +32,7 @@ public interface UserProtocolService {
     public UserProject createProject(UUID userProjectUUID, UUID userUUID, String title, String description, Set<UUID> protocolUUIDs, Set<String> protocolTitles, Set<String> keywords);
     
     public Comment updateComment(Comment comment);
+    public void deleteCommentByUserUUIDAndCommentUUID(UUID userUUID, UUID commentUUID);
     
     public ProtocolToUser updateProtocolByUser(ProtocolToUser protocolByUser);
     public ProtocolToUser findProtocolByUser(UUID userProtocolUUID);

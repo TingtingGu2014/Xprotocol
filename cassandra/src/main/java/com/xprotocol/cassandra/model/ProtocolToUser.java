@@ -17,12 +17,12 @@ import org.springframework.data.cassandra.mapping.Table;
  *
  * @author zhao0677
  */
-@Table(value = "protocol_by_user")
-public class ProtocolByUser {
+@Table(value = "protocol_to_user")
+public class ProtocolToUser {
     
-    @PrimaryKeyColumn (name="user_protocol_uuid", type = PrimaryKeyType.PARTITIONED)
+    @PrimaryKeyColumn (name="protocol_uuid", type = PrimaryKeyType.PARTITIONED)
     @CassandraType(type = DataType.Name.UUID)
-    private UUID userProtocolUUID;
+    private UUID protocolUUID;
     
     @Column(value = "user_uuid")
     private UUID userUUID;
@@ -30,11 +30,11 @@ public class ProtocolByUser {
     @Column(value = "title")
     private String title;
 
-    public ProtocolByUser() {
+    public ProtocolToUser() {
     }
 
-    public UUID getUserProtocolUUID() {
-        return userProtocolUUID;
+    public UUID getProtocolUUID() {
+        return protocolUUID;
     }
 
     public UUID getUserUUID() {
@@ -45,8 +45,8 @@ public class ProtocolByUser {
         return title;
     }
 
-    public void setUserProtocolUUID(UUID userProtocolUUID) {
-        this.userProtocolUUID = userProtocolUUID;
+    public void setProtocolUUID(UUID protocolUUID) {
+        this.protocolUUID = protocolUUID;
     }
 
     public void setUserUUID(UUID userUUID) {
@@ -59,12 +59,12 @@ public class ProtocolByUser {
 
     @Override
     public String toString() {
-        return "ProtocolByUser {" + "userProtocolUUID=" + userProtocolUUID + 
+        return "ProtocolByUser {" + "protocolUUID=" + protocolUUID + 
                 ", \nuserUUID=" + userUUID + ", \ntitle=" + title + "\n}";
     }
 
-    public ProtocolByUser(UUID userProtocolUUID, UUID userUUID, String title) {
-        this.userProtocolUUID = userProtocolUUID;
+    public ProtocolToUser(UUID protocolUUID, UUID userUUID, String title) {
+        this.protocolUUID = protocolUUID;
         this.userUUID = userUUID;
         this.title = title;
     }

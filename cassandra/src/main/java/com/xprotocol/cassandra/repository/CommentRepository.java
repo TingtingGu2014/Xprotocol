@@ -9,6 +9,7 @@ import com.xprotocol.cassandra.model.Comment;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.cassandra.repository.CassandraRepository;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -16,10 +17,10 @@ import org.springframework.stereotype.Repository;
  * @author zhao0677
  */
 @Repository
-public interface CommentRepository extends CassandraRepository<Comment>{
+public interface CommentRepository extends CrudRepository<Comment, UUID> {
     List<Comment> findCommentByUserUUID(UUID userUUID);
     
     Comment findCommentByUserUUIDAndCommentUUID(UUID userUUID, UUID commentUUID);
     
-    UUID deleteCommentByUserUUIDAndCommentUUID(UUID userUUID, UUID commentUUID);
+    void deleteCommentByUserUUIDAndCommentUUID(UUID userUUID, UUID commentUUID);
 }
