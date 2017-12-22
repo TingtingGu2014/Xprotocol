@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -273,7 +274,7 @@ public class UserProtocolController {
     }
     
     @RequestMapping(value="/api/users/{userUUIDStr}/comments/{commentUUIDStr}", method=RequestMethod.DELETE)
-    public void deleteComment(HttpServletRequest request, 
+    public @ResponseBody void deleteComment(HttpServletRequest request, 
                                         @PathVariable("userUUIDStr") String userUUIDStr, 
                                         @PathVariable("commentUUIDStr") String commentUUIDStr,
                                         HttpServletResponse response

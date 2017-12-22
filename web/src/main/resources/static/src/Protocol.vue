@@ -381,11 +381,11 @@
                 comment.path = ''
                 
                 var commentKey = userInfo.userUUID + '____' + commentUserName + '____' + newCommentUUID
+                this.$set(this.comments, commentKey, addCommentInputVal)  
                                 
                 Utils.saveComment(comment)
                 .then((data) => {
-                    console.log(data)
-                    this.$set(this.comments, commentKey, addCommentInputVal)   
+                    console.log(data)                     
                     $("#addCommentInput").val('')
                 })
                 .catch((err) => {
@@ -535,7 +535,8 @@
                 if(Utils.isEmpty(protocol.comments)){
                     return false
                 }
-                delete this.comments[commentKey]
+                
+                this.$delete(this.comments, commentKey)
                 
                 Utils.saveUserProtocol(protocol)
                 .then((data) => {
