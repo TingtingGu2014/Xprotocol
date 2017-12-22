@@ -97,10 +97,9 @@
                     </fieldset>
                 </div>
             </div>
-            
+            <br><br>
             <div class="row">
-                
-                <br><br>
+                <div class="col">
                     <fieldset class="form-group text-center" style="width:100%;">
                         <legend>Comments:</legend>
                         <div v-if="comments && Object.keys(comments).length > 0">
@@ -144,8 +143,7 @@
                                 <textarea class="form-control" id="addCommentInput" rows="5"></textarea>
                             </p>
                         </form>
-                    </fieldset>
-                
+                    </fieldset>                
             </div>
         </div>
         <br>
