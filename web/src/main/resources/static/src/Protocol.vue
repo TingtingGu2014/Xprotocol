@@ -116,7 +116,7 @@
                                             <a v-bind:id="key + '-edit-show'" href="#" v-on:click.prevent="toggleCommentEditBtn">
                                                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                                             </a>                                            
-                                            <a v-bind:id="key + 'delete'" href="#" v-on:click.prevent="deleteComment">
+                                            <a v-bind:id="key + '-edit-delete'" href="#" v-on:click.prevent="deleteComment">
                                                 <i class="fa fa-trash-o" aria-hidden="true"></i>
                                             </a>
                                         </span>
@@ -515,9 +515,53 @@
                 
             },
             deleteComment: function(event){
+                var del = confirm('Are you sure to delete this comment?')
+                if(del == false){
+                    return false
+                } 
+                var id = event.target.id
+                if(Utils.isEmpty(id)){
+                    id = event.currentTarget.id
+                }
+                var keyArr = id.split('-edit-')
+                var commentKey = keyArr[0]
                 
-              
-            }
+                var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.userUUID, this.userProtocolUUID)
+                if(Utils.isEmpty(protocol)){
+                    alert("Cannot find the protocol for this comment!")
+                    return false
+                }
+                
+                if(Utils.isEmpty(protocol.comments)){
+                    return false
+                }
+                delete this.comments[commentKey]
+                
+                Utils.saveUserProtocol(protocol)
+                .then((data) => {
+                    console.log(data) 
+                    this.setProtocolByUserUUIDANDProtocolUUID(data)
+                    console.log('Protocol with deleted comment saved')
+                })
+                .catch((err) => {
+                    alert("oops, something happened")
+                    console.log(err)
+                });
+                
+                var keyArr = commentKey.split('____')
+                var userInfo = JSON.parse(localStorage.userInfo)
+                var commentUUID = keyArr[2]
+                var userUUID = userInfo.userUUID
+                
+                Utils.deleteComment(userUUID, commentUUID)
+                    .then((status) => {
+                        console.log('Delete comment status: ' + status)                        
+                    })
+                    .catch((err) => {
+                        alert("oops, something happened")
+                        console.log(err)
+                    });
+                }
         },
         components: {
             VueTinymce

@@ -34,6 +34,6 @@ public interface UserProtocolService {
     public Comment updateComment(Comment comment);
     public void deleteCommentByUserUUIDAndCommentUUID(UUID userUUID, UUID commentUUID);
     
-    public ProtocolToUser updateProtocolByUser(ProtocolToUser protocolByUser);
-    public ProtocolToUser findProtocolByUser(UUID userProtocolUUID);
+    public ProtocolToUser updateProtocolToUser(ProtocolToUser protocolToUser);
+    public ProtocolToUser findProtocolToUser(UUID userProtocolUUID);
 }

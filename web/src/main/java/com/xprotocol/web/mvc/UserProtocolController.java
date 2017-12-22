@@ -151,8 +151,8 @@ public class UserProtocolController {
             protocol = protocolSrv.updateProtocol(protocol);
             
             if(null != protocol){
-                ProtocolToUser protocolByUser = new ProtocolToUser(protocol.getUserProtocolUUID(), protocol.getUserUUID(), protocol.getTitle());
-                protocolSrv.updateProtocolByUser(protocolByUser);
+                ProtocolToUser protocolToUser = new ProtocolToUser(protocol.getUserProtocolUUID(), protocol.getUserUUID(), protocol.getTitle());
+                protocolSrv.updateProtocolToUser(protocolToUser);
             }
             // Clean up the associted files
             protocolFilesProcess(protocol);

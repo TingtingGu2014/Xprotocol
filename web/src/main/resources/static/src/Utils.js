@@ -432,6 +432,52 @@ export function saveComment(comment){
     
 }
 
+export function deleteComment(userUUID, commentUUID){
+    
+    try{
+        if(isEmpty(userUUID)){
+            throw new exceptions.EmptyUserUUIDException(400, 'User UUID cannot be empty!')
+        }
+        else if(isEmpty(commentUUID)){
+            throw new exceptions.EmptyUserProtocolUUIDException(400, 'Comment UUID cannot be empty!')
+        }
+    }
+    catch(exception){
+        sessionStorage.errorMessage = exception.message
+        document.location.href = '/errors/400'
+        return false
+    }
+    
+    var url = ''
+    if(isEmpty(userUUID)){
+        url = '/api/comments/'+commentUUID
+    }
+    else{
+        url = '/api/users/' + userUUID +'/comments/'+commentUUID
+    }
+    
+    return axios({
+        method: 'delete',
+        url: url,
+        dataType: 'json',
+        data: null,
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+    })
+    .then( (response) => {
+        var status = response.status;
+        if(status == 200 || status == "200"){              
+            return response.status
+        }
+        else{
+            alert("status " + status + ", cannot delete the comment!");
+        }                                   
+    })
+    .catch( (error) => {
+        console.log(error);
+    });
+    
+}
+
 export function getProtocolsByUserUUID(userUUID){
     if(isEmpty(userUUID)){
         alert('The user UUID is empty!')
@@ -477,7 +523,6 @@ export function getTimeFromTimeUUID(uuid){
     var int_time = time_int - 122192928000000000,
     int_millisec = Math.floor( int_time / 10000 );
     var date = new Date( int_millisec );
-    console.log(date);
     dateFormat(date, "dddd, mmmm dS, yyyy, h:MM:ss");
     return date;
 }

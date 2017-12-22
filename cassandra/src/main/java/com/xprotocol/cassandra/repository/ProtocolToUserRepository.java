@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
  * @author Tao Zhao
  */
 @Repository
-public interface ProtocolByUserRepository extends CassandraRepository<ProtocolToUser> {
+public interface ProtocolToUserRepository extends CassandraRepository<ProtocolToUser> {
 //    @Query("select * from user_details where user_id = ?0 LIMIT ?1 ")
     ProtocolToUser findProtocolToUserByprotocolUUID(UUID protocolUUID);
 }
