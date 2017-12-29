@@ -1,14 +1,10 @@
 <template id="sign-up-template">
     
     <div class="container"><br><br>
-        <h3>List of Your Protocols</h3>
-        <router-link :to="{ path: 'users/'+userUUID+'/protocols/new'}">&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus-square-o" aria-hidden="true"></i>&nbsp;New Protocol</router-link>
+        <h3>You Made the Following Comments Recently</h3>        
         <b-table :fields="fields" :items="tableDataForDisplay">            
-            <template slot="index" scope="data">
-              {{data.index + 1}}
-            </template>
             
-            <template slot="title" scope="data">
+            <template slot="protocolTitle" scope="data">
                 <table-router-link :linkData = "data.value"></table-router-link>                
             </template>
 
@@ -26,12 +22,10 @@
     export default {
         data: function() {
             return {
-                fields: [                    
-                    'index',                    
-                    'title',                    
-                    'projects',                    
-                    { key: 'keywords', label: 'Key Words' },                    
-                    { key: 'versions', label: 'Archived Versions' }
+                fields: [                                      
+                    { key: 'protocolTitle', label: 'Protocol Title',  'class': 'w-30'},      
+                    { key: 'content', label: 'Contents', 'class': 'w-50'}, 
+                    { key: 'time', label: 'Time', 'class': 'w-30'},
                 ],
                 rawData: [],
             }
@@ -40,10 +34,6 @@
             userUUID: String,
         },
         computed: {
-            ...mapGetters({                
-                getProtocolsByUserUUID: 'protocolModule/getProtocolsByUserUUID',
-                getProtocolsByUserUUIDANDProtocolUUID: 'protocolModule/getProtocolsByUserUUIDANDProtocolUUID',
-            }),
             tableDataForDisplay: function(){
                 var items = []
                 if(!Utils.isEmpty(this.rawData)){
@@ -51,18 +41,22 @@
                         items[i] = {}
                         var row = this.rawData[i]
                         $.each(row, function(key, value){
-                            if('title' != key){
-                                items[i][key] = value
+                            if('commentUUID' == key){
+                                var time = Utils.getTimeFromTimeUUID(value)
+                                items[i].time = time
                             }
-                            else{
+                            else if('protocolTitle' == key){
                                 var templateData = {}
-                                templateData.label = row.title
+                                templateData.label = row.protocolTitle
                                 templateData.name = 'userProtocol'
                                 templateData.params = {}
                                 templateData.params.userUUID = row.userUUID
-                                templateData.params.userProtocolUUID = row.userProtocolUUID
-                                items[i].title = templateData
+                                templateData.params.userProtocolUUID = row.protocolUUID
+                                items[i].protocolTitle = templateData
                             }
+                            else{
+                                items[i][key] = value
+                            }                            
                         })
                     }
                 }
@@ -87,24 +81,10 @@
                 return false
             }
             
-            if(!Utils.isEmpty(localStorage.protocolListCount)){
-                var protocolList = this.getProtocolsByUserUUID(userUUID)
-
-                if(!Utils.isEmpty(protocolList) && Number(localStorage.protocolListCount) === protocolList.length){                
-                    console.log(protocolList)
-                    this.rawData = protocolList
-                    return false
-                }
-            }
-
-            Utils.getProtocolsByUserUUID(userUUID)
+            Utils.getCommentsByUserUUID(userUUID)
             .then((data) => {
                 console.log(data)                
                 this.rawData = data
-                var protocolsData = {}
-                protocolsData[userUUID] = data
-                this.setProtocolsByUserUUID(protocolsData)
-                localStorage.protocolListCount = Object.keys(data).length
             })
             .catch((err) => {
                 alert("oops, something happened")

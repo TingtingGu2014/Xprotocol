@@ -14,7 +14,8 @@ import org.springframework.data.cassandra.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.mapping.Table;
 
 /**
- *
+ * Find users by protocol UUID
+ * 
  * @author zhao0677
  */
 @Table(value = "protocol_to_user")

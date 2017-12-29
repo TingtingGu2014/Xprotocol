@@ -49,6 +49,11 @@ public class UserProtocolServiceImpl implements UserProtocolService {
     }
     
     @Override
+    public List<Comment> findCommentsByUserUUID(String userUUIDStr) {
+        return commentRepo.findCommentsByUserUUID(UUID.fromString(userUUIDStr));
+    }
+    
+    @Override
     public void deleteCommentByUserUUIDAndCommentUUID(UUID userUUID, UUID commentUUID){
         commentRepo.delete(BasicMapId.id("userUUID", userUUID).with("commentUUID", commentUUID));
     }
@@ -70,7 +75,7 @@ public class UserProtocolServiceImpl implements UserProtocolService {
     }
     
     @Override
-    public List<UserProtocol> findProtocolByUserUUID(String userUUIDStr){ 
+    public List<UserProtocol> findProtocolsByUserUUID(String userUUIDStr){ 
         return protocolRepo.findUserProtocolByUserUUID(UUID.fromString(userUUIDStr));
     }
     

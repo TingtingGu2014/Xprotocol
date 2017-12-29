@@ -66,7 +66,7 @@ public class UserProtocolController {
 
     @RequestMapping(value="/api/users/{userUUIDStr}/protocols", method=RequestMethod.GET)
     public List<UserProtocol> findAllProtocolsByUser(HttpServletRequest request, @PathVariable("userUUIDStr") String userUUIDStr){
-        return protocolSrv.findProtocolByUserUUID(userUUIDStr);
+        return protocolSrv.findProtocolsByUserUUID(userUUIDStr);
     }
     
     /**
@@ -229,6 +229,11 @@ public class UserProtocolController {
         }
         
         
+    }
+    
+    @RequestMapping(value="/api/users/{userUUIDStr}/comments", method=RequestMethod.GET)
+    public List<Comment> findAllCommentsByUser(HttpServletRequest request, @PathVariable("userUUIDStr") String userUUIDStr){
+        return protocolSrv.findCommentsByUserUUID(userUUIDStr);
     }
     
     @RequestMapping(value="/api/users/{userUUIDStr}/comments/{commentUUIDStr}", method=RequestMethod.POST)

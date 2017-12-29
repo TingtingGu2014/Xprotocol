@@ -20,7 +20,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface CommentRepository extends CrudRepository<Comment, MapId> {
-    List<Comment> findCommentByUserUUID(UUID userUUID);
+    List<Comment> findCommentsByUserUUID(UUID userUUID);
     
     Comment findCommentByUserUUIDAndCommentUUID(UUID userUUID, UUID commentUUID);
     

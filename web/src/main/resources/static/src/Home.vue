@@ -3,14 +3,19 @@
         
         <ProtocolList v-if="loggedIn"
             :userUUID = "userUUID"
-        >            
+        >   
         </ProtocolList>
+        
+        <CommentList v-if="loggedIn"
+            :userUUID = "userUUID"
+        ></CommentList>
         
     </div>
 </template>
 
 <script>
     import ProtocolList from './ProtocolList.vue'
+    import CommentList from './CommentList.vue'
     
     var Utils = require('./Utils')
     var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
@@ -38,7 +43,7 @@
         }
       },
       components: {
-          ProtocolList,
+          ProtocolList, CommentList,
       },
       methods: {
         alertName: function(){

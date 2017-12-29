@@ -21,7 +21,7 @@ import java.util.UUID;
 public interface UserProtocolService {
     
     public Iterable<UserProtocol> findProtocolByUserUUID(UUID userUUID);
-    public List<UserProtocol> findProtocolByUserUUID(String userUUIDStr);
+    public List<UserProtocol> findProtocolsByUserUUID(String userUUIDStr);
             
     public UserProtocol findProtocolByUserUUIDAndProtocolUUID(UUID userUUID, UUID userProtocolUUID);
     public UserProtocol findProtocolByUserUUIDAndProtocolUUID(String userUUIDStr, String userProtocolUUIDStr);
@@ -32,6 +32,7 @@ public interface UserProtocolService {
     public UserProject createProject(UUID userProjectUUID, UUID userUUID, String title, String description, Set<UUID> protocolUUIDs, Set<String> protocolTitles, Set<String> keywords);
     
     public Comment updateComment(Comment comment);
+    public List<Comment> findCommentsByUserUUID(String userUUIDStr);
     public void deleteCommentByUserUUIDAndCommentUUID(UUID userUUID, UUID commentUUID);
     
     public ProtocolToUser updateProtocolToUser(ProtocolToUser protocolToUser);

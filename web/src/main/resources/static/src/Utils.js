@@ -504,6 +504,32 @@ export function getProtocolsByUserUUID(userUUID){
     });
 }
 
+export function getCommentsByUserUUID(userUUID){
+    if(isEmpty(userUUID)){
+        alert('The user UUID is empty!')
+        return false
+    }
+    
+    return axios({
+        method: 'get',
+        url: '/api/users/'+userUUID+'/comments',
+        dataType: 'json',
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+    })
+    .then( (response) => {
+        var status = response.status;
+        if(status == 200 || status == "200"){              
+            return response.data
+        }
+        else{
+            alert("status " + status + ", cannot get the protocols!");
+        }                                   
+    })
+    .catch( (error) => {
+        console.log(error);
+    });
+}
+
 export function getTimeUUID(){
     var UUID = require('uuid-js')
     var uuid1 = UUID.create(1);
