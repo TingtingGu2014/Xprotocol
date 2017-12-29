@@ -87,12 +87,14 @@
                 return false
             }
             
-            var protocolList = this.getProtocolsByUserUUID(userUUID)
+            if(!Utils.isEmpty(localStorage.protocolListCount)){
+                var protocolList = this.getProtocolsByUserUUID(userUUID)
 
-            if(!Utils.isEmpty(protocolList)){                
-                console.log(protocolList)
-                this.rawData = protocolList
-                return false
+                if(!Utils.isEmpty(protocolList) && Number(localStorage.protocolListCount) === protocolList.length){                
+                    console.log(protocolList)
+                    this.rawData = protocolList
+                    return false
+                }
             }
 
             Utils.getProtocolsByUserUUID(userUUID)
@@ -102,6 +104,7 @@
                 var protocolsData = {}
                 protocolsData[userUUID] = data
                 this.setProtocolsByUserUUID(protocolsData)
+                localStorage.protocolListCount = Object.keys(data).length
             })
             .catch((err) => {
                 alert("oops, something happened")

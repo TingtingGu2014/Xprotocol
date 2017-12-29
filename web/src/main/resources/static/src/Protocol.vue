@@ -272,6 +272,10 @@
 
                 Utils.saveUserProtocol(protocolData)
                 .then((data) => {
+                    if(protocolData.userProtocolUUID === 'new'){
+                        var protocolListCount = Number(localStorage.protocolListCount) + 1
+                        localStorage.protocolListCount = protocolListCount
+                    }
                     this.resetUserProtocol(data)
                     document.location.href = '/home'
                 })

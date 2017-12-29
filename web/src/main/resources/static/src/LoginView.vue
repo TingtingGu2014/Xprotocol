@@ -37,6 +37,7 @@
     var userInfo = null
     if(loggedIn !== true){
         localStorage.userInfo = null
+        localStorage.protocolListCount = null
     }
     else {
         try{
