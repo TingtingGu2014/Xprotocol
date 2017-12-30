@@ -23,8 +23,8 @@
         data: function() {
             return {
                 fields: [                                      
-                    { key: 'protocolTitle', label: 'Protocol Title',  'class': 'w-30'},      
-                    { key: 'content', label: 'Contents', 'class': 'w-50'}, 
+                    { key: 'protocolTitle', label: 'Protocols',  'class': 'w-30'},      
+                    { key: 'content', label: 'Comments', 'class': 'w-50'}, 
                     { key: 'time', label: 'Time', 'class': 'w-30'},
                 ],
                 rawData: [],
@@ -42,8 +42,8 @@
                         var row = this.rawData[i]
                         $.each(row, function(key, value){
                             if('commentUUID' == key){
-                                var time = Utils.getTimeFromTimeUUID(value)
-                                items[i].time = time
+                                var date = Utils.getTimeFromTimeUUID(value)
+                                items[i].time = Utils.outputDateTime(date)
                             }
                             else if('protocolTitle' == key){
                                 var templateData = {}
