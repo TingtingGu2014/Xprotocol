@@ -9,6 +9,7 @@ import com.xprotocol.cassandra.model.ProtocolToUser;
 import com.xprotocol.cassandra.model.Comment;
 import com.xprotocol.cassandra.model.UserProject;
 import com.xprotocol.cassandra.model.UserProtocol;
+import com.xprotocol.service.exceptions.InvalidCommentKeyException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,7 @@ public interface UserProtocolService {
     public Comment updateComment(Comment comment);
     public List<Comment> findCommentsByUserUUID(String userUUIDStr);
     public void deleteCommentByUserUUIDAndCommentUUID(UUID userUUID, UUID commentUUID);
+    public void updateProtocolComments(UserProtocol protocol) throws InvalidCommentKeyException;
     
     public ProtocolToUser updateProtocolToUser(ProtocolToUser protocolToUser);
     public ProtocolToUser findProtocolToUser(UUID userProtocolUUID);

@@ -9,6 +9,7 @@ import com.xprotocol.cassandra.model.Comment;
 import com.xprotocol.cassandra.model.ProtocolToUser;
 import com.xprotocol.cassandra.model.UserProtocol;
 import com.xprotocol.persistence.model.User;
+import com.xprotocol.service.exceptions.InvalidCommentKeyException;
 import com.xprotocol.service.user.UserService;
 import com.xprotocol.service.protocol.UserProtocolService;
 import com.xprotocol.utils.UtilsFileHelper;
@@ -149,14 +150,16 @@ public class UserProtocolController {
             else if(null == protocol || Validators.isEmptyString(protocol.getTitle())){
                 throw new IncompleteUserProtocolInformationException("The protocol data or title is empty!");
             }
-            protocol = protocolSrv.updateProtocol(protocol);
+            UserProtocol oldProtocol = protocolSrv.findProtocolByUserUUIDAndProtocolUUID(protocol.getUserUUID(), protocol.getUserProtocolUUID());
+            UserProtocol newProtocol = protocolSrv.updateProtocol(protocol);
             
-            if(null != protocol){
-                ProtocolToUser protocolToUser = new ProtocolToUser(protocol.getUserProtocolUUID(), protocol.getUserUUID(), protocol.getTitle());
+            if(null != newProtocol && !oldProtocol.getTitle().equals(newProtocol.getTitle())){
+                ProtocolToUser protocolToUser = new ProtocolToUser(newProtocol.getUserProtocolUUID(), newProtocol.getUserUUID(), newProtocol.getTitle());
                 protocolSrv.updateProtocolToUser(protocolToUser);
+                protocolSrv.updateProtocolComments(newProtocol);
             }
             // Clean up the associted files
-            protocolFilesProcess(protocol);
+            protocolFilesProcess(newProtocol);
         }
         catch(IncompleteUserProtocolInformationException  | InvalidProtocolFileNameFormatException ex){
             try {
@@ -165,7 +168,7 @@ public class UserProtocolController {
                 Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
-        catch(IOException ex){
+        catch(IOException | InvalidCommentKeyException ex){
             try {
                 response.sendError(500, "Server error: " + ex.getMessage());
             } catch (IOException ex1) {
