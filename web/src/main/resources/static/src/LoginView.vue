@@ -31,8 +31,8 @@
 <script>
 
     import { mapGetters, mapMutations } from 'vuex'
-    
     var Utils = require('./Utils')
+    
     var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
     var userInfo = null
     if(loggedIn !== true){
@@ -128,6 +128,7 @@
                         this.userUUID = ''
                         this.setUserDetails(null)
                         this.setDetailsFetched(false)
+                        this.setProtocols(null)
                         document.location.href = '/home'
                     }
                     else{
@@ -142,6 +143,7 @@
             ...mapMutations({                
                 setUserDetails: 'userModule/setUserDetails',
                 setDetailsFetched: 'userModule/setDetailsFetched',
+                setProtocols: 'protocolModule/setProtocols'
             }),
         }
     }

@@ -111,7 +111,7 @@
                                     </div>
                                     <div id="key + '-edit-delete-div'" class="d-flex w-100 justify-content-between" v-if="!hiddenCommentEditors || hiddenCommentEditors.indexOf(key) < 0">
                                         <span class="mb-1" v-html="value" style="text-align: left"></span>
-                                        <span class="mb-1" style="width: 15%;">
+                                        <span class="mb-1" style="width: 15%;" v-if="isLoggedInUser">
                                             <a v-bind:id="key + '-edit-show'" href="#" v-on:click.prevent="toggleCommentEditBtn">
                                                 <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                                             </a>                                            
