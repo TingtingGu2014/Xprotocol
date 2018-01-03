@@ -147,7 +147,7 @@ export function signUp(data, url) {
 }
 
 export function signIn(email, password) {
-    axios({
+    return axios({
         method: 'post',
         url: '/api/signIn',
         dataType: 'json',
@@ -162,7 +162,7 @@ export function signIn(email, password) {
         if(status == 200 || status == "200"){
             var data = response.data
             localStorage.userInfo = JSON.stringify(data) 
-            document.location.href = '/home'
+            return data
         }
         else{
             alert("not 200");
@@ -172,6 +172,41 @@ export function signIn(email, password) {
     .catch( (error) => {
         console.log(error);
     });      
+}
+
+export function signOut() {
+    return axios({
+        method: 'post',
+        url: '/api/logout',
+        dataType: 'json',
+    })
+    .then( (response) => {
+        var status = response.status;
+        var data = response.data;
+
+        if(status == 200 || status == 204){
+            localStorage.userEmail = ''
+            localStorage.userName = ''
+            localStorage.userUUID = ''
+            localStorage.userInfo = ''
+            var loggedIn = readCookie('loggedIn')
+            if(loggedIn == 'true'){
+                eraseCookie('loggedIn')
+            }
+            this.loggedIn = false
+            this.userEmail = ''
+            this.userAlias = ''
+            this.userUUID = ''
+            document.location.href = '/home'
+            return data
+        }
+        else{
+            alert("not 200 "+status);
+        }                                   
+      })
+      .catch( (error) => {
+        console.log(error);
+      });
 }
 
 export function isAdminUser () {

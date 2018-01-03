@@ -32,6 +32,7 @@
 
     import { mapGetters, mapMutations } from 'vuex'
     var Utils = require('./Utils')
+    import { EventBus } from './EventBus.js';
     
     var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
     var userInfo = null
@@ -96,7 +97,18 @@
                     event.preventDefault()
                 }
                 
-                Utils.signIn(this.emaillogin, this.passwordlogin)
+                Utils.signIn(this.emaillogin, this.passwordlogin)                
+                .then((data) => {
+                    if(data){
+                        this.$emit('session-change')
+                        EventBus.$emit('session-change', 'signIn');
+                        document.location.href = '/home';
+                    }                    
+                })
+                .catch((err) => {
+                    alert("oops, something happened during signing in!")
+                    console.log(err)
+                });
                 
             },
             logoutsubmit: function (message, event) {
