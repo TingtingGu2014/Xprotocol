@@ -1,27 +1,34 @@
+// === DEFAULT / CUSTOM STYLE ===
+// WARNING! always comment out ONE of the two require() calls below.
+// 1. use next line to activate CUSTOM STYLE (./src/themes)
+// require(`./themes/app.${__THEME}.styl`)
+// 2. or, use next line to activate DEFAULT QUASAR STYLE
+require(`quasar/dist/quasar.${__THEME}.css`)
+// ==============================
+
+// Uncomment the following lines if you need IE11/Edge support
+// require(`quasar/dist/quasar.ie`)
+// require(`quasar/dist/quasar.ie.${__THEME}.css`)
+
 import Vue from 'vue'
-import VueRouter from 'vue-router'
+import Quasar from 'quasar'
+import router from './router'
 import Vuex from 'vuex'
-import BootstrapVue from 'bootstrap-vue'
-import VuePassword from 'vue-password'
 
-Vue.use(VueRouter)
+Vue.config.productionTip = false
 Vue.use(Vuex)
-Vue.use(BootstrapVue);
-Vue.component(VuePassword)
- 
-import App from './App.vue'
-import routejs from './Router.js'
-import userModule from './UserModule.js';
-import protocolModule from './ProtocolModule.js'
-import exceptions from './Exceptions.js'
+Vue.use(Quasar) // Install Quasar Framework
 
-var Utils = require('./Utils')
+if (__THEME === 'mat') {
+  require('quasar-extras/roboto-font')
+}
+import 'quasar-extras/material-icons'
+// import 'quasar-extras/ionicons'
+// import 'quasar-extras/fontawesome'
+// import 'quasar-extras/animate'
 
-
-const router = new VueRouter({
-  mode: 'history',
-  routes: routejs
-})
+import userModule from './modules/UserModule.js';
+import protocolModule from './modules/ProtocolModule.js'
 
 const store = new Vuex.Store({
     modules: {
@@ -30,34 +37,14 @@ const store = new Vuex.Store({
     },
 });
 
-//axios.interceptors.request.use(function (config) {
-//    alert('ok');
-//    return config;
-//  }, function (error) {
-//    // Do something with request error
-//    alert('not ok');
-//    return Promise.reject(error);
-//  });
-
-axios.interceptors.response.use(function (response) {
-    if(response.status !== 200 && response.status !== 204){
-        alert("This is not a 200 response!")
-    }
-    return response;
-}, function (error) {
-    var status = error.response.status
-    var message = error.response.data.message
-    sessionStorage.errorMessage = message
-    document.location.href = '/errors/' + status
-//    alert(error.response.status + " is not a good response!")
-    return Promise.reject(error);
-});
-
-new Vue({
+Quasar.start(() => {
+  /* eslint-disable no-new */
+  new Vue({
+    el: '#q-app',
     router,
     store,
-    el: '#app',
-    render:h => h(App)
-});
+    render: h => h(require('./App').default)
+  })
+})
 
 Vue.config.devtools = true;

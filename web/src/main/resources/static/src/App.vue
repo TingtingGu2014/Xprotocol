@@ -1,21 +1,23 @@
 <template>
-    <div id="app">
+  <!-- Don't drop "q-app" class -->
+  <div id="q-app">
         <Navbar></Navbar>
         <router-view
             class="view"
             keep-alive
             transition
             transition-mode="out-in">
-        </router-view>    
-    </div>
+        </router-view> 
+  </div>
 </template>
 
 <script>
-    import Navbar from './Navbar.vue';
+    import axios from 'axios'
+    import Navbar from './components/Navbar.vue';
     import { mapGetters, mapMutations } from 'vuex'
-    import { EventBus } from './EventBus.js';
+    import { EventBus } from './utils/EventBus.js';
     
-    var Utils = require('./Utils')
+    var Utils = require('./utils/Utils')
     
     export default {
 	name: 'app',
@@ -75,69 +77,22 @@
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-  
-}
+    input {
+        -webkit-border-radius: 10px; 
 
-h1, h2 {
-  font-weight: normal;
-}
+        /* Firefox 1-3.6 */
+        -moz-border-radius: 10px; 
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
+        /* Opera 10.5, IE 9, Safari 5, Chrome, Firefox 4, iOS 4, Android 2.1+ */
+        border-radius: 10px; 
+    }
+    
+    .inner-row-div {
+        line-height:2em
+    }
+    
+    .move-right {
+        text-align: right;
+    }
 
-li {
-  padding: 0;
-  margin: 0;
-    text-align: left;
-}
-
-a {
-  color: #42b983;
-  margin-right: 5px;
-}
-
-table.table-component__table {
-    position: relative;
-    //display: block;
-    margin: 10px auto;
-    padding: 0;
-    width: 100%;
-    height: auto;
-    border-collapse: collapse;
-    text-align: center;
-}
-
-th.table-component__th {
-    text-align: center;
-}
-
-.table-hover tbody tr:hover {
-    background-color: #E0FFFF;
-}
-
-input.table-component__filter__field {
-    width: 30%;
-    margin-bottom: 5px;
-}
-
-fieldset {
-    border: 1px groove lightblue !important;
-    padding: 0 1.4em 1.4em 1.4em !important;
-    margin: 0 0 1.5em 0 !important;
-    -webkit-box-shadow:  0px 0px 0px 0px #000;
-            box-shadow:  0px 0px 0px 0px #000;
-}
-
-legend {
-    width:auto; /* Or auto */
-    padding:0 10px; /* To give a bit of padding on the left and right */
-    border-bottom:none;
-}
 </style>

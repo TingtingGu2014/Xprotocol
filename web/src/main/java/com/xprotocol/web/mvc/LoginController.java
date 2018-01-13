@@ -27,7 +27,7 @@ public class LoginController {
     public String test() {
         ModelAndView view = new ModelAndView();
         view.setViewName("/");
-        return "index.html";
+        return "dist/index.html";
     }
     
     @RequestMapping(value = "/home")
