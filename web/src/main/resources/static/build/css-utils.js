@@ -74,7 +74,7 @@ module.exports.purify = function(cb) {
   Promise.all(css.map(function (file) {
     return new Promise(function (resolve) {
       console.log('\n Purifying ' + path.relative(path.join(__dirname, '../dist'), file).bold + '...')
-      purify(js, [file], {minify: true}, function (purified) {
+      purify(js, [file], {minify: true, whitelist: [ '*:not*' ]}, function (purified) {
         var ulrs = purified.indexOf('src:url(dist/fonts')
         if( ulrs > 0){
             console.log('\n  Fixing the font urls...')
