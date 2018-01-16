@@ -82,6 +82,28 @@ export function getUserDetails(userUUID) {
     });
 }
 
+export function getUserListByAdmin(){
+    return axios({
+        method: 'get',
+        url: '/api/admin/users',
+        dataType: 'json',
+        headers: {'X-Requested-With': 'XMLHttpRequest'},
+    })
+    .then( (response) => {
+        var status = response.status;
+        var data = response.data
+        if(status == 200 || status == "200"){
+            return data
+        }
+        else{
+            alert("not 200");
+        }                                   
+    })
+    .catch( (error) => {
+        console.log(error);
+    });  
+}
+
 export function saveUserProfile(userUUID, profile){
     if(isEmpty(userUUID)){
         Alert.create({html: 'User UUID cannot be empty!'})

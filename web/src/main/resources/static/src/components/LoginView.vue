@@ -33,7 +33,7 @@
                 <q-collapsible icon="perm_identity" v-bind:label="getCurrentUserName"  v-if="loggedIn">
                   <div>
                     <form class="form-inline">        
-                        <!--<router-link to="/profile/userId">Go to notfound</router-link>-->
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         <router-link :to="{ name: 'userProfile', params: { userUUID: userUUID }  }" >
                         <!--<a href="#" v-on:click="getUserDetails">--> 
                             <span class="fa fa-user"></span>    
@@ -68,7 +68,7 @@
 
                 <q-collapsible icon="fa-sun-o" label="Admin" v-if="isAdminUser">
                   <div>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<router-link :to="{ name: 'admin' }">&nbsp;Admin</router-link>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<router-link :to="{ name: 'userList' }"><i class="fa fa-users">&nbsp;User List</i></router-link>                    
                   </div>
                 </q-collapsible>
             </q-list>

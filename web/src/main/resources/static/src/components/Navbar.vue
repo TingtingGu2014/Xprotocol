@@ -3,13 +3,13 @@
         <q-toolbar slot="header" color="blue-grey-10" class="glossy navbar" style="width: 100%;">
             
             <div class="row items-center" style="width: 100%; vertical-align: middle;"> 
-                <div class="col-xs-4 col-sm-3 col-md-2 col-lg-1 gt-md" style="order: 1">
+                <div class="col-xs-4 col-sm-3 col-md-2 col-lg-2 gt-md" style="order: 1">
                     <router-link :to="{ name: 'home'}"><span class="fa fa-home"></span> &nbsp;XProtocol</router-link>
                 </div>
-                <div class="col-xs-4 col-sm-3 col-md-2 col-lg-1 lt-lg" style="order: 1">
+                <div class="col-xs-4 col-sm-3 col-md-2 col-lg-2 lt-lg" style="order: 1">
                     <a href="#" v-on:click="toggleLogin"><span class="fa fa-bars"></span> &nbsp;XProtocol</a>
                 </div>
-                <div class="col-xs-8 col-sm-9 col-md-10 col-lg-2" style="order: 2">
+                <div class="col-xs-8 col-sm-9 col-md-10 col-lg-3" style="order: 2">
                     <form>
                             <!--<input class="" type="text" placeholder="Find Protocols">-->
                         <router-link :to="{ name: 'home'}" style="vertical-align: middle;">

@@ -1,28 +1,22 @@
 <template id="nav-template">
-    <div class="container">
-<!--        <div class="row">
-            <img src="..." class="img-fluid" alt="Responsive image">
-        </div>-->
-        <div class="row" style="margin-top: 10%;">
-            <div style="width: 100%">
-                <div>
-                    <h1>Administrator Management Tools</h1>
-                    <br><br>
+    <div class="row text-center" style="width:60%; margin: auto; margin-top: 7%; " ref="" id="">
+        <div style="width: 100%">
+            <div class=" text-center">
+                <span class="adminHeading">Administrator Management Tools</span>
+                <br><br>
+            </div>
+            <div class="row text-left">
+                <div class="col-xs-6 col-md-6 col-lg-6 ">
+                    <div class="">                                    
+                        <!--<a href="/userlist" class="btn btn- btn-lg" role="button"><i class="fa fa-users fa-5x"></i><span class=""></span><br><br>User List</a>-->
+                        <router-link :to="{ name: 'userList' }" class="adminLink"><i class="fa fa-users ">&nbsp;<span class="adminLinkText">User List</span></i></span></router-link>                    
+                    </div>
                 </div>
-                <div class="">
-                    <div class="row">
-                        <div class="col-xs-6 col-md-6 col-lg-6 ">
-                            <div class="">                                    
-                                <a href="/userlist" class="btn btn- btn-lg" role="button"><i class="fa fa-users fa-5x"></i><span class=""></span><br><br>User List</a>
-                            </div>
-                        </div>
-                        <div class="col-xs-6 col-md-6 col-lg-6 ">
-                            <div class="">                                    
-                                <a href="#" class="btn btn- btn-lg" role="button"><i class="fa fa-user-md fa-5x"></i><span class=""></span><br><br>User Management</a>
-                            </div>
-                        </div>
-                    </div>                    
-                </div>
+                <div class="col-xs-6 col-md-6 col-lg-6 ">
+                    <div class="">                                    
+                    <a href="#" class="btn btn- btn-lg adminLink" role="button" ><i class="fa fa-user-md">&nbsp;<span class="adminLinkText">User Management</span></i></span></a>
+                    </div>
+                </div>                   
             </div>
         </div>
     </div>
@@ -34,12 +28,12 @@
     
     var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
     if(loggedIn != true){
-//        document.location.href = '/login'
+        document.location.href = '/login'
     }
     
     var isAdminUser = Utils.isAdminUser();
     if(!isAdminUser){
-//        document.location.href = '/errors/403'
+        document.location.href = '/errors/403'
     }
                 
     export default {  
@@ -50,7 +44,16 @@
 </script>
 
 <style>
-body { padding-top:20px; }
-.panel-body .btn:not(.btn-block) { width:120px;margin-bottom:10px; }
-.admin-heading {margin-top: 10%}
+.adminLink{
+    font-size: 2.0vw;
+}
+
+.adminLinkText{        
+    font-family: Arial;
+    font-weight: bold;
+}
+
+.adminHeading{
+    font-size: 3.0vw;
+}
 </style>

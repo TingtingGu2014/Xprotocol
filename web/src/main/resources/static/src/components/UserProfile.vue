@@ -1,5 +1,5 @@
 <template id="sign-up-template">
-    <div class="row" style="width:60%; margin: auto; margin-top: 8%; " ref="userProfileDiv" id="userProfileDiv">
+    <div class="row" style="width:60%; margin: auto; margin-top: 7%; " ref="userProfileDiv" id="userProfileDiv">
     
         <form class="col" enctype="multipart/form-data" v-bind:action="'/api/userProfile/'+userUUID" 
         method="post" name="userProfileInfo" autocomplete="off">
@@ -105,7 +105,7 @@
     
     var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
     if(loggedIn != true){
-//        document.location.href = '/login'
+        document.location.href = '/login'
     }
     
     var currentUrl = window.location.href
@@ -300,17 +300,5 @@ div.q-field-short, div.q-field-long {
     padding-left: 25px;
     padding-right: 25px;
 }
-
-/*@media screen and (min-width: 480px) {
-    #userProfileDiv {
-        margin: auto; margin-top: 7%;
-    }
-}
-
-@media screen and (max-width: 475px) {
-    #userProfileDiv {
-        margin: auto; margin-top: 7%;
-    }
-}*/
 
 </style>
