@@ -62,17 +62,24 @@ export function eraseCookie(name) {
     createCookie(name,"",-1);
 }
 
-export function getUserDetails(userUUID) {
+export function getUserDetails(userUUID, isAdmin = false) {
+    let url = ''
+    if(isAdmin === true){
+        url = '/api/admin/users/'+userUUID+'/userDetails'
+    }
+    else{
+        url = '/api/users/'+userUUID+'/userDetails'
+    }
     return axios({
         method: 'get',
         dataType: 'json',
-        url: '/api/users/'+userUUID+'/userDetails',
+        url: url,
     }).then( (response) => {
         if(response.status === 200){
             return response.data;
         }
         else{
-            Toast.create.negative({html: `Something is wrong in pulling user profile.`})
+            Toast.create.negative({html: `Something is wrong in pulling user profile.`, duration: 3000})
             return null
         }     
     })
@@ -104,7 +111,8 @@ export function getUserListByAdmin(){
     });  
 }
 
-export function saveUserProfile(userUUID, profile){
+export function updateUserDetails(userUUID, profile, isAdmin = false){
+    
     if(isEmpty(userUUID)){
         Alert.create({html: 'User UUID cannot be empty!'})
         return null
@@ -114,17 +122,25 @@ export function saveUserProfile(userUUID, profile){
         Alert.create({html: 'User profile data cannot be empty!'})
         return null
     }
+    
+    let url = ''
+    if(isAdmin === false){
+        url = '/api/users/'+userUUID+'/userDetails'
+    }
+    else{
+        url = '/api/admin/users/'+userUUID+'/userDetails'
+    }
         
-    return axios.post('/api/users/'+userUUID+'/userDetails', profile)
+    return axios.post(url, profile)
     .then( (response) => {
         if(response.status === 200){
-            Toast.create.positive({html: 'Your profile information has been updated!'})
+            Toast.create.positive({html: 'Your profile information has been updated!', duration: 3000})
             return response.data
         }
 
     })
     .catch(function (error) {
-        Alert.create({html: 'Your profile is NOT updated, sorry!'})
+        Alert.create({html: 'Your profile is NOT updated, sorry!', duration: 3000})
         console.log(error);
     });
 }
@@ -149,44 +165,6 @@ export function getUserName(){
         userName = userInfo.email
     }
     return userName
-}
-
-export function userProfileUpdate (object) {
-    axios({
-        method: 'post',
-        dataType: 'json',
-        url: '/api/users/'+localStorage.userUUID+'/userDetails',
-    }).then( (response) => {
-        if(response.status === 200){
-            var data = response.data
-            var details = data.userDetails
-            var user = data.user
-            if(!isEmpty(details) && !this.isUserDetailsFetched){
-                this.setUserDetails(data.userDetails)
-                this.major = details.major
-                this.address = details.address
-                this.affiliation = details.affiliation
-                this.keyWords = ''
-                this.city = details.city
-                this.state = details.state
-                this.zipcode = details.zipcode
-            }                            
-            this.email = user.email
-            this.alias = user.alias
-            this.userUUID = user.userUUID
-            this.createdDate = user.createdDate
-            this.firstName = user.firstName
-            this.lastName = user.lastName                            
-            this.setDetailsFetched(true)
-        }
-        else{
-            alert("not 200");
-            return;
-        }     
-    })
-    .catch(function (error) {
-        console.log(error);
-    });
 }
 
 export function signUp(data, url) {

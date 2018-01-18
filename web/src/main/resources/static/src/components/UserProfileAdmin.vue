@@ -131,6 +131,7 @@
         QField,
         QInput,
         QBtn,
+        Toast,
     } from 'quasar'
     
     var Utils = require('../utils/Utils')
@@ -182,7 +183,7 @@
             },            
         },
         components: {
-            QBtn, QField, QInput,
+            QBtn, QField, QInput, Toast,
         },
         created: function() {
 //            var data = {"user":{"userId":1,"firstName":"Sooner","lastName":"Zhao","email":"tao.zhao@xprotocol.com","password":"123","alias":"soonerZhao","userUUID":"5ce824f0-bdfe-11e7-9696-0b2512d9785a","roles":"anonymous,admin,regular","createdDate":"2017-04-25","active":true},"userDetails":{"userDetailsId":1,"userId":1,"address":"2202 Houston Ave","city":"norman","state":"OK","zipcode":"73072","major":"biology","affiliation":"University of Oklahoma"}};
@@ -192,23 +193,22 @@
             }
             else{
                 var userUUID = this.userUUID
-                axios({
-                    method: 'get',
-                    dataType: 'json',
-                    url: '/api/admin/users/'+userUUID+'/userDetails',
-                }).then( (response) => {
-                    if(response.status === 200){
-                        var data = response.data
+                Utils.getUserDetails(userUUID, true)
+                .then((data) => {
+                    console.log(data)
+                    if(data){
                         this.resetUserProfileAdmin(data)
-                    }
+                    }         
                     else{
-                        alert("not 200");
+                        Toast.create.negative({html: `Something is wrong in pulling user profile. Status: `+response.status, duration: 3000})
                         return;
-                    }     
+                    } 
                 })
-                .catch(function (error) {
-                    console.log(error);
+                .catch((err) => {
+                    Alert.create({html: 'oops, something happened during pulling out user profile!'})
+                    console.log(err)
                 });
+                
             }
         },
         mounted: function(){
@@ -239,18 +239,17 @@
                 var qs = require('qs');
                 var userUUID = this.userUUID
 
-                axios.post('/api/admin/users/'+userUUID+'/userDetails', qs.stringify(this.$data))
+                Utils.updateUserDetails(userUUID, qs.stringify(this.$data), true)
                 .then( (response) => {
-                    if(response.status === 200){
-                        alert('Your profile information has been updated!')
+                    if(response.status === 200){                        
                         var data = response.data
                         this.resetUserProfileAdmin(data)
-//                        this.allRoles = 'protocol editor,anonymous,admin,regular'
+                        Toast.create.positive({html: `User profile has been saved.`, duration: 3000})
                     }
                             
                 })
                 .catch(function (error) {
-                    alert('Your profile is NOT updated, sorry')
+                    Toast.create.negative({html: `Something is wrong in pulling user profile. Status: `+response.status, duration: 3000})
                     console.log(error);
                 });
             },           

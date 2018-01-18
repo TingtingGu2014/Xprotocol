@@ -237,7 +237,7 @@
                     console.log(err.message)
                 }
                 
-                Utils.saveUserProfile(userInfo.userUUID, qs.stringify(this.$data))                
+                Utils.updateUserDetails(userInfo.userUUID, qs.stringify(this.$data))                
                 .then((data) => {
                     if(data){
                         this.resetUserProfile(data)
