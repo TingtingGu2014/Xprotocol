@@ -73,7 +73,7 @@
                     <q-field label="User Authority Roles" class="col-12 q-field-short">
                         <input type="hidden" name="roles" v-model="roles"/>
                         <div style='margin-left:20px' class="text-left">
-                            <q-btn rounded outline small color="blue" v-for="(role, index) in roles.split(',')" v-if="role != ''" @click.prevent="doNothing" style="margin-right:10px; margin-bottom: 10px;">
+                            <q-btn rounded outline small color="blue" v-if="role != ''" v-for="(role, index) in roles.split(',')" @click.prevent="doNothing" style="margin-right:10px; margin-bottom: 10px;">
                                 {{index+1}}.&nbsp;{{role}}
                             </q-btn>  
                         </div>

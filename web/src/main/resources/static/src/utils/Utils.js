@@ -84,7 +84,7 @@ export function getUserDetails(userUUID, isAdmin = false) {
         }     
     })
     .catch(function (error) {
-        Alert.create({html: error.message})
+        Alert.create({html: error.message, druation: 3000})
         console.log(error);
     });
 }
@@ -167,10 +167,10 @@ export function getUserName(){
     return userName
 }
 
-export function signUp(data, url) {
-    axios({
+export function signUp(data) {
+    return axios({
         method: 'POST',
-        url: url,
+        url: '/api/signUp',
         dataType: 'json',
         data: data,
         headers: {
@@ -179,20 +179,20 @@ export function signUp(data, url) {
     })
     .then( (response) => {
         var status = response.status;
-        var data = response.data;
+        var responseData = response.data;
 
         if(status == 200){
-            alert("200");
-            localStorage.userInfo = JSON.stringify(data)
-            document.location.href = '/home';
+            localStorage.userInfo = JSON.stringify(responseData) 
+            return responseData
         }
         else{
-            alert("Error status : " + status + "\nError message: "+response.message);
-            return;
+            Alert.create({html: "Error status : " + status + "\nError message: "+response.message, druation: 3000})
+            return false;
         }                                   
       })
       .catch( (error) => {
-        console.log(error);
+            Alert.create({html: error.message, druation: 3000})
+            console.log(error);
       });     
 }
 

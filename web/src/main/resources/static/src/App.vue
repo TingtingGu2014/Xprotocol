@@ -84,7 +84,7 @@
         -moz-border-radius: 10px; 
 
         /* Opera 10.5, IE 9, Safari 5, Chrome, Firefox 4, iOS 4, Android 2.1+ */
-        border-radius: 10px; 
+        border-radius: 5px; 
     }
     
     .inner-row-div {

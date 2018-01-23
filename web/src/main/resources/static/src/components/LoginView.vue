@@ -165,7 +165,6 @@
                 Utils.signIn(this.emaillogin, this.passwordlogin)                
                 .then((data) => {
                     if(data){
-                        this.$emit('session-change')
                         EventBus.$emit('session-change', 'signIn');
                         document.location.href = '/home';
                     }                    
