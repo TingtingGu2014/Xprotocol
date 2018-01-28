@@ -23,12 +23,12 @@ if (__THEME === 'mat') {
   require('quasar-extras/roboto-font')
 }
 import 'quasar-extras/material-icons'
-// import 'quasar-extras/ionicons'
-// import 'quasar-extras/fontawesome'
-// import 'quasar-extras/animate'
 
 import userModule from './modules/UserModule.js';
 import protocolModule from './modules/ProtocolModule.js'
+import { Toast } from 'quasar'
+
+var Utils = require('./utils/Utils')
 
 const store = new Vuex.Store({
     modules: {
@@ -36,6 +36,9 @@ const store = new Vuex.Store({
         protocolModule : protocolModule,
     },
 });
+
+Vue.prototype.$toast = Toast
+Vue.prototype.$utils = Utils
 
 Quasar.start(() => {
   /* eslint-disable no-new */

@@ -17,7 +17,7 @@
 
 <script>
     import {QDataTable} from 'quasar'
-    import TableRouterLink from './vuetablecomponents/TableRouterLink.vue'
+    import TableRouterLink from './elements/TableRouterLink.vue'
     
     var Utils = require('../utils/Utils')
     

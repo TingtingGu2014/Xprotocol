@@ -172,7 +172,7 @@
             
                 if(this.path.lastIndexOf('signup') >= 0){
                     if(Utils.isEmpty(this.email) || Utils.isEmpty(this.password) || Utils.isEmpty(this.password2)){
-                        Toast.create.negative({html: `Please fill your email and password for registration.`, duration: 3000})
+                        Alert.create({html: `Please fill your email and password for registration.`, duration: 3000})
                         return false;
                     }
                     if(this.password != this.password2){

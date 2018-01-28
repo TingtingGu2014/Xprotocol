@@ -20,7 +20,7 @@
 <script>
     import {QDataTable} from 'quasar'
     import { mapGetters, mapMutations } from 'vuex'
-    import TableRouterLink from './vuetablecomponents/TableRouterLink.vue'
+    import TableRouterLink from './elements/TableRouterLink.vue'
     
     var Utils = require('../utils/Utils')
     

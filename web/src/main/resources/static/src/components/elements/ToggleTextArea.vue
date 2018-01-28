@@ -1,0 +1,154 @@
+<template>
+    <div class="row" style="width: 100%; padding: 0 10px 0 10px; " :ref="name+'ToggleDiv'">
+        <div class="col-12 toggle-editor">
+            <q-field :label="label" >
+                <q-input id="toggle-editor" type="textarea" ref="toggleEditor" color="teal-9" :min-rows="3" :max-rows="8"
+                :class="editorClasses"
+                v-model="newValue" 
+            />
+            </q-field>            
+        </div>
+        <div class="col text-center toggle-editor">
+            <q-btn class="toggle-btn" color="blue" small icon="fa-check" :id="name + '-toggle-btn-done'" @click.prevent="toggleBtnClick">Done</q-btn>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <q-btn class="toggle-btn" color="positive" small icon="fa-times" :id="name + '-toggle-btn-cancel'" @click.prevent="toggleBtnClick">Cancel</q-btn>
+        </div>
+        
+        <div class="col toggle-display" style="display: none;" ref="toggleDisplay">
+            <a id="displayLink" href="#" @click.prevent="toggleBtnClick">
+                <q-field :label="label">
+                    <p class="display-p" v-html="newValue"></p>
+                </q-field>            
+            </a>
+        </div>
+    </div>
+    
+</template>
+
+<script>
+    import {QField, QInput, QBtn} from 'quasar'
+    var Utils = require('../../utils/Utils')
+    export default {
+        data: function(){
+            return {
+                newValue: '',
+                oldValue: '',
+            }
+        },
+        props: {
+            name: {
+                type: String,
+                required: true
+            },
+            label: {
+                type: String,
+                default: '',
+                required: false
+            },
+            displayClasses: {
+                type: String,
+                default: '',
+                required: false
+            },
+            displayStyles: {
+                type: String,
+                default: '',
+                required: false
+            },
+            editorClasses: {
+                type: String,
+                default: '',
+                required: false
+            },
+            editorStyles: {
+                type: String,
+                default: '',
+                required: false
+            },
+            inputValue: {
+                type: String,
+                default: '',
+                required: false
+            },
+        },
+        beforeMount: function(){        
+            this.oldValue = this.inputValue
+            this.newValue = this.inputValue
+        },
+        components: {
+            QField, QInput, QBtn,
+        },
+        methods: {
+            toggleBtnClick: function(event){
+                var id = event.target.id
+                if(Utils.isEmpty(id)){
+                    id = event.currentTarget.id
+                }
+                if(id.lastIndexOf('-btn-done') > 0){
+                    var editor = this.$refs.toggleEditor
+                    var val = editor.value
+                    if(editor){
+                        this.newValue = val
+                        this.oldValue = val
+                    }
+                    var refs = this.$refs
+                    var div = refs[this.name+'ToggleDiv']
+                    var editors = div.getElementsByClassName('toggle-editor')
+                    if(editors){
+                        for(var i = 0; i < editors.length; i++){
+                            editors[i].style.display = 'none'
+                        }
+                    }
+                    var displayDiv = refs['toggleDisplay']
+                    displayDiv.style.display = 'block'
+                    this.$emit('toggleTextAreaValueChange', this.newValue)
+                }
+                else if(id.lastIndexOf('-btn-cancel') > 0){
+                    this.newValue = this.oldValue
+                    var displayDiv = this.$refs.toggleDisplay
+                    displayDiv.style.display = 'block'
+                    var refs = this.$refs
+                    var div = refs[this.name+'ToggleDiv']
+                    var editors = div.getElementsByClassName('toggle-editor')
+                    if(editors){
+                        for(var i = 0; i < editors.length; i++){
+                            editors[i].style.display = 'none'
+                        }
+                    }
+                }
+                else if(id.indexOf('displayLink') >= 0){
+                    var refs = this.$refs
+                    var div = refs[this.name+'ToggleDiv']
+                    var editors = div.getElementsByClassName('toggle-editor')
+                    if(editors){
+                        for(var i = 0; i < editors.length; i++){
+                            editors[i].style.display = 'block'
+                        }
+                    }
+                    var displayDiv = refs['toggleDisplay']
+                    if(displayDiv){
+                        displayDiv.style.display = 'none'
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+<style scoped>
+    #toggle-editor {
+        margin: 0 30px 0 30px;
+        font-family: Georgia, "Times New Roman", Times, serif;
+    }
+    #toggle-display {
+        font-family: Georgia, "Times New Roman", Times, serif;
+    }
+    .display-p {
+        white-space: pre-wrap;
+        background: #e6f7ff;
+        color: #133913;
+        font-family: Georgia, "Times New Roman", Times, serif;
+        margin: 0 30px 0 30px;
+        padding: 5px 5px 5px 5px;
+    }
+</style>
