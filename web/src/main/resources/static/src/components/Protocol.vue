@@ -20,8 +20,8 @@
                                 :width='width'
                             ></VueTinymce>    
                             <div class="text-center" slot="footer" v-if="isProtocolAuthor">
-                                <q-btn small color="blue" style="margin-top:25px;">
-                                    <span v-if="saveEditor"><i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save</span>                                        
+                                <q-btn small color="blue" style="margin-top:25px;" v-on:click.prevent="saveUserProtocol">
+                                    <span><i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save</span>                                        
                                 </q-btn>
                             </div>
                         </q-card-main>
@@ -51,18 +51,35 @@
                 <br><br>
                     <fieldset class="text-center" style="width:100%;">
                         <legend>Protocol Associated Files:</legend>
-                        <div>
-                            <ul class="list-group">
-                                <span class="" v-if="!files || files.length == 0">There are no file associated with this protocol</span>
-                                <li class="" v-else v-for="file in displayFiles " v-html="file"></li>
-                            </ul>
-                            <br><br>
+                        <div class="displayFileDiv">
+                            <q-list highlight style="padding-left: 10%">
+                                <q-item v-if="!files || files.length == 0">There are no file associated with this protocol</q-item>
+                                <q-item v-else v-for="fileInfo in displayFiles" style="margin: 0 4rem 2rem 0">
+                                    <q-item-side left>
+                                        <img :src="fileInfo.currentName" class="responsive" alt="Protocol file without preview" style="width: 7rem; height: auto">
+                                    </q-item-side>
+                                    <q-item-main>
+                                        <a :href="fileInfo.currentName + '?name='+fileInfo.originalName" target="_blank">
+                                            <i class="fa fa-download" style="font-">&nbsp;&nbsp;<span class="fileBtn">DOWNLOAD</span></i>
+                                        </a>                                    
+                                        <a class="imgDelBtn" href="#" :id="fileInfo.currentName" :name="fileInfo.originalName" color="red-4" small>
+                                            <i class="fa fa-trash-o">&nbsp;&nbsp;<span class="fileBtn">DELETE</span></i>
+                                        </a>                                    
+                                    </q-item-main>
+                                </q-item>
+                            </q-list>
                         </div>
+                        
                         <div class="" v-if="isProtocolAuthor">
-                            <form class="form-inline">
-                                <label for="uploadFileForProtocol">Select a file to upload:&nbsp;&nbsp;</label>
-                                <input type="file" style="width:20%" id="uploadFileForProtocol">
-                                <q-btn color="blue" small icon="fa-upload" @click.prevent="uploadProtocolFile">Add File</q-btn>
+                            <form class="row">
+                                <br>
+                                <q-field label="Select a file to upload:" class="col-md-8 col-sm-12" style="margin-bottom: 10px;">
+                                    <!--<label for="uploadFileForProtocol">Select a file to upload:&nbsp;&nbsp;</label>-->
+                                    <q-input type="file" id="uploadFileForProtocol">                                    
+                                </q-field>
+                                <q-field class="col">
+                                    <q-btn color="blue" small icon="fa-upload" @click.prevent="uploadProtocolFile">Add File</q-btn>
+                                </q-field>
                             </form>
                         </div>
                     </fieldset>
@@ -116,7 +133,7 @@
                         <div v-if="comments && Object.keys(comments).length > 0">
                             <div class="list-group" v-if="comments && Object.keys(comments).length > 0" v-for="(value, key) in comments">
                                 <span class="list-group-item list-group-item-action flex-column align-items-start borderless">
-                                    <div class="d-flex w-100 justify-content-between">
+                                    <div class="">
                                         <h5 class="mb-1">{{getCommentUserNameFromCommentKey(key)}} says:</h5>
                                         <small>{{getCommentDateFromCommentKey(key)}}</small>
                                     </div>
@@ -171,7 +188,7 @@
 </template>
 
 <script>
-    import {QCard, QCardTitle, QCardSeparator, QCardMain, QBtn, QField, QInput,QLayout,} from 'quasar'
+    import {QCard, QCardTitle, QCardSeparator, QCardMain, QBtn, QField, QInput,QLayout,QList, QItem, QItemSide, QItemMain} from 'quasar'
     import ToggleInput from './elements/ToggleInput.vue'
     import VueTinymce from './Editor.vue'
     import { mapGetters, mapMutations } from 'vuex'
@@ -219,33 +236,53 @@
                         var fileExtension = ''
                         if(originalNameArr.length === 2){
                             fileExtension = originalNameArr[1].toLowerCase()
-                            if(this.$utils.imageExtensions.indexOf(fileExtension) >= 0){
-                                fileRowHtml += '&nbsp;&nbsp;&nbsp;&nbsp;<img src=\"' + currentName + '\" alt=\"File not found\" width=\"80\" height=\"80\" >' +
-                                               '&nbsp;&nbsp;&nbsp;&nbsp;<a href="' + currentName + '?name='+originalName+'" class="btn btn-secondary" target="_blank">Download</a>'
-                                if(this.isProtocolAuthor){
-                                    fileRowHtml += '&nbsp;&nbsp;&nbsp;&nbsp;<button id="' + currentName + '" type="button" class="btn btn-secondary imgDelBtn" name="'+originalName+'">Delete</button>'
-                                }                                                 
-                                fileHtmls.push(fileRowHtml)
+                            if(this.$utils.isEmpty(fileExtension)){
+                                fileExtension = 'none'
                             }
+                            let fileInfo = new Object()
+                            fileInfo.currentName = currentName
+                            fileInfo.originalName = originalName
+                            fileInfo.extension = fileExtension
+                                               
+                            fileHtmls.push(fileInfo)
                         }
                     }
                 }
                 return fileHtmls
             },
             isProtocolAuthor: function(){
-                return true
+                var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
+                if(!loggedIn === true){
+                    return false
+                }
+                var userInfo = JSON.parse(localStorage.userInfo)
+                var currentUserUUID = userInfo.userUUID
+                return currentUserUUID == this.userUUID ? true : false
             },            
             isLoggedInUser: function(){
-            
-               
+                var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
+                if(!loggedIn === true){
+                    return false
+                }
+                
+                var userInfo = JSON.parse(localStorage.userInfo)
+                if(!userInfo){
+                    return false
+                }
+                
+                var currentUserUUID = userInfo.userUUID
+                if(!currentUserUUID){
+                    return false
+                }
+                
                 return true
             },
         },
         methods: {
             saveEditor: function(event){
-                
+                saveUserProtocol()
             },
-            saveUserProtocol: function(event){
+            saveUserProtocol: function(){
 
                 var protocolData = JSON.parse(JSON.stringify(this.$data))
                 protocolData.userUUID = this.userUUID
@@ -256,7 +293,7 @@
                     return false;
                 }
                 
-                if(Utithis.$utilsls.isEmpty(protocolData.title)){
+                if(this.$utils.isEmpty(protocolData.title)){
                     alert('Protocol titile cannot be empty!')
                     return false;
                 }
@@ -299,18 +336,19 @@
             contentChange: function(content){
                 var refs = this.$refs
                 var protocolDiv = refs['protocolDiv']
-                if(Utilthis.$utilss.isEmpty(protocolDiv)){
+                if(this.$utils.isEmpty(protocolDiv)){
                     this.$toast.create.negative({html: "Cannot get the protocol Div!", druation: 3000})
                 }                
                 var pbody = document.getElementById('pbody')
-                if(Utithis.$utilsls.isEmpty(protocolDiv)){
+                if(this.$utils.isEmpty(protocolDiv)){
                     this.$toast.create.negative({html: "Cannot get the protocol display Div!", druation: 3000})
                     return false
                 } 
                 pbody.innerHTML = content
+                this.body = content
             },
             editorFileUploaded: function(content){
-                if(Utithis.$utilsls.isEmpty(this.files)){
+                if(this.$utils.isEmpty(this.files)){
                     this.files = []
                 }
                 this.files.push(content)
@@ -326,7 +364,7 @@
                     return false
                 } 
                 var files = fileInput['files']
-                if(Utithis.$utilsls.isEmpty(files)){
+                if(this.$utils.isEmpty(files)){
                     this.$toast.create.negative({html: "No files selected!", druation: 3000})
                     return false
                 }
@@ -577,25 +615,74 @@
                 }
         },
         components: {
-            VueTinymce, QCard, QCardTitle, QCardSeparator, QCardMain, QBtn, QField, QInput, QLayout, ToggleInput,
+            VueTinymce, QCard, QCardTitle, QCardSeparator, QCardMain, QBtn, QField, QInput, QLayout, ToggleInput,QItem, QList, QItemSide, QItemMain,
         },
         created: function() {
         
+            try{
+                var userUUID = this.$route.params.userUUID
+                if(Utils.isEmpty(userUUID)){
+                    throw new EmptyUserUUIDException(400, 'User UUID cannot be empty!')
+                }
+            }
+            catch(exception){
+                if (e instanceof EmptyUserUUIDException) {
+                    sessionStorage.errorMessage = message
+                    document.location.href = '/errors/400'
+                    return false
+                } else {
+                    return false;
+                }
+            }
             
+            // When userProtocolUUID == 'new' this is a new protocol
+            var userProtocolUUID = this.$route.params.userProtocolUUID
+            if(userProtocolUUID == 'new'){
+                this.userProtocolUUID = Utils.getTimeUUID()
+                this.showEditor = true
+                return false
+            }
+            
+            var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.userUUID, this.userProtocolUUID)
+
+            if(!Utils.isEmpty(protocol)){
+                this.resetUserProtocol(protocol)
+                return false
+            }
+
+            Utils.getUserProtocol(this.userUUID, this.userProtocolUUID)
+            .then((data) => {
+                console.log(data)
+                this.resetUserProtocol(data)
+            })
+            .catch((err) => {
+                alert("oops, something happened")
+                console.log(err)
+            });
             
         },
         updated: function(){
             var files = this.files
-//            $(".imgDelBtn").click(function(event){
-//                var del = confirm('Are you sure to delete this file?')
-//                if(del == false){
-//                    return false
-//                }                
-//                alert('File '+fileName+' will NOT be deleted until you click the save button below!')
-//                var location = event.target.id
-//                var fileName = event.target.name
-//                this.files = Utils.removeArrayElementByValue(files, location+'____'+fileName)
-//            })
+            var imgDelBtn = document.getElementsByClassName('imgDelBtn')
+            if(imgDelBtn){
+                for(let i = 0; i < imgDelBtn.length; i++){
+                    imgDelBtn[i].addEventListener("click", function(){
+                        var del = confirm('Are you sure to delete this file?')
+                        if(del == false){
+                            return false
+                        }                
+                        var location = event.target.id
+                        var fileName = event.target.name
+                        if(!location){
+                            location = event.currentTarget.id
+                            fileName = event.currentTarget.name
+                        }
+                        this.files = Utils.removeArrayElementByValue(files, location+'____'+fileName)
+                        return false
+                    });
+                }
+            }
+  
         },
     }
 </script>
@@ -626,24 +713,22 @@ hr {
   border: 0;
   border-top: 2px solid rgb(169, 178, 180);
 }
-/*
-how to css list group border: https://arkuuu.de/blog/bootstrap4-card-heading-list-group
-
-.card > .list-group .list-group-item {
-//    border-left-width: 0;
-//    border-right-width: 0;
-}
-.card > .list-group .list-group-item:last-of-type {
-//    border-bottom-width: 0;
-}
-.card > .list-group .list-group-item:first-of-type {
-//    border-top-width: 0;
-}
-
-*/
 
 .list-group .list-group-item {
     border-left-width: 0;
     border-right-width: 0;
 }
+
+span.fileBtn {
+    margin-right: 10px;
+    margin-bottom: 10px;
+    font-family: Arial;
+    font-size:12px;
+    font-weight: bolder;
+}
+
+.q-item-section+.q-item-section {
+    margin-left: 20px !important;
+}
+
 </style>
