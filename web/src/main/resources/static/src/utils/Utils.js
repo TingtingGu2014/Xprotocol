@@ -18,7 +18,7 @@ export function isEmpty(obj){
     }
     if(obj instanceof Object){
         for(var key in obj) {
-            if (obj.hasOwnProperty(key)) {
+            if (obj.hasOwnProperty(key) || obj[key]) {
                 return false;
             }
         }
