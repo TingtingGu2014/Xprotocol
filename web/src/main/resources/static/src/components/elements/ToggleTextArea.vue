@@ -1,20 +1,19 @@
 <template>
     <div class="row" style="width: 100%; padding: 0 10px 0 10px; " :ref="name+'ToggleDiv'">
-        <div class="col-12 toggle-editor">
+        <div class="col-12 toggle-editor" style="display: none;">
             <q-field :label="label" >
-                <q-input id="toggle-editor" type="textarea" ref="toggleEditor" color="teal-9" :min-rows="3" :max-rows="8"
-                :class="editorClasses"
+                <q-input id="toggle-editor" type="textarea" ref="toggleEditor" :min-rows="4" :max-rows="8" class="textarea-class"
                 v-model="newValue" 
             />
             </q-field>            
         </div>
-        <div class="col text-center toggle-editor">
+        <div class="col text-center toggle-editor" style="display: none;">
             <q-btn class="toggle-btn" color="blue" small icon="fa-check" :id="name + '-toggle-btn-done'" @click.prevent="toggleBtnClick">Done</q-btn>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <q-btn class="toggle-btn" color="positive" small icon="fa-times" :id="name + '-toggle-btn-cancel'" @click.prevent="toggleBtnClick">Cancel</q-btn>
         </div>
         
-        <div class="col toggle-display" style="display: none;" ref="toggleDisplay">
+        <div class="col toggle-display" ref="toggleDisplay">
             <a id="displayLink" href="#" @click.prevent="toggleBtnClick">
                 <q-field :label="label">
                     <p class="display-p" v-html="newValue"></p>
@@ -45,29 +44,9 @@
                 default: '',
                 required: false
             },
-            displayClasses: {
-                type: String,
-                default: '',
-                required: false
-            },
-            displayStyles: {
-                type: String,
-                default: '',
-                required: false
-            },
-            editorClasses: {
-                type: String,
-                default: '',
-                required: false
-            },
-            editorStyles: {
-                type: String,
-                default: '',
-                required: false
-            },
             inputValue: {
                 type: String,
-                default: '',
+                default: '\n\n',
                 required: false
             },
         },
@@ -101,7 +80,7 @@
                     }
                     var displayDiv = refs['toggleDisplay']
                     displayDiv.style.display = 'block'
-                    this.$emit('toggleTextAreaValueChange', this.newValue)
+                    this.$emit('toggleTextAreaValueChange', this.newValue, this.name)
                 }
                 else if(id.lastIndexOf('-btn-cancel') > 0){
                     this.newValue = this.oldValue
@@ -150,5 +129,10 @@
         font-family: Georgia, "Times New Roman", Times, serif;
         margin: 0 30px 0 30px;
         padding: 5px 5px 5px 5px;
+    }
+    .textarea-class {
+        border-bottom: 1px solid #b4e1f7;
+        box-shadow: 0 1px 0 0 #ffa000;
+        padding: 10px 10px 5px 10px;
     }
 </style>

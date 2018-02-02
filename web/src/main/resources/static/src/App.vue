@@ -103,8 +103,8 @@
     
     fieldset legend {
         font-family: arial, "Times New Roman", Times, serif;
-        font-size: 1.0em;
-       
+        font-size: 0.6rem;
+        font-weight: bold;
         background-color: #ecf2f9;
         padding: 5px 10px 5px 10px;
         margin: 0 5px 0 5px;

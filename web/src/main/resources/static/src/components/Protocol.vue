@@ -50,7 +50,7 @@
                 <div class="col">
                 <br><br>
                     <fieldset class="text-center" style="width:100%;">
-                        <legend>Protocol Associated Files:</legend>
+                        <legend>Protocol Associated Files</legend>
                         <div class="displayFileDiv">
                             <q-list highlight style="padding-left: 10%">
                                 <q-item v-if="!files || files.length == 0">There are no file associated with this protocol</q-item>
@@ -62,7 +62,7 @@
                                         <a :href="fileInfo.currentName + '?name='+fileInfo.originalName" target="_blank">
                                             <i class="fa fa-download" style="font-">&nbsp;&nbsp;<span class="fileBtn">DOWNLOAD</span></i>
                                         </a>                                    
-                                        <a class="imgDelBtn" href="#" :id="fileInfo.currentName" :name="fileInfo.originalName" color="red-4" small>
+                                        <a class="imgDelBtn" href="javascript:void(0)" :id="fileInfo.currentName" :name="fileInfo.originalName" @click.prevent="deleteProtocolFiles">
                                             <i class="fa fa-trash-o">&nbsp;&nbsp;<span class="fileBtn">DELETE</span></i>
                                         </a>                                    
                                     </q-item-main>
@@ -70,15 +70,14 @@
                             </q-list>
                         </div>
                         
-                        <div class="" v-if="isProtocolAuthor">
+                        <div class="protocolUploadDiv" v-if="isProtocolAuthor">
                             <form class="row">
                                 <br>
                                 <q-field label="Select a file to upload:" class="col-md-8 col-sm-12" style="margin-bottom: 10px;">
-                                    <!--<label for="uploadFileForProtocol">Select a file to upload:&nbsp;&nbsp;</label>-->
-                                    <q-input type="file" id="uploadFileForProtocol">                                    
+                                    <input type="file" id="uploadFileForProtocol" style="width: 100%;"/>                                    
                                 </q-field>
-                                <q-field class="col">
-                                    <q-btn color="blue" small icon="fa-upload" @click.prevent="uploadProtocolFile">Add File</q-btn>
+                                <q-field class="col col-sm-12">
+                                    <q-btn color="blue" small align="left" icon="fa-upload" @click.prevent="uploadProtocolFile">Add File</q-btn>
                                 </q-field>
                             </form>
                         </div>
@@ -89,7 +88,7 @@
                 <div class="col">
                 <br><br>
                     <fieldset class="form-group text-center" style="width:100%;">
-                        <legend>Protocol Key Words:</legend>
+                        <legend>Protocol Key Words</legend>
                         <div class="row" v-if="keywords && keywords.length > 0">
    
                             <span  class="col-md-4 col-lg-3 col-sm-6 text-left" v-for="(keyword, index) in keywords" >
@@ -128,41 +127,26 @@
             <br><br>
             <div class="row">
                 <div class="col">
-                    <fieldset class="form-group text-center" style="width:100%;">
-                        <legend>Comments:</legend>
-                        <div v-if="comments && Object.keys(comments).length > 0">
-                            <div class="list-group" v-if="comments && Object.keys(comments).length > 0" v-for="(value, key) in comments">
-                                <span class="list-group-item list-group-item-action flex-column align-items-start borderless">
-                                    <div class="">
-                                        <h5 class="mb-1">{{getCommentUserNameFromCommentKey(key)}} says:</h5>
-                                        <small>{{getCommentDateFromCommentKey(key)}}</small>
+                    <fieldset class="text-center" style="width:100%;">
+                        <legend>Comments</legend>
+                        <q-list class="" v-if="comments && Object.keys(comments).length > 0" v-for="(value, key) in comments">
+                            <q-item>
+                                <q-item-main>
+                                    <div class="row">
+                                        <small class="col-5 text-left comment-signature">{{getCommentUserNameFromCommentKey(key)}} says:</small>
+                                        <small class="col-7 text-right">{{getCommentDateFromCommentKey(key)}}</small>
                                     </div>
-                                    <div id="key + '-edit-delete-div'" class="d-flex w-100 justify-content-between" v-if="!hiddenCommentEditors || hiddenCommentEditors.indexOf(key) < 0">
-                                        <span class="textarea-display" v-html="value" style="text-align: left"></span>
-                                        <span class="mb-1" style="width: 15%;" v-if="isLoggedInUser">
-                                            <a v-bind:id="key + '-edit-show'" href="#" v-on:click.prevent="toggleCommentEditBtn">
-                                                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                                            </a>                                            
-                                            <a v-bind:id="key + '-edit-delete'" href="#" v-on:click.prevent="deleteComment">
-                                                <i class="fa fa-trash-o" aria-hidden="true"></i>
-                                            </a>
-                                        </span>
-                                    </div>     
-                                    <div id="key + '-edit-input-div'" class="d-flex w-100 justify-content-between" v-else>
-                                        <span style="width:100%">
-                                            <p><textarea class="form-control" v-bind:id="key + '-editCommentInput'" rows="5">{{value}}</textarea></p>
-                                            <!--<a v-bind:id="key + '-edit-commit'" href="#" v-on:click.prevent="editComment">OK</a>-->
-                                            <b-button v-bind:id="key + '-edit-commit'" :size="sm" :variant="outline-sucess" v-on:click.prevent="updateComment" >
-                                                Commit &nbsp;&nbsp;<i class="fa fa-check" aria-hidden="true"></i>
-                                            </b-button>
-                                            <b-button v-bind:id="key + '-edit-cancel'" :size="sm" :variant="outline-sucess" v-on:click.prevent="toggleCommentEditBtn">
-                                                Cancel&nbsp;&nbsp;<i class="fa fa-undo" aria-hidden="true"></i>
-                                            </b-button>
-                                        </span>
+                                    <div class="row" style="width: 100%;">
+                                        <toggle-textarea :name="key" :inputValue="value" @toggleTextAreaValueChange="updateComment"></toggle-textarea>
                                     </div>
-                                </span>
-                            </div>
-                        </div>
+                                </q-item-main>
+                                <q-item-side right link color="red-4" >
+                                <a href="# " :id="key + '-edit-delete'" class="commentDelBtn" @click.prevent="deleteComment" ><i class="fa fa-trash-o">&nbsp;&nbsp;Delete</i></a>
+                                </q-item-side>
+                            </q-item>
+                        </q-list>
+                        <br>
+                        <hr>
                         <form v-if="isLoggedInUser">
                             <div class="col-12 toggle-editor">
                                 <q-field>
@@ -170,7 +154,7 @@
                                 </q-field>            
                             </div>
                             <div class="col text-center toggle-editor">
-                                <q-btn color="blue" small icon="fa-floppy-o" @click.prevent="addComment">Save</q-btn>                                
+                                <q-btn color="blue" small icon="fa-floppy-o" @click.prevent="addComment">Add Comment</q-btn>                                
                             </div>
                         </form>
                     </fieldset>                
@@ -189,11 +173,11 @@
 
 <script>
     import {QCard, QCardTitle, QCardSeparator, QCardMain, QBtn, QField, QInput,QLayout,QList, QItem, QItemSide, QItemMain} from 'quasar'
-    import ToggleInput from './elements/ToggleInput.vue'
+    import ToggleTextarea from './elements/ToggleTextArea.vue'
     import VueTinymce from './Editor.vue'
     import { mapGetters, mapMutations } from 'vuex'
     
-    var Utils = require('../utils/Utils')
+    var FileUtils = require('../utils/FileUtils')
     
     export default {
         name: 'example',
@@ -251,7 +235,7 @@
                 return fileHtmls
             },
             isProtocolAuthor: function(){
-                var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
+                var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
                 if(!loggedIn === true){
                     return false
                 }
@@ -260,7 +244,7 @@
                 return currentUserUUID == this.userUUID ? true : false
             },            
             isLoggedInUser: function(){
-                var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
+                var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
                 if(!loggedIn === true){
                     return false
                 }
@@ -378,7 +362,27 @@
                     var newName = 'blobid' + (new Date()).getTime() + '.' + file.name.split('.').pop()                
                     this.$utils.uploadFile(url, file, newName)
                     .then((data) => {
-                        protocolFiles.push(data['location'] + '____' + originalName)
+                        
+                        let newFileVal = data['location'] + '____' + originalName
+                        protocolFiles.push(newFileVal)
+                
+                        // Update protocol in the storage:
+                        var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.userUUID, this.userProtocolUUID)
+                        if(this.$utils.isEmpty(protocol.files)){
+                            protocol.files = []
+                        }
+                        protocol.files.push(newFileVal)
+
+                        this.$utils.saveUserProtocol(protocol)
+                        .then((data) => {
+                            this.setProtocolByUserUUIDANDProtocolUUID(protocol)
+                            console.log(data)                    
+                        })
+                        .catch((err) => {
+                            alert("oops, something happened")
+                            console.log(err)
+                        });
+                
                         this.$toast.create.positive({html: 'File ' + originalName + ' has been successfully uploaded!', duration: 3000})
                     })
                     .catch((err) => {
@@ -387,6 +391,48 @@
                     });
                 }
                 
+            },
+            deleteProtocolFiles: function(event){
+                var del = confirm('Are you sure to delete this file?')
+                if(del == false){
+                    return event.preventDefault()
+                }                
+                var target = event.target
+                if(this.$utils.isEmpty(target) || this.$utils.isEmpty(target.id)){
+                    target = event.currentTarget
+                    if(this.$utils.isEmpty(target) || this.$utils.isEmpty(target.id)){
+                        this.$toast.create.negative({html: 'Cannot find DOM target ID to delete protocol file!', duration: 3000})
+                        return false
+                    }
+                }
+                var location = target.id
+                var fileName = target.name
+                
+                FileUtils.deleteProtocolFile(location)
+                .then((data) => {
+                    console.log(data) 
+                    if(data.toString() == '200'){
+                        this.files = this.$utils.removeArrayElementByValue(this.files, location+'____'+fileName)
+                        var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.userUUID, this.userProtocolUUID)
+                        protocol.files = this.files
+                        
+                        this.$utils.saveUserProtocol(protocol)
+                        .then((data) => {
+                            console.log(data) 
+                            this.setProtocolByUserUUIDANDProtocolUUID(data)
+                            console.log('Protocol with deleted comment saved')
+                        })
+                        .catch((err) => {
+                            alert("oops, something happened")
+                            console.log(err)
+                        });
+                    }
+                })
+                .catch((err) => {
+                    alert("oops, something happened")
+                    console.log(err)
+                });
+                return false
             },
             addKeyword: function(){
           
@@ -402,18 +448,13 @@
                 keywords = this.$utils.removeArrayElementByValue(keywords, id)                
             },
             addComment: function(){
-            
-                var addKeyInput = this.$refs['addCommentInput']
-                if(this.$utils.isEmpty(addKeyInput)){
-                    this.$toast.create.negative({html: 'The add comment input does not exist!', duration: 3000})
-                    return false
-                }
-
-                var addCommentInputVal = addKeyInput.value
-                if(this.$utils.isEmpty(addCommentInputVal)){
+                let newVal = this.newComment
+                let userInfo = JSON.parse(localStorage.userInfo)
+                if(this.$utils.isEmpty(newVal)){
                     this.$toast.create.negative({html: 'Please type in something for a new comment!', duration: 3000})
                     return false
                 }
+                
                 if(this.$utils.isEmpty(this.comments)){
                     this.comments = {}
                 }
@@ -427,16 +468,16 @@
                 comment.commentUUID = newCommentUUID
                 comment.userUUID = userInfo.userUUID
                 comment.protocolTitle = this.title
-                comment.content = addCommentInputVal
+                comment.content = newVal
                 comment.path = ''
                 
                 var commentKey = userInfo.userUUID + '____' + commentUserName + '____' + newCommentUUID
-                this.$set(this.comments, commentKey, addCommentInputVal)  
+                this.$set(this.comments, commentKey, newVal)  
                                 
                 this.$utils.saveComment(comment)
                 .then((data) => {
                     console.log(data)                     
-                    $("#addCommentInput").val('')
+                    this.newComment = ''
                 })
                 .catch((err) => {
                     alert("oops, something happened")
@@ -447,11 +488,12 @@
                 if(this.$utils.isEmpty(protocol.comments)){
                     protocol.comments = {}
                 }
-                protocol.comments[commentKey] = addCommentInputVal
+                protocol.comments[commentKey] = newVal
                 
                 this.$utils.saveUserProtocol(protocol)
                 .then((data) => {
-                    console.log(data)                    
+                    console.log(data)   
+                    this.setProtocolByUserUUIDANDProtocolUUID(protocol)
                 })
                 .catch((err) => {
                     alert("oops, something happened")
@@ -509,37 +551,35 @@
                     }
                 }                
             },          
-            updateComment: function(event){
-                var id = event.target.id
-                if(this.$utils.isEmpty(id)){
-                    id = event.currentTarget.id
-                }
-                var keyArr = id.split('-edit-')
-                var commentKey = keyArr[0]
-                var val = $("#"+commentKey+"-editCommentInput").val()                
+            updateComment: function(newVal, key){
+
+                if(this.$utils.isEmpty(key)){
+                    this.$toast.create.negative({html: "Cannot get the comment key information!", druation: 3000})
+                    return false
+                }            
                 
                 var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.userUUID, this.userProtocolUUID)
                 if(this.$utils.isEmpty(protocol)){
-                    alert("Cannot find the protocol for this comment!")
+                    this.$toast.create.negative({html: "Cannot find the protocol for this comment!", druation: 3000})
                     return false
                 }
                 
                 if(this.$utils.isEmpty(protocol.comments)){
                     protocol.comments = {}
                 }
-                protocol.comments[commentKey] = val
+                protocol.comments[key] = newVal
                 
                 this.$utils.saveUserProtocol(protocol)
                 .then((data) => {
                     console.log(data) 
-                    console.log('Protocol with new comment content saved')
+                    this.setProtocolByUserUUIDANDProtocolUUID(protocol)
                 })
                 .catch((err) => {
-                    alert("oops, something happened")
+                    this.$toast.create.negative({html: "Cannot update protocol: " + this.userProtocolUUID + " comment : " + key, druation: 3000})
                     console.log(err)
                 });
                 
-                var keyArr = commentKey.split('____')
+                var keyArr = key.split('____')
                 var userInfo = JSON.parse(localStorage.userInfo)
                 var comment = {}
                 comment.protocolUserUUID = this.userUUID
@@ -547,19 +587,19 @@
                 comment.commentUUID = keyArr[2]
                 comment.userUUID = userInfo.userUUID
                 comment.protocolTitle = this.title
-                comment.content = val
+                comment.content = newVal
                 comment.path = ''
                 
                 this.$utils.saveComment(comment)
                 .then((data) => {
                     console.log(data)
-                    this.$set(this.comments, commentKey, val)   
-                    if(this.hiddenCommentEditors.indexOf(commentKey) >= 0){
-                        this.$utils.removeArrayElementByValue(this.hiddenCommentEditors, commentKey)
-                    }
+                    this.$set(this.comments, key, newVal)   
+//                    if(this.hiddenCommentEditors.indexOf(commentKey) >= 0){
+//                        this.$utils.removeArrayElementByValue(this.hiddenCommentEditors, commentKey)
+//                    }
                 })
                 .catch((err) => {
-                    alert("oops, something happened")
+                    this.$toast.create.negative({html: "Cannot update protocol: " + this.userProtocolUUID + " comment : " + comment.commentUUID, druation: 3000})
                     console.log(err)
                 });
                 
@@ -582,7 +622,7 @@
                     return false
                 }
                 
-                if(Utthis.$utilsils.isEmpty(protocol.comments)){
+                if(this.$utils.isEmpty(protocol.comments)){
                     return false
                 }
                 
@@ -615,13 +655,14 @@
                 }
         },
         components: {
-            VueTinymce, QCard, QCardTitle, QCardSeparator, QCardMain, QBtn, QField, QInput, QLayout, ToggleInput,QItem, QList, QItemSide, QItemMain,
+            VueTinymce, QCard, QCardTitle, QCardSeparator, QCardMain, QBtn, QField, QInput, QLayout,QItem, QList, QItemSide, QItemMain,
+            ToggleTextarea,
         },
         created: function() {
         
             try{
                 var userUUID = this.$route.params.userUUID
-                if(Utils.isEmpty(userUUID)){
+                if(this.$utils.isEmpty(userUUID)){
                     throw new EmptyUserUUIDException(400, 'User UUID cannot be empty!')
                 }
             }
@@ -638,19 +679,19 @@
             // When userProtocolUUID == 'new' this is a new protocol
             var userProtocolUUID = this.$route.params.userProtocolUUID
             if(userProtocolUUID == 'new'){
-                this.userProtocolUUID = Utils.getTimeUUID()
+                this.userProtocolUUID = this.$utils.getTimeUUID()
                 this.showEditor = true
                 return false
             }
             
             var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.userUUID, this.userProtocolUUID)
 
-            if(!Utils.isEmpty(protocol)){
+            if(!this.$utils.isEmpty(protocol)){
                 this.resetUserProtocol(protocol)
                 return false
             }
 
-            Utils.getUserProtocol(this.userUUID, this.userProtocolUUID)
+            this.$utils.getUserProtocol(this.userUUID, this.userProtocolUUID)
             .then((data) => {
                 console.log(data)
                 this.resetUserProtocol(data)
@@ -660,29 +701,6 @@
                 console.log(err)
             });
             
-        },
-        updated: function(){
-            var files = this.files
-            var imgDelBtn = document.getElementsByClassName('imgDelBtn')
-            if(imgDelBtn){
-                for(let i = 0; i < imgDelBtn.length; i++){
-                    imgDelBtn[i].addEventListener("click", function(){
-                        var del = confirm('Are you sure to delete this file?')
-                        if(del == false){
-                            return false
-                        }                
-                        var location = event.target.id
-                        var fileName = event.target.name
-                        if(!location){
-                            location = event.currentTarget.id
-                            fileName = event.currentTarget.name
-                        }
-                        this.files = Utils.removeArrayElementByValue(files, location+'____'+fileName)
-                        return false
-                    });
-                }
-            }
-  
         },
     }
 </script>
@@ -731,4 +749,18 @@ span.fileBtn {
     margin-left: 20px !important;
 }
 
+.comment-signature {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.commentDelBtn {
+    font-weight: bolder;
+    font-family: Arial;
+    font-size: .8rem;
+}
+
+div.protocolUploadDiv .q-field-label-inner {
+    float: right;
+}
 </style>
