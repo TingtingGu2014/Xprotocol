@@ -44,7 +44,7 @@ public class UserSessionInterceptor implements HandlerInterceptor {
                 else{
                     sessionInvalid = true;
                 }
-                if(sessionInvalid == true){
+                if(sessionInvalid == true && !"/error".equals(contextUrl)){
                     Cookie loggedIn = new Cookie("loggedIn", "");
                     loggedIn.setMaxAge(0);
                     loggedIn.setPath("/");
