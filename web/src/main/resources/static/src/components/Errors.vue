@@ -1,27 +1,25 @@
 <template>
     <div>
-        <div class="container" style="margin-top: 5%">
-            <!-- Jumbotron -->
-            <div class="jumbotron">
-            <h1><div ref="errorDiv"><span class='fa fa-frown-o red'>&nbsp;&nbsp;</span></div></h1>
-              <p class="lead" v-html="errorMessage"><em><span id="display-domain"></span></em></p>
-                <div>                    
-                    <router-link :to="{ name: 'home'}" class="btn btn-primary">Take Me To The Homepage</router-link>
-                </div>
-              </p>
-            </div>
+        <div class="row text-center" style="margin-top: 5%">
+            <h1><div ref="errorDiv">
+                <span class='fa fa-frown-o red'>&nbsp;&nbsp;</span></div></h1>
+                <p class="lead" v-html="errorMessage"><em><span id="display-domain"></span></em></p>
+                  <div>                    
+                      <router-link :to="{ name: 'home'}" class="btn btn-primary">Take Me To The Homepage</router-link>
+                  </div>
+                </p>
           </div>          
       </div>
 </template>
 
 <script>
-//    var Utils = require('../utils/Utils')
+import Utils from '../utils/Utils'
     var errorDetailMessage = sessionStorage.errorMessage
-    errorDetailMessage = this.$utils.isEmpty(errorDetailMessage) ? '' : errorDetailMessage
+    errorDetailMessage = Utils.isEmpty(errorDetailMessage) ? '' : errorDetailMessage
     
     export default {
         data: function(){
-            var error = this.$utils.getErrorPage(this.$route.params.errorCode, errorDetailMessage)
+            var error = Utils.getErrorPage(this.$route.params.errorCode, errorDetailMessage)
             sessionStorage.errorMessage = ''
             return {
                 errorTitle: error.title,

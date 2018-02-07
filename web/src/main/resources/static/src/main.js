@@ -31,6 +31,9 @@ import { Toast } from 'quasar'
 
 var Utils = require('./utils/Utils')
 
+Vue.prototype.$toast = Toast
+Vue.prototype.$utils = Utils
+
 const store = new Vuex.Store({
     modules: {
         userModule : userModule,
@@ -40,7 +43,7 @@ const store = new Vuex.Store({
 
 axios.interceptors.response.use(function (response) {
     if(response.status !== 200 && response.status !== 204){
-        alert("This is not a 200 response!")
+        Toast.create.negative({html: "This is not a 200 response: "+response.status+"! "})
     }
     else{
         console.log('current response url = '+response.request.responseURL)
@@ -48,17 +51,15 @@ axios.interceptors.response.use(function (response) {
     }
     return response;
 }, function (error) {
-    alert('error'+error)
     var status = error.response.status
     var message = error.response.data.message
+    Toast.create.negative({html: "Error response: "+status+", message: "+message})    
     sessionStorage.errorMessage = message
-    document.location.href = '/errors/' + status
+    router.push('/errors/' + status)
+//    document.location.href = '/errors/' + status
 //    alert(error.response.status + " is not a good response!")
     return Promise.reject(error);
 });
-
-Vue.prototype.$toast = Toast
-Vue.prototype.$utils = Utils
 
 Quasar.start(() => {
   /* eslint-disable no-new */
