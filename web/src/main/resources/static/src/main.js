@@ -14,6 +14,7 @@ import Vue from 'vue'
 import Quasar from 'quasar'
 import router from './router'
 import Vuex from 'vuex'
+import axios from 'axios'
 
 Vue.config.productionTip = false
 Vue.use(Vuex)
@@ -35,6 +36,25 @@ const store = new Vuex.Store({
         userModule : userModule,
         protocolModule : protocolModule,
     },
+});
+
+axios.interceptors.response.use(function (response) {
+    if(response.status !== 200 && response.status !== 204){
+        alert("This is not a 200 response!")
+    }
+    else{
+        console.log('current response url = '+response.request.responseURL)
+        console.log(response)
+    }
+    return response;
+}, function (error) {
+    alert('error'+error)
+    var status = error.response.status
+    var message = error.response.data.message
+    sessionStorage.errorMessage = message
+    document.location.href = '/errors/' + status
+//    alert(error.response.status + " is not a good response!")
+    return Promise.reject(error);
 });
 
 Vue.prototype.$toast = Toast

@@ -99,7 +99,8 @@
                             // call the callback and populate the Title field with the file name
                             cb(blobInfo.blobUri(), { title: file.name });
                         };
-                        $("#filePickerName").val(file.name)
+                        var picker = document.getElementById('filePickerName')
+                        picker.value = file.name
                         reader.readAsDataURL(file);
                     };
 
@@ -130,7 +131,7 @@
                         console.log('location =' + json.location);
                         
                         // ** trigger the uploaded file event for the protocol object **
-                        var originalFileName = $('#filePickerName').val()                        
+                        var originalFileName = document.getElementById('filePickerName').value                       
                         var fileName = json.location+'____'+originalFileName                        
                         console.log('file name = '+fileName)                    
                         vm.$emit('editor-file-uploaded', fileName)

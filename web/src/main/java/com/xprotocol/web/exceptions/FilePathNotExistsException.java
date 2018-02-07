@@ -9,13 +9,13 @@ package com.xprotocol.web.exceptions;
  *
  * @author zhao0677
  */
-public class UserNotExistsException extends Exception {
+public class FilePathNotExistsException extends Exception {
 
     /**
      *
      * @param message
      */
-    public UserNotExistsException(String message){
+    public FilePathNotExistsException(String message){
         super(message);
     }
 }

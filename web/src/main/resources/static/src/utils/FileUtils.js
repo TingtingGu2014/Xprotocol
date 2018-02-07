@@ -11,10 +11,10 @@ export function deleteProtocolFile(location){
     .then( (response) => {
         var status = response.status;
         if(status == 200 || status == "200"){              
-            alert('The file at '+location+' has been successfully deleted!')
+            Toast.create.positive({html: 'The file at '+location+' has been successfully deleted!', duration: 3000})
         }
         else{
-            alert("status " + status + ": cannot delete the file at "+location+"!");
+            Toast.create.negative({html: "status " + status + ": cannot delete the file at "+location+"!", duration: 3000});
         }  
         return status
     })
