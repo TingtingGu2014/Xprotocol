@@ -17,7 +17,6 @@
 </template>
 
 <script>
-    import Quasar from 'quasar'
     import {QBtn} from 'quasar'
     var Utils = require('../utils/Utils')
     var errorDetailMessage = sessionStorage.errorMessage

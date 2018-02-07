@@ -11,6 +11,9 @@
             <q-btn class="toggle-btn" color="blue" small icon="fa-check" :id="name + '-toggle-btn-done'" @click.prevent="toggleBtnClick">Done</q-btn>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <q-btn class="toggle-btn" color="positive" small icon="fa-times" :id="name + '-toggle-btn-cancel'" @click.prevent="toggleBtnClick">Cancel</q-btn>
+            
+            <q-btn v-for="btn in otherBtns" class="toggle-btn" :color="btn['color']" small :icon="btn['icon']" 
+                :id="btn['id']" @click.prevent="otherBtnClick" style="margin-left: 30px;">{{btn['label']}}</q-btn>
         </div>
         
         <div class="col toggle-display" ref="toggleDisplay">
@@ -49,6 +52,11 @@
                 default: '\n\n',
                 required: false
             },
+            otherBtns: {
+                type: Array,
+                default: null,
+                required: false,
+            }
         },
         beforeMount: function(){        
             this.oldValue = this.inputValue
@@ -109,16 +117,23 @@
                         displayDiv.style.display = 'none'
                     }
                 }
+            },
+            otherBtnClick: function(event){
+                var id = event.target.id
+                if(this.$utils.isEmpty(id)){
+                    id = event.currentTarget.id
+                    if(this.$utils.isEmpty(id)){
+                        this.$toast.create.negative({html: 'Cannot get ID from button click!', duration: 3000})
+                        return false
+                    }                    
+                }
+                this.$emit('otherBtnClick', id)
             }
         }
     }
 </script>
 
 <style scoped>
-    #toggle-editor {
-        margin: 0 30px 0 30px;
-        font-family: Georgia, "Times New Roman", Times, serif;
-    }
     #toggle-display {
         font-family: Georgia, "Times New Roman", Times, serif;
     }
@@ -128,7 +143,8 @@
         color: #133913;
         font-family: Georgia, "Times New Roman", Times, serif;
         margin: 0 30px 0 30px;
-        padding: 5px 5px 5px 5px;
+        padding: 8px 8px 8px 8px;
+        over-flow: auto;
     }
     .textarea-class {
         border-bottom: 1px solid #b4e1f7;
