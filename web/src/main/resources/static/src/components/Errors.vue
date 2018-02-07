@@ -1,19 +1,25 @@
 <template>
     <div>
-        <div class="row text-center" style="margin-top: 5%">
-            <h1><div ref="errorDiv">
-                <span class='fa fa-frown-o red'>&nbsp;&nbsp;</span></div></h1>
-                <p class="lead" v-html="errorMessage"><em><span id="display-domain"></span></em></p>
-                  <div>                    
-                      <router-link :to="{ name: 'home'}" class="btn btn-primary">Take Me To The Homepage</router-link>
-                  </div>
-                </p>
+        <div class="row text-center" style="margin-top: 5%; padding: 5% 5% 5% 5%">
+            <div class="col-12 text-center" ref="errorDiv">
+                <span style='font-size: 2rem; font-family: Arial; font-weight: bold; color: red'><i class="fa fa-frown-o" aria-hidden="true"></i>
+                    &nbsp;&nbsp;{{errorTitle}}
+                </span>
+            </div>
+            <div class="col-12">                    
+                  <br>Message: {{errorMessage}}                          
+            </div>
+            <div class="col-12">                    
+                <br><q-btn color="positive" small icon="fa-home" @click.prevent="$router.push('/home')">Take me home</q-btn>                    
+            </div>
           </div>          
       </div>
 </template>
 
 <script>
-import Utils from '../utils/Utils'
+    import Quasar from 'quasar'
+    import {QBtn} from 'quasar'
+    var Utils = require('../utils/Utils')
     var errorDetailMessage = sessionStorage.errorMessage
     errorDetailMessage = Utils.isEmpty(errorDetailMessage) ? '' : errorDetailMessage
     
@@ -26,32 +32,11 @@ import Utils from '../utils/Utils'
                 errorMessage: error.message,
             }
         },
-        mounted: function() {
-            var errorDiv = this.$refs.errorDiv
-            var i = document.createElement("span")
-            i.innerHTML = this.errorTitle
-            errorDiv.appendChild(i)
-        }
+        components: {QBtn}
     }
 </script>
 
-<style>
-  p{
-    color: #69C;
-  }
-  
-  h1, h2 {
-  font-weight: normal;
-}
+<style scoped>
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
 
 </style>
