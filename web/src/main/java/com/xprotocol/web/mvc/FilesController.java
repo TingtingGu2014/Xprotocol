@@ -7,6 +7,7 @@ package com.xprotocol.web.mvc;
 
 import com.xprotocol.persistence.model.User;
 import com.xprotocol.web.config.XprotocolWebUtils;
+import com.xprotocol.web.exceptions.FilePathNotExistsException;
 import com.xprotocol.web.exceptions.InvalidProtocolFileException;
 import com.xprotocol.web.exceptions.UserNotLoggedInException;
 import java.io.File;
@@ -98,10 +99,25 @@ public class FilesController {
         InputStream in = null;
         try{
             String filePath = XprotocolWebUtils.getProtocolFilePath(editorFileUploadPath, userUUID, userProtocolUUID, fileName);
+            if(null == filePath){
+                throw new FilePathNotExistsException("Cannot find the download file path!");
+            }
             XprotocolWebUtils.downloadFileFromServer(response, filePath, originalName);
         }
         catch(IOException ex){
             ex.printStackTrace();
+            try {
+                response.sendError(500, "IOException:"+ex.getMessage()+"!");
+            } catch (IOException ex1) {
+                Logger.getLogger(FilesController.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        } catch (FilePathNotExistsException ex) {
+            ex.printStackTrace();
+            try {
+                response.sendError(500, "File does not exist!");
+            } catch (IOException ex1) {
+                Logger.getLogger(FilesController.class.getName()).log(Level.SEVERE, null, ex1);
+            }
         }
         finally{
             if(in != null){

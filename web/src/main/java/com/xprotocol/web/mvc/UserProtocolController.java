@@ -5,13 +5,17 @@
  */
 package com.xprotocol.web.mvc;
 
+import com.xprotocol.cassandra.model.Comment;
+import com.xprotocol.cassandra.model.ProtocolToUser;
 import com.xprotocol.cassandra.model.UserProtocol;
 import com.xprotocol.persistence.model.User;
+import com.xprotocol.service.exceptions.InvalidCommentKeyException;
 import com.xprotocol.service.user.UserService;
 import com.xprotocol.service.protocol.UserProtocolService;
 import com.xprotocol.utils.UtilsFileHelper;
 import com.xprotocol.utils.Validators;
 import com.xprotocol.web.config.XprotocolWebUtils;
+import com.xprotocol.web.exceptions.IncompleteCommentInformationException;
 import com.xprotocol.web.exceptions.IncompleteUserProtocolInformationException;
 import com.xprotocol.web.exceptions.InvalidProtocolFileNameFormatException;
 import com.xprotocol.web.exceptions.UserNotLoggedInException;
@@ -20,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +36,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -61,7 +67,7 @@ public class UserProtocolController {
 
     @RequestMapping(value="/api/users/{userUUIDStr}/protocols", method=RequestMethod.GET)
     public List<UserProtocol> findAllProtocolsByUser(HttpServletRequest request, @PathVariable("userUUIDStr") String userUUIDStr){
-        return protocolSrv.findProtocolByUserUUID(userUUIDStr);
+        return protocolSrv.findProtocolsByUserUUID(userUUIDStr);
     }
     
     /**
@@ -144,9 +150,16 @@ public class UserProtocolController {
             else if(null == protocol || Validators.isEmptyString(protocol.getTitle())){
                 throw new IncompleteUserProtocolInformationException("The protocol data or title is empty!");
             }
-            protocol = protocolSrv.updateProtocol(protocol);
+            UserProtocol oldProtocol = protocolSrv.findProtocolByUserUUIDAndProtocolUUID(protocol.getUserUUID(), protocol.getUserProtocolUUID());
+            UserProtocol newProtocol = protocolSrv.updateProtocol(protocol);
+            
+            if(null != newProtocol && !oldProtocol.getTitle().equals(newProtocol.getTitle())){
+                ProtocolToUser protocolToUser = new ProtocolToUser(newProtocol.getUserProtocolUUID(), newProtocol.getUserUUID(), newProtocol.getTitle());
+                protocolSrv.updateProtocolToUser(protocolToUser);
+                protocolSrv.updateProtocolComments(newProtocol);
+            }
             // Clean up the associted files
-            protocolFilesProcess(protocol);
+            protocolFilesProcess(newProtocol);
         }
         catch(IncompleteUserProtocolInformationException  | InvalidProtocolFileNameFormatException ex){
             try {
@@ -155,7 +168,7 @@ public class UserProtocolController {
                 Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
-        catch(IOException ex){
+        catch(IOException | InvalidCommentKeyException ex){
             try {
                 response.sendError(500, "Server error: " + ex.getMessage());
             } catch (IOException ex1) {
@@ -219,5 +232,94 @@ public class UserProtocolController {
         }
         
         
+    }
+    
+    @RequestMapping(value="/api/users/{userUUIDStr}/comments", method=RequestMethod.GET)
+    public List<Comment> findAllCommentsByUser(HttpServletRequest request, @PathVariable("userUUIDStr") String userUUIDStr){
+        return protocolSrv.findCommentsByUserUUID(userUUIDStr);
+    }
+    
+    @RequestMapping(value="/api/users/{userUUIDStr}/comments/{commentUUIDStr}", method=RequestMethod.POST)
+    public Comment updateComment(HttpServletRequest request, 
+                                        @PathVariable("userUUIDStr") String userUUIDStr, 
+                                        @PathVariable("commentUUIDStr") String commentUUIDStr,
+                                        @RequestBody Comment comment,
+                                        HttpServletResponse response
+                                        )
+    {
+        try{
+            User currentUser = XprotocolWebUtils.getCurrentXprotocolUser();
+            if(null == currentUser){
+                throw new UserNotLoggedInException("You have to log in to update comments!");
+            }
+            if(Validators.isEmptyString(userUUIDStr)){            
+                throw new IncompleteCommentInformationException("The user UUID cannot be empty!");
+            }
+            else if(Validators.isEmptyString(commentUUIDStr)){
+                throw new IncompleteCommentInformationException("The comment UUID is empty!");
+            }
+            else if(null == comment || Validators.isEmptyString(comment.getContent())){
+                throw new IncompleteCommentInformationException("The comment body is empty!");
+            }
+            comment = protocolSrv.updateComment(comment);
+            return comment;
+        }
+        catch(UserNotLoggedInException ex){
+            try {
+                response.sendError(403, ex.getMessage());
+            } catch (IOException ex1) {
+                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
+        catch(IncompleteCommentInformationException ex){
+            try {
+                response.sendError(400, "Incomplete or invalid user registration information!"+ex.getMessage());
+            } catch (IOException ex1) {
+                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
+        return null;
+    }
+    
+    @RequestMapping(value="/api/users/{userUUIDStr}/comments/{commentUUIDStr}", method=RequestMethod.DELETE)
+    public @ResponseBody void deleteComment(HttpServletRequest request, 
+                                        @PathVariable("userUUIDStr") String userUUIDStr, 
+                                        @PathVariable("commentUUIDStr") String commentUUIDStr,
+                                        HttpServletResponse response
+                                        ) {
+        try{
+            User currentUser = XprotocolWebUtils.getCurrentXprotocolUser();
+            if(null == currentUser){
+                throw new UserNotLoggedInException("You have to log in to delete comments!");
+            }
+            if(Validators.isEmptyString(userUUIDStr)){            
+                throw new IncompleteCommentInformationException("The user UUID cannot be empty!");
+            }
+            else if(Validators.isEmptyString(commentUUIDStr)){
+                throw new IncompleteCommentInformationException("The comment UUID is empty!");
+            }
+            protocolSrv.deleteCommentByUserUUIDAndCommentUUID(UUID.fromString(userUUIDStr), UUID.fromString(commentUUIDStr));
+        }
+        catch(UserNotLoggedInException ex){
+            try {
+                response.sendError(403, ex.getMessage());
+            } catch (IOException ex1) {
+                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
+        catch(IncompleteCommentInformationException ex){
+            try {
+                response.sendError(400, "Incomplete or invalid user registration information!"+ex.getMessage());
+            } catch (IOException ex1) {
+                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
+        catch(Exception ex){
+            try {
+                response.sendError(500, ex.getMessage());
+            } catch (IOException ex1) {
+                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
     }
 }

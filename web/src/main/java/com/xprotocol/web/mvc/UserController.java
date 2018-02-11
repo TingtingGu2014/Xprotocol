@@ -112,7 +112,7 @@ public class UserController {
             if(null != existingUser){
                 throw new UserAlreadyExistsException("User email "+user.getEmail()+" already exists!");
             }
-            Map<Integer, String> idMap = userSrv.addUser(user.getEmail(), user.getAlias(), user.getPassword());
+            Map<Integer, String> idMap = userSrv.addUser(user.getFirstName(), user.getLastName(), user.getEmail(), user.getAlias(), user.getPassword());
             if(null != idMap && !idMap.isEmpty()){
                 Iterator it = idMap.entrySet().iterator();
                 Map.Entry element = (Map.Entry)it.next();
@@ -167,7 +167,7 @@ public class UserController {
         response.addCookie(loggedIn);        
     }
     
-    @RequestMapping(value = "/api/userProfile/{userUUIDStr}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/users/{userUUIDStr}/userDetails", method = RequestMethod.GET)
     public Map<String, Object> getUserProfile(HttpServletResponse response, @PathVariable("userUUIDStr") String userUUIDStr) {
         
         try{           
@@ -183,6 +183,7 @@ public class UserController {
             }
             User user = userSrv.findUserByUUID(userUUIDStr);
             if(null != user){
+                userProfileMap.put("user", user);
                 UserDetails details = userDetailsSrv.findUserDetailsByUserId(user.getUserId());
                 if(null != details){
                     userProfileMap.put("userDetails", details);
@@ -213,7 +214,7 @@ public class UserController {
     }
     
 //    @PreAuthorize("hasRole('admin')")
-    @RequestMapping(value = "/api/admin/userProfile/{userUUIDStr}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/admin/users/{userUUIDStr}/userDetails", method = RequestMethod.GET)
     public Map<String, Object> getUserProfileByAdmin(HttpServletResponse response, @PathVariable("userUUIDStr") String userUUIDStr) {
         
         try{                       
@@ -265,7 +266,7 @@ public class UserController {
     }
     
     @ResponseBody
-    @RequestMapping(value = "/api/userProfile/{userUUIDStr}", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/users/{userUUIDStr}/userDetails", method = RequestMethod.POST)
     public Map<String, Object> updateUserProfile(HttpServletRequest request, HttpServletResponse response, @PathVariable("userUUIDStr") String userUUIDStr, @ModelAttribute UserDetails details) {
         
         int rowAffected = -1;
@@ -344,7 +345,7 @@ public class UserController {
     
 //    @PreAuthorize("hasRole('admin')")
     @ResponseBody
-    @RequestMapping(value = "/api/admin/userProfile/{userUUIDStr}", method = RequestMethod.POST)
+    @RequestMapping(value = "/api/admin/users/{userUUIDStr}/userDetails", method = RequestMethod.POST)
     public Map<String, Object> updateUserProfileByAdmin(HttpServletRequest request, HttpServletResponse response, @PathVariable("userUUIDStr") String userUUIDStr, @ModelAttribute UserDetails details) {
         
         int rowAffected = -1;

@@ -5,10 +5,11 @@
  */
 package com.xprotocol.service.protocol;
 
-import com.xprotocol.cassandra.model.UserComment;
+import com.xprotocol.cassandra.model.ProtocolToUser;
+import com.xprotocol.cassandra.model.Comment;
 import com.xprotocol.cassandra.model.UserProject;
 import com.xprotocol.cassandra.model.UserProtocol;
-import com.xprotocol.service.exceptions.EntityDoesNotExistException;
+import com.xprotocol.service.exceptions.InvalidCommentKeyException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +22,7 @@ import java.util.UUID;
 public interface UserProtocolService {
     
     public Iterable<UserProtocol> findProtocolByUserUUID(UUID userUUID);
-    public List<UserProtocol> findProtocolByUserUUID(String userUUIDStr);
+    public List<UserProtocol> findProtocolsByUserUUID(String userUUIDStr);
             
     public UserProtocol findProtocolByUserUUIDAndProtocolUUID(UUID userUUID, UUID userProtocolUUID);
     public UserProtocol findProtocolByUserUUIDAndProtocolUUID(String userUUIDStr, String userProtocolUUIDStr);
@@ -31,5 +32,11 @@ public interface UserProtocolService {
     
     public UserProject createProject(UUID userProjectUUID, UUID userUUID, String title, String description, Set<UUID> protocolUUIDs, Set<String> protocolTitles, Set<String> keywords);
     
-    public UserComment createComment(UUID userCommentUUID, UUID userUUID, String content, String path, String protocolTitle);
+    public Comment updateComment(Comment comment);
+    public List<Comment> findCommentsByUserUUID(String userUUIDStr);
+    public void deleteCommentByUserUUIDAndCommentUUID(UUID userUUID, UUID commentUUID);
+    public void updateProtocolComments(UserProtocol protocol) throws InvalidCommentKeyException;
+    
+    public ProtocolToUser updateProtocolToUser(ProtocolToUser protocolToUser);
+    public ProtocolToUser findProtocolToUser(UUID userProtocolUUID);
 }

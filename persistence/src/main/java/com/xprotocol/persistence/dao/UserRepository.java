@@ -80,9 +80,9 @@ public class UserRepository {
                     "SELECT users.*, GROUP_CONCAT(roleName SEPARATOR ',') AS roles FROM users " +
                     "LEFT JOIN userRoles ON users.userId = userRoles.userId " +
                     "LEFT JOIN roles ON userRoles.roleId = roles.roleId " +
-                    "WHERE userUUID=? AND active=? " +
+                    "WHERE userUUID=? " +
                     "GROUP BY userId;", 
-                    new Object[]{UtilsHelper.getBytesFromUUID(userUUID), true}, new UserRowMapper());
+                    new Object[]{UtilsHelper.getBytesFromUUID(userUUID)}, new UserRowMapper());
         }
         catch(EmptyResultDataAccessException ex) {
             return null;

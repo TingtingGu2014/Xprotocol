@@ -6,6 +6,7 @@
 package com.xprotocol.web.config;
 
 import com.xprotocol.utils.UtilsStringHelper;
+import java.security.Principal;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,21 +32,23 @@ public class UserSessionInterceptor implements HandlerInterceptor {
         System.out.println("PreHandle is done!");
         String contextUrl = XprotocolWebUtils.getContextUrlFromRequest(request);
         if(!UtilsStringHelper.isEmptyString(contextUrl)){
-            String method = request.getMethod();
+            boolean sessionInvalid = false;
             if(!contextUrl.equals("user")){
-                SessionRepository<Session> repo = (SessionRepository<Session>) request.getAttribute(SessionRepository.class.getName());
-                HttpSession httpSession = (HttpSession)request.getSession();
-                if(null != httpSession){
-                    ExpiringSession session = (ExpiringSession) repo.getSession(httpSession.getId());
-                    if(null != session && !session.isExpired()){
-//                        String email = (String) session.getAttribute("email");
-//                        if(null != email){
-//                            RedisUser userPersisted = redisUserService.findAuthenticatedUser(email, session.getId());
-//                            if(null != userPersisted){
-//                                sessionValidated = true;
-//                            }
-//                        }
+                Principal principal = request.getUserPrincipal();
+                if(null != principal){
+                    String name = principal.getName();
+                    if(null == name || "".equalsIgnoreCase(name)){
+                        sessionInvalid = true;
                     }
+                }
+                else{
+                    sessionInvalid = true;
+                }
+                if(sessionInvalid == true && !"/error".equals(contextUrl)){
+                    Cookie loggedIn = new Cookie("loggedIn", "");
+                    loggedIn.setMaxAge(0);
+                    loggedIn.setPath("/");
+                    response.addCookie(loggedIn);
                 }
             }
 
