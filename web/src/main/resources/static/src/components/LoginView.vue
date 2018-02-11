@@ -68,10 +68,12 @@
 
                 <q-collapsible icon="fa-sun-o" label="Admin" v-if="isAdminUser">
                   <div>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<router-link :to="{ name: 'userList' }"><i class="fa fa-users">&nbsp;User List</i></router-link>                    
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<router-link :to="{ name: 'userList' }" style='font-family: Arial'><span class="fa fa-users"></span>&nbsp;User List</router-link>                    
                   </div>
                 </q-collapsible>
-            </q-list>
+                
+                <q-collapsible icon="fa-home" label="Home" @open="goHome" ref='homeLink'></q-collapsible>
+            </q-list>                                                                                                                                                                                                                                                                                                                        
         </div>
     </div>
 </template>     
@@ -196,6 +198,13 @@
                 setDetailsFetched: 'userModule/setDetailsFetched',
                 setProtocols: 'protocolModule/setProtocols'
             }),
+            goHome: function(event){
+                let homeLink = this.$refs['homeLink']
+                if(!this.$utils.isEmpty(homeLink)){
+                    homeLink.close()
+                }
+                this.$router.push('/')
+            }
         }
     }
     
