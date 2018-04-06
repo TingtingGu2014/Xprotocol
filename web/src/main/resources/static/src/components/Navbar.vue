@@ -28,28 +28,16 @@
         </q-toolbar>
         
         <login-view v-if="showLoginSheet" :inNavBar="false"></login-view>
-      <!--
-        Replace following <div> with
-        <router-view /> component
-        if using subRoutes
-      -->
-<!--      <div class="layout-padding logo-container non-selectable no-pointer-events">
-        <div class="logo" :style="position">
-          <img src="~assets/quasar-logo-full.svg">
-        </div>
-      </div>-->
     </div>
 </template>
 
 <script>
-    import LoginView from './LoginView.vue'
+    import LoginView from 'pages/LoginView.vue'
     import {
         dom,
         QToolbar,
         QCollapsible,
     } from 'quasar'
-    
-    var Utils = require('../utils/Utils')
 
     export default {
       name: 'index',
@@ -65,7 +53,7 @@
       },
         computed: {
             isAdminUser: function () {
-                return Utils.isAdminUser();
+                return this.$utils.isAdminUser();
             },
         },
       methods: {

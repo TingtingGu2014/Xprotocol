@@ -1,11 +1,4 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 import axios from 'axios'
-import { Alert, Toast } from 'quasar'
 
 export const imageExtensions = ['bmp','tif','tiff','gif','jpeg','jpg','jif','jfif','jp2','jpx','j2k','j2c','pcd','png','pdf']
 
@@ -79,12 +72,12 @@ export function getUserDetails(userUUID, isAdmin = false) {
             return response.data;
         }
         else{
-            Toast.create.negative({html: `Something is wrong in pulling user profile.`, duration: 3000})
+            this.$q.notify({message: `Something is wrong in pulling user profile.`, timeout: 3000})
             return null
         }     
     })
     .catch(function (error) {
-        Alert.create({html: error.message, druation: 3000})
+        this.$q.notify({message: error.message, timeout: 3000})
         console.log(error);
     });
 }
@@ -103,7 +96,7 @@ export function getUserListByAdmin(){
             return data
         }
         else{
-            alert("not 200");
+            this.$q.notify("not 200");
         }                                   
     })
     .catch( (error) => {
@@ -114,12 +107,12 @@ export function getUserListByAdmin(){
 export function updateUserDetails(userUUID, profile, isAdmin = false){
     
     if(isEmpty(userUUID)){
-        Alert.create({html: 'User UUID cannot be empty!'})
+        this.$q.notify({message: 'User UUID cannot be empty!'})
         return null
     }
     
     if(isEmpty(profile)){
-        Alert.create({html: 'User profile data cannot be empty!'})
+        this.$q.notify({message: 'User profile data cannot be empty!'})
         return null
     }
     
@@ -134,13 +127,13 @@ export function updateUserDetails(userUUID, profile, isAdmin = false){
     return axios.post(url, profile)
     .then( (response) => {
         if(response.status === 200){
-            Toast.create.positive({html: 'Your profile information has been updated!', duration: 3000})
+            this.$q.notify({message: 'Your profile information has been updated!', timeout: 3000})
             return response.data
         }
 
     })
     .catch(function (error) {
-        Alert.create({html: 'Your profile is NOT updated, sorry!', duration: 3000})
+        this.$q.notify({message: 'Your profile is NOT updated, sorry!', timeout: 3000})
         console.log(error);
     });
 }
@@ -186,12 +179,12 @@ export function signUp(data) {
             return responseData
         }
         else{
-            Alert.create({html: "Error status : " + status + "\nError message: "+response.message, druation: 3000})
+            this.$q.notify({message: "Error status : " + status + "\nError message: "+response.message, druation: 3000})
             return false;
         }                                   
       })
       .catch( (error) => {
-            Alert.create({html: error.message, druation: 3000})
+            this.$q.notify({message: error.message, druation: 3000})
             console.log(error);
       });     
 }
@@ -215,7 +208,7 @@ export function signIn(email, password) {
             return data
         }
         else{
-            alert("not 200");
+            this.$q.notify("not 200");
             return;
         }                                   
     })
@@ -251,7 +244,7 @@ export function signOut() {
             return data
         }
         else{
-            alert("not 200 "+status);
+            this.$q.notify("not 200 "+status);
         }                                   
       })
       .catch( (error) => {
@@ -355,7 +348,7 @@ export function getAllUserRoles() {
             return roleNames
         }
         else{
-            alert("status " + status + ", cannot get the roles!");
+            this.$q.notify("status " + status + ", cannot get the roles!");
         }                                   
     })
     .catch( (error) => {
@@ -366,7 +359,7 @@ export function getAllUserRoles() {
 export function getUserProtocol(userUUID, userProtocolUUID){
     
     if(isEmpty(userProtocolUUID)){
-        alert('The protocol UUID is empty!')
+        this.$q.notify('The protocol UUID is empty!')
         return false
     }
     
@@ -390,7 +383,7 @@ export function getUserProtocol(userUUID, userProtocolUUID){
             return response.data
         }
         else{
-            alert("status " + status + ", cannot get the roles!");
+            this.$q.notify("status " + status + ", cannot get the roles!");
         }                                   
     })
     .catch( (error) => {
@@ -401,7 +394,7 @@ export function getUserProtocol(userUUID, userProtocolUUID){
 export function saveUserProtocol(protocol){
     
     if(isEmpty(protocol)){
-        alert('The protocol data is empty!')
+        this.$q.notify('The protocol data is empty!')
         return false
     }
     
@@ -450,7 +443,7 @@ export function saveUserProtocol(protocol){
             return response.data
         }
         else{
-            alert("status " + status + ", cannot get the protocol information!");
+            this.$q.notify("status " + status + ", cannot get the protocol information!");
         }                                   
     })
     .catch( (error) => {
@@ -462,7 +455,7 @@ export function saveUserProtocol(protocol){
 export function saveComment(comment){
     
     if(isEmpty(comment)){
-        alert('The comment data is empty!')
+        this.$q.notify('The comment data is empty!')
         return false
     }
     
@@ -508,7 +501,7 @@ export function saveComment(comment){
             return response.data
         }
         else{
-            alert("status " + status + ", cannot get the comment information!");
+            this.$q.notify("status " + status + ", cannot get the comment information!");
         }                                   
     })
     .catch( (error) => {
@@ -554,7 +547,7 @@ export function deleteComment(userUUID, commentUUID){
             return response.status
         }
         else{
-            alert("status " + status + ", cannot delete the comment!");
+            this.$q.notify("status " + status + ", cannot delete the comment!");
         }                                   
     })
     .catch( (error) => {
@@ -565,7 +558,7 @@ export function deleteComment(userUUID, commentUUID){
 
 export function getProtocolsByUserUUID(userUUID){
     if(isEmpty(userUUID)){
-        alert('The user UUID is empty!')
+        this.$q.notify('The user UUID is empty!')
         return false
     }
     
@@ -581,7 +574,7 @@ export function getProtocolsByUserUUID(userUUID){
             return response.data
         }
         else{
-            alert("status " + status + ", cannot get the protocols!");
+            this.$q.notify("status " + status + ", cannot get the protocols!");
         }                                   
     })
     .catch( (error) => {
@@ -591,7 +584,7 @@ export function getProtocolsByUserUUID(userUUID){
 
 export function getCommentsByUserUUID(userUUID){
     if(isEmpty(userUUID)){
-        alert('The user UUID is empty!')
+        this.$q.notify('The user UUID is empty!')
         return false
     }
     
@@ -607,7 +600,7 @@ export function getCommentsByUserUUID(userUUID){
             return response.data
         }
         else{
-            alert("status " + status + ", cannot get the protocols!");
+            this.$q.notify("status " + status + ", cannot get the protocols!");
         }                                   
     })
     .catch( (error) => {
@@ -670,7 +663,7 @@ export function uploadFile(url, file, newFileName){
             return response.data
         }
         else{
-            alert( "Cannot upload the file "+file.name);
+            this.$q.notify( "Cannot upload the file "+file.name);
         }                                   
     })
     .catch( (error) => {
