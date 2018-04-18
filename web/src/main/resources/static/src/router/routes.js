@@ -6,6 +6,7 @@ export default [
         children: [
           { path: '', component: () => import('pages/Home') },
           { path: '/home', redirect: '/' },
+          { path: '/signup' , name: 'signUp', component: () => import('pages/SignUp'),  meta:{signUpType: 'signup'}},
         ]
     },
 

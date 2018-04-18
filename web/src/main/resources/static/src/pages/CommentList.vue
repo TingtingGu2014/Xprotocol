@@ -4,21 +4,21 @@
         <div class="row text-center">
             <span class="q-table-title">List of Your Recent Comments</span>
         </div>
-        <q-data-table
+        <q-table
             :data="tableDataForDisplay"
             :config="configs"
             :columns="columns"
             style="overflow-x: scroll"
         >
-            <template slot="col-protocolTitle" scope="cell">
+            <template slot="col-protocolTitle" slot-scope="cell">
                 <table-router-link :linkData = "cell.data"></table-router-link>                
             </template>
-        </q-data-table>
+        </q-table>
     </div>
 </template>
 
 <script>
-    import {QDataTable} from 'quasar'
+    
     import { mapGetters, mapMutations } from 'vuex'
     import TableRouterLink from './elements/TableRouterLink.vue'
     
@@ -110,7 +110,7 @@
             });
         },
         components: {
-            TableRouterLink, QDataTable
+            TableRouterLink, 
         },
     }
 </script>

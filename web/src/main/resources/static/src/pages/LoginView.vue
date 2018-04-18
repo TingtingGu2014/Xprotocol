@@ -1,16 +1,16 @@
 <template id="login-template">
     <div>
         <div class="gt-md" v-if="inNavBar">
-            <form class="form-inline" v-if=loggedIn>        
+            <form class="form-inline" v-if="loggedIn">        
                 <!--<router-link to="/profile/userId">Go to notfound</router-link>-->
-                <router-link :to="{ name: 'userProfile', params: { userUUID: userUUID }  }" >
+                <router-link :to="{ name: 'userProfile', params: { userUUID: userInfo.userUUID }  }" >
                 <!--<a href="#" v-on:click="getUserDetails">--> 
                     <span class="fa fa-user"></span>    
-                    <span v-if="userAlias">
-                        {{userAlias}}
+                    <span v-if="userInfo.userAlias">
+                        {{userInfo.userAlias}}
                     </span>
                     <span v-else>
-                        {{userEmail}}
+                        {{userInfo.userEmail}}
                     </span>
                 <!--</a>-->
                 </router-link>
@@ -34,13 +34,11 @@
                   <div>
                     <form class="form-inline">        
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <router-link :to="{ name: 'userProfile', params: { userUUID: userUUID }  }" >
-                        <!--<a href="#" v-on:click="getUserDetails">--> 
+                        <router-link :to="{ name: 'userProfile', params: { userUUID: userInfo.userUUID }  }" >
                             <span class="fa fa-user"></span>    
                             <span>
                                 &nbsp;&nbsp;Your Profile
                             </span>
-                        <!--</a>-->
                         </router-link>
 
                          &nbsp;&nbsp;
@@ -79,16 +77,9 @@
 </template>     
 
 <script>
-    import {
-        QList,
-        QCollapsible,
-    } from 'quasar'
     
     import { mapGetters, mapMutations } from 'vuex'    
     import { EventBus } from '../utils/EventBus.js';
-//    import * as Utils from '../utils/Utils.js'
-    
-    var userInfo = null
             
     export default {
         
@@ -100,22 +91,17 @@
         },
         data: function () {
             return {
-                loggedIn: loggedIn,
-                userEmail: (this.$utils.isEmpty(userInfo) || this.$utils.isEmpty(userInfo.email)) ? '' : userInfo.email,
-                userAlias: (this.$utils.isEmpty(userInfo) || this.$utils.isEmpty(userInfo.alias)) ? '' : userInfo.alias,
-                userUUID: (this.$utils.isEmpty(userInfo) || this.$utils.isEmpty(userInfo.userUUID)) ? '' : userInfo.userUUID,
+                loggedIn: false,
+                userInfo: null,
                 emaillogin: '',
                 passwordlogin: '',
             }
         },     
         computed: {
             reloadUserInfo: function() {
-                try{
-                    userInfo = JSON.parse(localStorage.userInfo)
-                    if(!this.$utils.isEmpty(userInfo)){
-                        this.userEmail = this.$utils.isEmpty(userInfo.email) ? '' : userInfo.email
-                        this.userAlias = this.$utils.isEmpty(userInfo.alias) ? '' : userInfo.alias
-                        this.userUUID = this.$utils.isEmpty(userInfo.userUUID) ? '' : userInfo.userUUID
+                try{                    
+                    if(!this.$utils.isEmpty(localStorage.userInfo)){
+                        this.userInfo = JSON.parse(localStorage.userInfo)
                     }
                 }
                 catch(err) {
@@ -135,7 +121,7 @@
             },
         },
         components:{
-            QCollapsible,QList,
+            
         },
         methods: {
             loginsubmit: function (message, event) {
@@ -191,16 +177,23 @@
                 this.$router.push('/')
             }
         },
-        beforeCreate: function(){
-            this.loggedIn = this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
-            userInfo = null
+        created: function(){
+            let loggedIn = this.$utils.readCookie('loggedIn')
+            this.loggedIn = loggedIn == 'true' ? true : false
             if(this.loggedIn !== true){
                 localStorage.userInfo = null
                 localStorage.protocolListCount = null
+                this.userInfo = null
             }
             else {
                 try{
-                    userInfo = JSON.parse(localStorage.userInfo)
+                    if(!this.$utils.isEmpty(localStorage.userInfo)){
+                        this.userInfo = JSON.parse(localStorage.userInfo)
+                    }
+                    else{
+                        this.loggedIn = false
+                        this.$utils.createCookie('loggedIn', false, 30)
+                    }
                 }
                 catch(err) {
                     console.log(err.message)

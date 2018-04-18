@@ -1,22 +1,22 @@
 <template id="sign-up-template">
     <div class="row" style="width:80%; margin: auto; margin-top: 7%; margin-bottom: 30px; overflow-y: auto" >
         <span class="q-table-title">User List</span>
-        <q-data-table
+        <q-table
             :data="tableData"
             :config="configs"
             :columns="columns"
             style="overflow-x: scroll"
         >
 
-            <template slot="col-edit" scope="cell">                
+            <template slot="col-edit" slot-scope="cell">                
                 <table-router-link :linkData = "cell.data"></table-router-link>                
             </template>
-        </q-data-table>
+        </q-table>
     </div>
 </template>
 
 <script>
-    import {QDataTable} from 'quasar'
+    
     import TableRouterLink from './elements/TableRouterLink.vue'
     
     var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
@@ -83,7 +83,7 @@
             });
         },
         components: {
-            QDataTable,TableRouterLink
+            TableRouterLink
         },
     }
 </script>

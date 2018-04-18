@@ -74,13 +74,7 @@
 </template>
 
 <script>
-    import {
-        QField,
-        QInput,
-        QBtn,
-        Toast,
-        Alert, 
-    } from 'quasar'
+
     import { mapGetters, mapMutations } from 'vuex'
     import { EventBus } from '../utils/EventBus.js';
     
@@ -109,7 +103,7 @@
             })
         },
         components: {
-            VuePassword, QField, QInput, QBtn, Toast,
+            VuePassword
         },
         watch: {
             email: function(value) {
@@ -174,11 +168,13 @@
                         return false;
                     }
                     if(this.password != this.password2){
-                        Toast.create.negative({html: `The two passwords are different!`, duration: 3000})
+//                        Toast.create.negative({html: `The two passwords are different!`, duration: 3000})
+                        this.$q.notify({message: `The two passwords are different!`, timeout: 3000, color: 'negative'})
                         return false;
                     }
                     if(this.$utils.isEmpty(this.alias) && (this.$utils.isEmpty(this.firstName) || this.$utils.isEmpty(this.lastName))) {
-                        Toast.create.negative({html: `Your name and nick name cannot be empty at the same time.`, duration: 3000})
+//                        Toast.create.negative({html: `Your name and nick name cannot be empty at the same time.`, duration: 3000})
+                        this.$q.notify({message: `Your name and nick name cannot be empty at the same time!`, timeout: 3000, color: 'negative'})
                         return false;
                     }
                 }                
@@ -198,11 +194,13 @@
                             document.location.href = '/home';
                         } 
                         else{
-                            Alert.create({html: "Received invalid data after user signing up!", druation: 3000})
+//                            Alert.create({html: "Received invalid data after user signing up!", druation: 3000})
+                            this.$q.notify({message: `Received invalid data after user signing up!`, timeout: 3000, color: 'negative'})
                         }
                     })
                     .catch((err) => {
-                        Alert.create({html: "Cannot sing up new user! Error: "+err.message, druation: 3000})
+//                        Alert.create({html: "Cannot sing up new user! Error: "+err.message, druation: 3000})
+                        this.$q.notify({message: 'Cannot sing up new user! Error: '+err.message, timeout: 3000, color: 'negative'})
                         console.log(err)
                     });
                     

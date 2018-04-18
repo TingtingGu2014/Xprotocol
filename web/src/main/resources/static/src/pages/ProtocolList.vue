@@ -8,21 +8,21 @@
         <div class="row text-left">
             <router-link :to="{ path: 'users/'+userUUID+'/protocols/new'}">&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus-square-o" aria-hidden="true"></i>&nbsp;Create a New Protocol</router-link>
         </div>
-        <q-data-table
+        <q-table
             :data="tableDataForDisplay"
             :config="configs"
             :columns="columns"
             style="overflow-x: scroll"
         >
-            <template slot="col-title" scope="cell">
+            <template slot="col-title" slot-scope="cell">
                 <table-router-link :linkData = "cell.data"></table-router-link>                
             </template>
-        </q-data-table>
+        </q-table>
     </div>
 </template>
 
 <script>
-    import {QDataTable} from 'quasar'
+    
     import { mapGetters, mapMutations } from 'vuex'
     import TableRouterLink from './elements/TableRouterLink.vue'
     
@@ -129,7 +129,7 @@
             });
         },
         components: {
-            TableRouterLink,QDataTable
+            TableRouterLink
         },
     }
 </script>
