@@ -6,11 +6,11 @@
                 <router-link :to="{ name: 'userProfile', params: { userUUID: userInfo.userUUID }  }" >
                 <!--<a href="#" v-on:click="getUserDetails">--> 
                     <span class="fa fa-user"></span>    
-                    <span v-if="userInfo.userAlias">
-                        {{userInfo.userAlias}}
+                    <span v-if="userInfo.alias">
+                        {{userInfo.alias}}
                     </span>
                     <span v-else>
-                        {{userInfo.userEmail}}
+                        {{userInfo.email}}
                     </span>
                 <!--</a>-->
                 </router-link>
@@ -79,7 +79,7 @@
 <script>
     
     import { mapGetters, mapMutations } from 'vuex'    
-    import { EventBus } from '../utils/EventBus.js';
+//    import { EventBus } from '../utils/EventBus.js';
             
     export default {
         
@@ -138,8 +138,8 @@
                 this.$utils.signIn(this.emaillogin, this.passwordlogin)                
                 .then((data) => {
                     if(data){
-                        EventBus.$emit('session-change', 'signIn');
-                        document.location.href = '/home';
+//                        EventBus.$emit('session-change', 'signIn');
+                        location.reload();
                     }                    
                 })
                 .catch((err) => {
@@ -156,7 +156,8 @@
                 this.$utils.signOut()
                 .then((data) => {
                     if(data){                            
-                        EventBus.$emit('session-change', 'signOut');
+//                        EventBus.$emit('session-change', 'signOut');
+                        location.reload();
                     }                    
                 })
                 .catch((err) => {

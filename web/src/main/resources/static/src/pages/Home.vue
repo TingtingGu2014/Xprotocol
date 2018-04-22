@@ -1,6 +1,6 @@
 <template>
     <div>
-        
+    <!--<Index></Index>-->
         <ProtocolList v-if="loggedIn"
             :userUUID = "userUUID"
         >   
@@ -17,28 +17,28 @@
 
     import ProtocolList from './ProtocolList.vue'
     import CommentList from './CommentList.vue'
+    import Index from './index.vue'
     
     export default {
-        name: 'index',
+        name: 'home',
         data: function(){
-        return {
-            name: 'Home',
-            userUUID: userUUID, 
-            loggedIn: loggedIn,
-        }
+            return {
+                userUUID: '', 
+                loggedIn: false,
+            }
         },
         components: {
-            ProtocolList, CommentList
+            Index, ProtocolList, CommentList,
         },
         methods: {
 
         },
-        beforeCreate: function(){
+        created: function(){
             this.loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
 
-            if(loggedIn === true) {
+            if(this.loggedIn === true) {
                 try{
-                    this.userInfo = JSON.parse(localStorage.userInfo)
+                    let userInfo = JSON.parse(localStorage.userInfo)
                     this.userUUID = userInfo.userUUID
                 }
                 catch(err) {

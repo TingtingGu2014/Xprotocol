@@ -95,24 +95,6 @@
 <script>
 
     import { mapGetters, mapMutations } from 'vuex'
-    import {
-        QField,
-        QInput,
-        QBtn,
-    } from 'quasar'
-    
-    var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
-    if(loggedIn != true){
-        document.location.href = '/login'
-    }
-    
-    var currentUrl = window.location.href
-    if(currentUrl.indexOf('admin/') >=0) {
-        var isAdminUser = this.$utils.isAdminUser();
-        if(!isAdminUser){
-            document.location.href = '/errors/403'
-        }
-    }
             
     export default {
         data: function() {
@@ -139,7 +121,7 @@
             })
         },
         components: {
-            QField, QInput, QBtn,
+            
         },
         created: function() {           
             
@@ -197,6 +179,19 @@
                 }
             }
             
+        },
+        beforeCreate: function(){
+            var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
+            if(loggedIn != true){
+                document.location.href = '/login'
+            }
+            var currentUrl = window.location.href
+            if(currentUrl.indexOf('admin/') >=0) {
+                var isAdminUser = this.$utils.isAdminUser();
+                if(!isAdminUser){
+                    document.location.href = '/errors/403'
+                }
+            }
         },
         mounted: function(){
             var refs = this.$refs

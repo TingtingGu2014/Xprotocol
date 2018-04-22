@@ -11,7 +11,7 @@
 </template>
 
 <script>
-    import {EventBus} from './utils/EventBus.js'
+//    import {EventBus} from './utils/EventBus.js'
     import { mapGetters, mapMutations } from 'vuex'
     
     export default {
@@ -27,28 +27,10 @@
                 setUserDetails: 'userModule/setUserDetails',
                 setDetailsFetched: 'userModule/setDetailsFetched',
             }),
-            clearStoreData: function () {                
-                var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
-                if(loggedIn !== true){
-                    this.$utils.signOut()
-                    .then((data) => {
-                        if(data){                            
-                            EventBus.$emit('session-change', 'signOut');
-                        }                    
-                    })
-                    .catch((err) => {
-                        alert("oops, something happened during signing in!")
-                        console.log(err)
-                    });
-                    console.log('   ***  the user store and the protocol store have been cleared ***  ')
-                }
-                else{
-                    console.log(' === the cookie monitor thread is running now ===')
-                }
-                return false
-            },
+           
         },
         created: function() {
+        /*
             EventBus.$on('session-change', (changeAct) => {
                 if(changeAct == 'signIn'){
                     console.log(`${changeAct} just kicked in`)
@@ -66,6 +48,7 @@
             if(loggedIn == true){
                 this.cookieTimer = window.setInterval(this.clearStoreData, 2000)
             }
+                        */
         }      
     }
 </script>

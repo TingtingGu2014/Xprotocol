@@ -255,7 +255,9 @@ export function signOut() {
 export function isAdminUser () {
     var user = null
     try{
-        user = JSON.parse(localStorage.userInfo)
+        if(!isEmpty(localStorage.userInfo)){
+            user = JSON.parse(localStorage.userInfo)
+        }
     }
     catch(err) {
         console.log(err.message)

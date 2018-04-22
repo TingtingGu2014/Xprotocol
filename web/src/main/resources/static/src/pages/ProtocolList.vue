@@ -12,6 +12,7 @@
             :data="tableDataForDisplay"
             :config="configs"
             :columns="columns"
+            :pagination.sync="configs.pagination"
             style="overflow-x: scroll"
         >
             <template slot="col-title" slot-scope="cell">
@@ -56,10 +57,6 @@
             userUUID: String,
         },
         computed: {
-            ...mapGetters({                
-                getProtocolsByUserUUID: 'protocolModule/getProtocolsByUserUUID',
-                getProtocolsByUserUUIDANDProtocolUUID: 'protocolModule/getProtocolsByUserUUIDANDProtocolUUID',
-            }),
             tableDataForDisplay: function(){
                 var items = []
                 if(!this.$utils.isEmpty(this.rawData)){
@@ -87,10 +84,7 @@
             },
         },
         methods: {
-                ...mapMutations({
-                setProtocolsByUserUUID: 'protocolModule/setProtocolsByUserUUID',
-                setProtocolByUserUUIDANDProtocolUUID: 'protocolModule/setProtocolByUserUUIDANDProtocolUUID',
-            }),
+      
         },
         beforeMount: function(){
         
@@ -105,7 +99,7 @@
             }
             
             if(!this.$utils.isEmpty(localStorage.protocolListCount)){
-                var protocolList = this.getProtocolsByUserUUID(userUUID)
+                var protocolList = this.$store.protocols.getProtocolsByUserUUID(userUUID)
 
                 if(!this.$utils.isEmpty(protocolList) && Number(localStorage.protocolListCount) === protocolList.length){                
                     console.log(protocolList)

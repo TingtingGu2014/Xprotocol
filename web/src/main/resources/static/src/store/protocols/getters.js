@@ -3,7 +3,7 @@ export const getProtocols = (state) => {
 	return state.protocols
 }
 
-export const getProtocolsByUserUUID = (state) => (userUUID) => {
+export const getProtocolsByUserUUID = (state, userUUID) => {
     var protocols = state.protocols
     console.log('loading protocols by user UUID from store...\n')
     if(this.$utils.isEmpty(protocols)){
@@ -21,7 +21,7 @@ export const getProtocolsByUserUUID = (state) => (userUUID) => {
     return protocolArr
 }
 
-export const getProtocolsByUserUUIDANDProtocolUUID = (state) => (userUUID, protocolUUID) => {
+export const getProtocolsByUserUUIDANDProtocolUUID = (state, userUUID, protocolUUID) => {
     var protocols = state.protocols
     console.log('loading protocol from store...\n')
     if(this.$utils.isEmpty(protocols)){

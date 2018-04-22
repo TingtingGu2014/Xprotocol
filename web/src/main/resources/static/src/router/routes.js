@@ -2,11 +2,15 @@
 export default [
     {
         path: '/',
-        component: () => import('components/Navbar.vue'),
+//        component: () => import('components/Navbar.vue'),
+        component: () => import('layouts/default'),
         children: [
           { path: '', component: () => import('pages/Home') },
-          { path: '/home', redirect: '/' },
+          { path: '/home', name: 'home', redirect: '/' },
+          { path: '/index', name: 'index', component: () => import('pages/index') },
           { path: '/signup' , name: 'signUp', component: () => import('pages/SignUp'),  meta:{signUpType: 'signup'}},
+          { path: '/userProfile/:userUUID' , name: 'userProfile', component: () => import('pages/UserProfile') },
+          { path: '/admin', name: 'admin', component: () => import('pages/Admin') },
         ]
     },
 
