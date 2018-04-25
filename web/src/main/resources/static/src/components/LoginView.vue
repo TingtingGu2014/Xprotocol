@@ -2,9 +2,7 @@
     <div>
         <div class="gt-md" v-if="inNavBar">
             <form class="form-inline" v-if="loggedIn">        
-                <!--<router-link to="/profile/userId">Go to notfound</router-link>-->
                 <router-link :to="{ name: 'userProfile', params: { userUUID: userInfo.userUUID }  }" >
-                <!--<a href="#" v-on:click="getUserDetails">--> 
                     <span class="fa fa-user"></span>    
                     <span v-if="userInfo.alias">
                         {{userInfo.alias}}
@@ -12,20 +10,19 @@
                     <span v-else>
                         {{userInfo.email}}
                     </span>
-                <!--</a>-->
                 </router-link>
 
                  &nbsp;&nbsp;
-                <a href="#" v-on:click="logoutsubmit"><span class="fa fa-sign-out"></span>&nbsp;Sign Out</a> 
+                <a href="#" v-on:click="logoutsubmit" class="link-with-bg"><span class="fa fa-sign-out"></span>&nbsp;Sign Out</a> 
             </form>
             <form class="form-inline" v-else>
                 <input type="email" class="form-control " placeholder="email" v-model='emaillogin'>
                 &nbsp;
                 <input type="password" class="form-control " placeholder="password" v-model="passwordlogin">
                 &nbsp;
-                <a href="#" v-on:click="loginsubmit"><span class="fa fa-sign-in"></span>&nbsp;Sign In</a> 
+                <a href="#" v-on:click="loginsubmit" class="link-with-bg"><span class="fa fa-sign-in"></span>&nbsp;Sign In</a> 
                 &nbsp;&nbsp;             
-                <router-link :to="{ name: 'signUp'}"><span class="fa fa-user"></span>&nbsp;Sign Up</router-link>
+                <router-link :to="{ name: 'signUp'}" class="link-with-bg"><span class="fa fa-user"></span>&nbsp;Sign Up</router-link>
             </form>
         </div>
         <div class="relative-position lt-lg" v-else>
