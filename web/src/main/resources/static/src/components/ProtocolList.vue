@@ -16,14 +16,14 @@
                 style="overflow-x: scroll"
             >
             
-                <q-td slot="body-cell-title" slot-scope="props" :props="props">
-                    <router-link :to="{ name: 'protocol', params: { userUUID: props.row.userUUID,  userProtocolUUID: props.row.userProtocolUUID }}">
+                <q-td auto-width slot="body-cell-title" slot-scope="props" :props="props">
+                    <router-link 
+                    :to="{ name: 'protocol', params: { userUUID: props.row.userUUID,  userProtocolUUID: props.row.userProtocolUUID }}"
+                    class="qtable-item-link"
+                >
                         &nbsp;&nbsp;{{props.row.title.label}}
                     </router-link>
                 </q-td>
-<!--                <template slot="body-cell-title" slot-scope="props" :props="props">
-                    <table-router-link :linkData = "props.value"></table-router-link>                
-                </template>-->
             </q-table>
         <!--</div>-->
     </q-page>

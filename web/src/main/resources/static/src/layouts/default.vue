@@ -21,7 +21,7 @@
                 </form>
             </div>
             <div class="col-xs-12 col-sm-3 col-md-2 col-lg-1 gt-md move-right" style="order: 4" v-if="isAdminUser">
-                <router-link :to="{ name: 'admin' }"><i class="fa fa-sun-o"></i>&nbsp;Admin</router-link>
+                <router-link :to="{ name: 'admin' }" class="link-with-bg"><i class="fa fa-sun-o"></i>&nbsp;Admin</router-link>
             </div>
             <div class="col move-right" style="order: 3">
                 <login-view :inNavBar="true"></login-view>

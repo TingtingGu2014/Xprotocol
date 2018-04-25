@@ -23,21 +23,22 @@
 </template>
 
 <script>
-    
-    var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
-    if(loggedIn != true){
-        document.location.href = '/login'
-    }
-    
-    var isAdminUser = this.$utils.isAdminUser();
-    if(!isAdminUser){
-        document.location.href = '/errors/403'
-    }
                 
     export default {  
         computed: {
 
         },
+        beforeCreate: function(){
+            var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
+            if(loggedIn != true){
+                document.location.href = '/login'
+            }
+
+            var isAdminUser = this.$utils.isAdminUser();
+            if(!isAdminUser){
+                document.location.href = '/errors/403'
+            }
+        }
     }
 </script>
 

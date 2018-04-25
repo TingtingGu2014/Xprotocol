@@ -2,7 +2,7 @@
     <div>
         <div class="gt-md" v-if="inNavBar">
             <form class="form-inline" v-if="loggedIn">        
-                <router-link :to="{ name: 'userProfile', params: { userUUID: userInfo.userUUID }  }" >
+                <router-link :to="{ name: 'userProfile', params: { userUUID: userInfo.userUUID }  }" class="link-with-bg" >
                     <span class="fa fa-user"></span>    
                     <span v-if="userInfo.alias">
                         {{userInfo.alias}}
