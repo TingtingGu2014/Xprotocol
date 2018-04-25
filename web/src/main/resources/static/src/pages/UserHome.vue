@@ -1,5 +1,6 @@
 <template>
     <div>
+    <!--<Index></Index>-->
         <ProtocolList v-if="loggedIn"
             :userUUID = "userUUID"
         >   

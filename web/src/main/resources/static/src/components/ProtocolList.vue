@@ -1,62 +1,58 @@
 <template id="sign-up-template">
-    
-    <div class="row" style="width:80%; margin: auto; margin-top: 7%; margin-bottom: 30px; overflow-y: auto" >
-        <div class="row text-center">
-            <span class="q-table-title">List of Your Protocols</span>
-        </div>
-        <br>
-        <div class="row text-left">
-            <router-link :to="{ path: 'users/'+userUUID+'/protocols/new'}">&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus-square-o" aria-hidden="true"></i>&nbsp;Create a New Protocol</router-link>
-        </div>
-        <q-table
-            :data="tableDataForDisplay"
-            :config="configs"
-            :columns="columns"
-            :pagination.sync="configs.pagination"
-            style="overflow-x: scroll"
-        >
-            <template slot="col-title" slot-scope="cell">
-                <table-router-link :linkData = "cell.data"></table-router-link>                
-            </template>
-        </q-table>
-    </div>
+    <q-page padding class="docs-table">
+        <p class="caption">Basic example</p>
+        <!--<div class="row" style="width:80%; margin: auto; margin-top: 7%; margin-bottom: 30px; overflow-y: auto" >-->
+    <!--        <div class="row text-center">
+                <span class="q-table-title">List of Your Protocols</span>
+            </div>
+            <br>
+            <div class="row text-left">
+                <router-link :to="{ path: 'users/'+userUUID+'/protocols/new'}">&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-plus-square-o" aria-hidden="true"></i>&nbsp;Create a New Protocol</router-link>
+            </div>-->
+            <q-table
+                :data="tableDataForDisplay"
+                :columns="columns"
+                
+                style="overflow-x: scroll"
+            >
+            
+                <q-td slot="body-cell-title" slot-scope="props" :props="props">
+                    <router-link :to="{ name: 'protocol', params: { userUUID: props.row.userUUID,  userProtocolUUID: props.row.userProtocolUUID }}">
+                        &nbsp;&nbsp;{{props.row.title.label}}
+                    </router-link>
+                </q-td>
+<!--                <template slot="body-cell-title" slot-scope="props" :props="props">
+                    <table-router-link :linkData = "props.value"></table-router-link>                
+                </template>-->
+            </q-table>
+        <!--</div>-->
+    </q-page>
 </template>
 
 <script>
     
     import { mapGetters, mapMutations } from 'vuex'
-    import TableRouterLink from './elements/TableRouterLink.vue'
     
     export default {
         data: function() {
             return {
                 columns: [
-                    {field: 'title', label: 'Title', width: '100px', sort: true, filter: true},
-                    {field: 'projects', label: 'Projects', width: '80px', filter: true},
-                    {field: 'keywords', label: 'Key Words', width: '80px', filter: true},                    
-                    {field: 'versions', label: 'Versions', width: '80px'},                    
+                    {field: 'title', name: 'title', label: 'Title', align: 'left', sortable: true,},
+                    {field: 'projects', name: 'projects', label: 'Projects', align: 'left', sortable: true},
+                    {field: 'keywords', name: 'keywords', label: 'Key Words', align: 'left',},                    
+                    {field: 'versions', name: 'versions', label: 'Versions',  align: 'left',},                    
                 ], 
-                rawData: [],
-                configs: {
-                    rowHeight: '50px',
-                    bodyStyle: {
-  //                    maxHeight: '500px'
-                    },
-                    pagination: {
-                      rowsPerPage: 15,
-                      options: [10, 15, 30, 50]
-                    },
-                    messages: {
-                      noData: '<i>warning</i> You do not have any protocols to show.',
-                      noDataAfterFiltering: '<i>warning</i> No protocols created'
-                    },
-                }
+                rawData: [],                
             }
         },
         props: {
             userUUID: String,
         },
         computed: {
+            ...mapGetters({                
+                getProtocolsByUserUUID: 'protocolModule/getProtocolsByUserUUID',
+                getProtocolsByUserUUIDANDProtocolUUID: 'protocolModule/getProtocolsByUserUUIDANDProtocolUUID',
+            }),
             tableDataForDisplay: function(){
                 var items = []
                 if(!this.$utils.isEmpty(this.rawData)){
@@ -65,6 +61,7 @@
                         var row = this.rawData[i]
                         for (var key in row) {
                             let value = row[key]
+//                            items[i][key] = value
                             if('title' != key){
                                 items[i][key] = value
                             }
@@ -84,7 +81,10 @@
             },
         },
         methods: {
-      
+            ...mapMutations({
+                setProtocolsByUserUUID: 'protocolModule/setProtocolsByUserUUID',
+                setProtocolByUserUUIDANDProtocolUUID: 'protocolModule/setProtocolByUserUUIDANDProtocolUUID',
+            }),
         },
         beforeMount: function(){
         
@@ -99,7 +99,7 @@
             }
             
             if(!this.$utils.isEmpty(localStorage.protocolListCount)){
-                var protocolList = this.$store.protocols.getProtocolsByUserUUID(userUUID)
+                var protocolList = this.getProtocolsByUserUUID(userUUID)
 
                 if(!this.$utils.isEmpty(protocolList) && Number(localStorage.protocolListCount) === protocolList.length){                
                     console.log(protocolList)
@@ -123,7 +123,7 @@
             });
         },
         components: {
-            TableRouterLink
+            
         },
     }
 </script>

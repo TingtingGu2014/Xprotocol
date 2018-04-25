@@ -1,17 +1,15 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import example from './module-example'
-import protocols from './protocols'
-import users from './users'
+import protocolModule from './protocolModule'
+import userModule from './userModule'
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
   modules: {
-    example,
-    protocols,
-    users
+    protocolModule,
+    userModule
   }
 })
 
