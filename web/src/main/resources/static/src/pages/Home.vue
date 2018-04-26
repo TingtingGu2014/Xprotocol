@@ -15,7 +15,7 @@
 <script>
 
     import ProtocolList from 'components/ProtocolList.vue'
-    import CommentList from './CommentList.vue'
+    import CommentList from 'components/CommentList.vue'
     import Index from './index.vue'
     
     export default {
@@ -27,14 +27,13 @@
             }
         },
         components: {
-            Index, ProtocolList, CommentList,
+            ProtocolList, CommentList,
         },
         methods: {
 
         },
         created: function(){
             this.loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
-
             if(this.loggedIn === true) {
                 try{
                     let userInfo = JSON.parse(localStorage.userInfo)
