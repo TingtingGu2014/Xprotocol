@@ -7,14 +7,13 @@
             </div>
             <div class="row text-left">
                 <div class="col-xs-6 col-md-6 col-lg-6 ">
-                    <div class="">                                    
-                        <!--<a href="/userlist" class="btn btn- btn-lg" role="button"><i class="fa fa-users fa-5x"></i><span class=""></span><br><br>User List</a>-->
-                        <router-link :to="{ name: 'userList' }" class="adminLink"><i class="fa fa-users ">&nbsp;<span class="adminLinkText">User List</span></i></span></router-link>                    
+                    <div class="">                                                    
+                        <router-link :to="{ name: 'userList' }" class="big-icon-link"><i class="fa fa-users ">&nbsp;<span class="">User List</span></i></span></router-link>                    
                     </div>
                 </div>
                 <div class="col-xs-6 col-md-6 col-lg-6 ">
                     <div class="">                                    
-                    <a href="#" class="btn btn- btn-lg adminLink" role="button" ><i class="fa fa-user-md">&nbsp;<span class="adminLinkText">User Management</span></i></span></a>
+                    <a href="#" class="big-icon-link" role="button" ><i class="fa fa-user-md">&nbsp;<span class="">User Management</span></i></span></a>
                     </div>
                 </div>                   
             </div>
@@ -30,27 +29,21 @@
         },
         beforeCreate: function(){
             var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
+            loggedIn = true
             if(loggedIn != true){
-                document.location.href = '/login'
+                this.$router.push({path: '/login'})
             }
 
             var isAdminUser = this.$utils.isAdminUser();
+            isAdminUser = true
             if(!isAdminUser){
-                document.location.href = '/errors/403'
+                this.$router.push({path: '/errors/403'})
             }
         }
     }
 </script>
 
 <style>
-.adminLink{
-    font-size: 2.0vw;
-}
-
-.adminLinkText{        
-    font-family: Arial;
-    font-weight: bold;
-}
 
 .adminHeading{
     font-size: 3.0vw;

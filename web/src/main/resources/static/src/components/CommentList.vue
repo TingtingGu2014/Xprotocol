@@ -34,9 +34,9 @@
         data: function() {
             return {
                 columns: [
-                    {field: 'protocolTitle', name: 'protocolTitle', label: 'Protocols', align: 'left', align: 'left', sortable: true, filter: true},
-                    {field: 'content', name: 'content', label: 'Comments', align: 'left', align: 'left', sortable: true, filter: true},
-                    {field: 'time', name: 'time', label: 'Time', align: 'left', align: 'left', sortable: true, filter: true},                                       
+                    {field: 'protocolTitle', name: 'protocolTitle', label: 'Protocols', align: 'left', sortable: true, filter: true},
+                    {field: 'content', name: 'content', label: 'Comments', align: 'left', sortable: true, filter: true},
+                    {field: 'time', name: 'time', label: 'Time', align: 'left', sortable: true, filter: true},                                       
                 ], 
                 rawData: [],
                 pagination: {
@@ -106,13 +106,6 @@
 </script>
 
 <style>
-
-.q-table-title{
-    font-size: 2.0vw;
-    font-family: Helvetica, Arial, Verdana;
-    padding: 5px 0px 5px 0px;
-    margin-left: 20px;
-}
 
 .q-table thead th {
 

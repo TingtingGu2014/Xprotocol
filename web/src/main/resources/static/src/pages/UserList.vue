@@ -3,62 +3,56 @@
         <span class="q-table-title">User List</span>
         <q-table
             :data="tableData"
-            :config="configs"
+            :pagination.sync="pagination"
             :columns="columns"
-            style="overflow-x: scroll"
+            style="width: 100%"
         >
-
-            <template slot="col-edit" slot-scope="cell">                
-                <table-router-link :linkData = "cell.data"></table-router-link>                
-            </template>
+            <q-td slot="body-cell-edit" slot-scope="props" :props="props">
+                <router-link 
+                    :to="{ name: 'userProfileAdmin', params: { userUUID: props.row.userUUID }}"
+                    class="qtable-item-link"
+                >
+                    <span class="fa fa-pencil" aria-hidden="true" ></span>
+                </router-link>
+            </q-td>
         </q-table>
     </div>
 </template>
 
 <script>
     
-    import TableRouterLink from './elements/TableRouterLink.vue'
-    
-    var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
-    if(loggedIn != true){
-        document.location.href = '/login'
-    }
-    
-    var isAdminUser = this.$utils.isAdminUser();
-    if(!isAdminUser){
-        document.location.href = '/errors/403'
-    }
-    
     export default {
         data: function() {
             return {
                 tableData: [],
                 columns: [
-                    {field: 'firstName', label: 'First Name', width: '80px', sort: true, filter: true},
-                    {field: 'lastName', label: 'Last Name', width: '80px', sort: true, filter: true},
-                    {field: 'email', label: 'Email', width: '120px', sort: true, filter: true},                    
-                    {field: 'createdDate', label: 'Registeration Date', width: '60px', 
+                    {field: 'firstName', name: 'firstName', label: 'First Name', align: 'left', sortable: true, filter: true},
+                    {field: 'lastName', name: 'firstName', label: 'Last Name', align: 'left', sortable: true, filter: true},
+                    {field: 'email', name: 'firstName', label: 'Email', align: 'left', sortable: true, filter: true},                    
+                    {field: 'createdDate', name: 'firstName', label: 'Registeration Date', align: 'left',  
                             format (value, row) {
                                 return new Date(value).toLocaleString()
                             }},
-                    {field: 'active', label: 'Active', type: 'boolean', width: '40px'},
-                    {field: 'edit', label: 'Edit', width: '30px'},
+                    {field: 'active', name: 'active', label: 'Active', type: 'boolean', align: 'left', },
+                    {field: 'edit', name: 'edit', label: 'Edit', align: 'left', },
                 ],          
-                configs: {
-                  rowHeight: '50px',
-                  bodyStyle: {
-//                    maxHeight: '500px'
-                  },
-                  pagination: {
-                    rowsPerPage: 15,
-                    options: [5, 10, 15, 30, 50, 500]
-                  },
-                  messages: {
-                    noData: '<i>warning</i> No registered users to show.',
-                    noDataAfterFiltering: '<i>warning</i> No registered users.'
-                  },
-                  responsive: true,
-                }
+                pagination: {
+                    sortBy: null, 
+                    descending: false,
+                    page: 1,
+                    rowsPerPage: 10
+                },
+            }
+        },
+        beforeCreate: function(){
+            var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
+            if(loggedIn != true){
+                this.$router.push('/login')
+            }
+
+            var isAdminUser = this.$utils.isAdminUser();
+            if(!isAdminUser){
+                this.$router.push('/errors/403')
             }
         },
         beforeMount: function(){
@@ -83,16 +77,9 @@
             });
         },
         components: {
-            TableRouterLink
         },
     }
 </script>
 
 <style>
-.q-table-title{
-    font-size: 2.0vw;
-    font-family: Helvetica, Arial, Verdana;
-    padding: 5px 0px 5px 0px;
-    margin: auto;
-}
 </style>

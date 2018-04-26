@@ -169,12 +169,10 @@
                         return false;
                     }
                     if(this.password != this.password2){
-//                        Toast.create.negative({html: `The two passwords are different!`, duration: 3000})
                         this.$q.notify({message: `The two passwords are different!`, timeout: 3000, color: 'negative'})
                         return false;
                     }
                     if(this.$utils.isEmpty(this.alias) && (this.$utils.isEmpty(this.firstName) || this.$utils.isEmpty(this.lastName))) {
-//                        Toast.create.negative({html: `Your name and nick name cannot be empty at the same time.`, duration: 3000})
                         this.$q.notify({message: `Your name and nick name cannot be empty at the same time!`, timeout: 3000, color: 'negative'})
                         return false;
                     }

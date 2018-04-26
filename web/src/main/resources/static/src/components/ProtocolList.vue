@@ -126,13 +126,6 @@
 
 <style>
 
-.q-table-title{
-    font-size: 2.0vw;
-    font-family: Helvetica, Arial, Verdana;
-    padding: 5px 0px 5px 0px;
-    margin: auto;
-}
-
 .q-table thead th {
 
     white-space: normal;

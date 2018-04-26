@@ -125,14 +125,7 @@
 </template>
 
 <script>
-    import axios from 'axios'
     import { mapGetters, mapMutations } from 'vuex'
-    import {
-        QField,
-        QInput,
-        QBtn,
-        Toast,
-    } from 'quasar'
     
     var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
     if(loggedIn != true){
@@ -181,7 +174,6 @@
             },            
         },
         components: {
-            QBtn, QField, QInput, Toast,
         },
         created: function() {
 //            var data = {"user":{"userId":1,"firstName":"Sooner","lastName":"Zhao","email":"tao.zhao@xprotocol.com","password":"123","alias":"soonerZhao","userUUID":"5ce824f0-bdfe-11e7-9696-0b2512d9785a","roles":"anonymous,admin,regular","createdDate":"2017-04-25","active":true},"userDetails":{"userDetailsId":1,"userId":1,"address":"2202 Houston Ave","city":"norman","state":"OK","zipcode":"73072","major":"biology","affiliation":"University of Oklahoma"}};
@@ -197,8 +189,8 @@
                     if(data){
                         this.resetUserProfileAdmin(data)
                     }         
-                    else{
-                        Toast.create.negative({html: `Something is wrong in pulling user profile. Status: `+response.status, duration: 3000})
+                    else{                        
+                        this.$q.notify({message: `Something is wrong in pulling user profile. Status: `+response.status, color: 'negative'})
                         return;
                     } 
                 })
@@ -242,12 +234,12 @@
                     if(response.status === 200){                        
                         var data = response.data
                         this.resetUserProfileAdmin(data)
-                        Toast.create.positive({html: `User profile has been saved.`, duration: 3000})
+                        this.$q.notify({message: `User profile has been saved.`, timeout: 3000, color: 'positive'})
                     }
                             
                 })
                 .catch(function (error) {
-                    Toast.create.negative({html: `Something is wrong in pulling user profile. Status: `+response.status, duration: 3000})
+                    this.$q.notify({message: `Something is wrong in pulling user profile. Status: `+response.status, color: 'negative'})
                     console.log(error);
                 });
             },           

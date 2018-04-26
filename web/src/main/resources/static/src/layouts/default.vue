@@ -38,19 +38,17 @@
 </template>
 
 <script>
-import { openURL } from 'quasar'
+
 import LoginView from 'components/LoginView.vue' 
 
 export default {
     name: 'LayoutDefault',
     data () {
         return {
-          leftDrawerOpen: this.$q.platform.is.desktop,
           showLoginSheet: false,  
         }
     },
     methods: {
-        openURL,
         toggleLogin: function(){
             this.showLoginSheet = !this.showLoginSheet
         },     

@@ -17,12 +17,11 @@
 </template>
 
 <script>
-    import {QBtn} from 'quasar'
-    var errorDetailMessage = sessionStorage.errorMessage
-    errorDetailMessage = this.$utils.isEmpty(errorDetailMessage) ? '' : errorDetailMessage
-    
+
     export default {
         data: function(){
+            var errorDetailMessage = sessionStorage.errorMessage
+            errorDetailMessage = this.$utils.isEmpty(errorDetailMessage) ? '' : errorDetailMessage
             var error = this.$utils.getErrorPage(this.$route.params.errorCode, errorDetailMessage)
             sessionStorage.errorMessage = ''
             return {
@@ -30,7 +29,7 @@
                 errorMessage: error.message,
             }
         },
-        components: {QBtn}
+        components: {}
     }
 </script>
 
