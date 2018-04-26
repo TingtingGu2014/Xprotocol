@@ -76,14 +76,9 @@
 <script>
 
     import { mapGetters, mapMutations } from 'vuex'
+    import VuePassword from 'vue-password'
     import { EventBus } from '../utils/EventBus.js';
     
-    var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
-    if(loggedIn == true){
-        document.location.href = '/home'
-    }
-    
-    import VuePassword from 'vue-password'
     export default {
         data: function() {
             return {
@@ -112,6 +107,12 @@
             '$route' (to, from) {console.log(to.meta.signUpType + ' === ' + from)
                 this.path = to.meta.signUpType
             },
+        },
+        beforeCreate: function(){
+            var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
+            if(loggedIn == true){
+                this.$router.push('/home')
+            }
         },
         mounted: function(){
             var url = window.location.toString().toLowerCase()
@@ -191,15 +192,13 @@
                         if(data){
                             EventBus.$emit('session-change', 'signIn');
                             this.setDetailsFetched(false)
-                            document.location.href = '/home';
+                            this.$router.push('/home')
                         } 
                         else{
-//                            Alert.create({html: "Received invalid data after user signing up!", druation: 3000})
                             this.$q.notify({message: `Received invalid data after user signing up!`, timeout: 3000, color: 'negative'})
                         }
                     })
                     .catch((err) => {
-//                        Alert.create({html: "Cannot sing up new user! Error: "+err.message, druation: 3000})
                         this.$q.notify({message: 'Cannot sing up new user! Error: '+err.message, timeout: 3000, color: 'negative'})
                         console.log(err)
                     });
@@ -211,7 +210,7 @@
                         if(data){
                             EventBus.$emit('session-change', 'signIn');
                             this.setDetailsFetched(false)
-                            document.location.href = '/home';
+                            this.$router.push('/home')
                         }                    
                     })
                     .catch((err) => {

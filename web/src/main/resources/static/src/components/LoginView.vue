@@ -76,7 +76,7 @@
 <script>
     
     import { mapGetters, mapMutations } from 'vuex'    
-//    import { EventBus } from '../utils/EventBus.js';
+    import { EventBus } from '../utils/EventBus.js';
             
     export default {
         
@@ -135,7 +135,7 @@
                 this.$utils.signIn(this.emaillogin, this.passwordlogin)                
                 .then((data) => {
                     if(data){
-//                        EventBus.$emit('session-change', 'signIn');
+                        EventBus.$emit('session-change', 'signIn');
                         location.reload();
                     }                    
                 })
@@ -153,7 +153,7 @@
                 this.$utils.signOut()
                 .then((data) => {
                     if(data){                            
-//                        EventBus.$emit('session-change', 'signOut');
+                        EventBus.$emit('session-change', 'signOut');
                         location.reload();
                     }                    
                 })
