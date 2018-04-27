@@ -92,7 +92,7 @@
     }
     
     fieldset {
-        border:1px solid #4dffc3;
+        border:1px solid #027be3;
         border-radius: 5px;
         box-shadow: 0 0 3px rgba(0,0,0,.3);
     }
@@ -112,7 +112,7 @@
     }
     
     .q-card {
-        border:1px solid #4dffc3;
+        border:1px solid #027be3;
         border-radius: 5px;
         box-shadow: 0 0 3px rgba(0,0,0,.3);
     }

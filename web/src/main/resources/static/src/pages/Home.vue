@@ -15,8 +15,7 @@
 <script>
 
     import ProtocolList from 'components/ProtocolList.vue'
-    import CommentList from 'components/CommentList.vue'
-    import Index from './index.vue'
+    import CommentList from 'components/CommentList.vue'    
     
     export default {
         name: 'home',

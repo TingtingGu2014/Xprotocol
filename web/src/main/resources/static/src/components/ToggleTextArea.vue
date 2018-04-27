@@ -1,5 +1,6 @@
 <template>
-    <div class="row" style="width: 100%; padding: 0 10px 0 10px; " :ref="name+'ToggleDiv'">
+    <div style="width: 100%; padding: 0 10px 0 10px; " :ref="name+'ToggleDiv'">
+        <div class="row">
         <div class="col-12 toggle-editor" style="display: none;">
             <q-field :label="label" >
                 <q-input id="toggle-editor" type="textarea" ref="toggleEditor" :min-rows="4" :max-rows="8" class="textarea-class"
@@ -7,28 +8,60 @@
             />
             </q-field>            
         </div>
-        <div class="col text-center toggle-editor" style="display: none;">
-            <q-btn class="toggle-btn" color="blue" small icon="fa-check" :id="name + '-toggle-btn-done'" @click.prevent="toggleBtnClick">Done</q-btn>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <q-btn class="toggle-btn" color="positive" small icon="fa-times" :id="name + '-toggle-btn-cancel'" @click.prevent="toggleBtnClick">Cancel</q-btn>
-            
-            <q-btn v-for="btn in otherBtns" :key="btn['id']" class="toggle-btn" :color="btn['color']" small :icon="btn['icon']" 
-                :id="btn['id']" @click.prevent="otherBtnClick" style="margin-left: 30px;">{{btn['label']}}</q-btn>
         </div>
-        
+        <div class="row" style="margin-top: .5em;">
+        <div class="col text-center toggle-editor" style="display: none;">
+            <q-btn 
+                class="toggle-btn" 
+                color="blue" 
+                icon="fa-check" 
+                size="sm"
+                :id="name + '-toggle-btn-done'" 
+                @click.prevent="toggleBtnClick"
+            >
+                &nbsp;&nbsp;Save
+            </q-btn>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <q-btn 
+                class="toggle-btn" 
+                color="positive" 
+                size="sm"
+                icon="fa-times" 
+                :id="name + '-toggle-btn-cancel'" 
+                @click.prevent="toggleBtnClick"
+            >
+                &nbsp;&nbsp;Cancel
+            </q-btn>
+            
+            <q-btn 
+                v-for="btn in otherBtns" 
+                :key="btn['id']" 
+                size="sm"
+                class="toggle-btn" 
+                :color="btn['color']" 
+                :icon="btn['icon']" 
+                :id="btn['id']" @click.prevent="otherBtnClick" 
+                style="margin-left: 30px;"
+            >
+                &nbsp;&nbsp;{{btn['label']}}
+            </q-btn>
+        </div>
+        </div>
+        <div class="row">
         <div class="col toggle-display" ref="toggleDisplay">
-            <a id="displayLink" href="#" @click.prevent="toggleBtnClick">
+            <a :id="'displayLink-' + name" href="#" @click.prevent="toggleBtnClick">
                 <q-field :label="label">
                     <p class="display-p" v-html="newValue"></p>
                 </q-field>            
             </a>
+        </div>
         </div>
     </div>
     
 </template>
 
 <script>
-    import {QField, QInput, QBtn} from 'quasar'
+
     export default {
         data: function(){
             return {
@@ -62,7 +95,6 @@
             this.newValue = this.inputValue
         },
         components: {
-            QField, QInput, QBtn,
         },
         methods: {
             toggleBtnClick: function(event){
@@ -148,6 +180,13 @@
     .textarea-class {
         border-bottom: 1px solid #b4e1f7;
         box-shadow: 0 1px 0 0 #ffa000;
-        padding: 10px 10px 5px 10px;
+        padding: 10px 12px 5px 12px;
+    }
+    [id^="displayLink"] {
+        text-decoration: none;        
+    }
+    [id^="displayLink"]:hover {
+        color: #027be3;
+        font-weight: bold;
     }
 </style>

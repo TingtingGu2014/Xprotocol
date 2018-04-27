@@ -20,7 +20,7 @@
                                 :width='width'
                             ></VueTinymce>    
                             <div class="text-center" slot="footer" v-if="isProtocolAuthor">
-                                <q-btn small color="blue" style="margin-top:25px;" v-on:click.prevent="saveUserProtocol">
+                                <q-btn size="sm" color="blue" style="margin-top:25px;" v-on:click.prevent="saveUserProtocol">
                                     <span><i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save</span>                                        
                                 </q-btn>
                             </div>
@@ -37,7 +37,7 @@
                         <q-card-main>
                             <p id="pbody" v-html="body" v-bind:style="{height: (Number(height)+145)+'px'}"></p>
                             <div class="text-center" slot="footer" v-if="isProtocolAuthor">
-                                <q-btn small color="blue" v-on:click="toggleEditor" style="margin-top:5px;">
+                                <q-btn size="sm" color="blue" v-on:click="toggleEditor" style="margin-top:5px;">
                                     <span v-if="showEditor"><i class="fa fa-window-close-o" aria-hidden="true"></i>&nbsp;&nbsp;Hide Editor</span>
                                     <span v-else><i class="fa fa-pencil-square-o" aria-hidden="true"></i>&nbsp;&nbsp;Show Editor</span>
                                 </q-btn>
@@ -54,21 +54,22 @@
                         <div class="displayFileDiv">
                             <q-list highlight style="padding-left: 10%">
                                 <q-item v-if="!files || files.length == 0">There are no file associated with this protocol</q-item>
-                                <q-item v-else v-for="fileInfo in displayFiles" :key="fileInfo.currentName" style="margin: 0 4rem 2rem 0">
+                                <q-item dense highlight="false" v-else v-for="fileInfo in displayFiles" :key="fileInfo.currentName" style="margin: 0 4rem 2rem 0">
                                     <q-item-side left>
-                                        <img :src="fileInfo.currentName" class="responsive" alt="Protocol file without preview" style="width: 7rem; height: auto">
+                                        <img :src="fileInfo.currentName" class="responsive" alt="Protocol file without preview" width="40em">
                                     </q-item-side>
                                     <q-item-main>
-                                        <a :href="fileInfo.currentName + '?name='+fileInfo.originalName" target="_blank">
-                                            <i class="fa fa-download" style="font-">&nbsp;&nbsp;<span class="fileBtn">DOWNLOAD</span></i>
-                                        </a>                                    
-                                        <a class="imgDelBtn" href="javascript:void(0)" 
+                                        <a :href="fileInfo.currentName + '?name='+fileInfo.originalName" target="_blank" class="form-link-wo-bg protocol-file-list-text">
+                                            <i class="fa fa-download" style="font-">&nbsp;&nbsp;<span>DOWNLOAD</span></i>
+                                        </a>        
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <a class="imgDelBtn form-link-wo-bg protocol-file-list-text" href="javascript:void(0)" 
                                             :id="fileInfo.currentName" 
                                             :name="fileInfo.originalName" 
                                             @click.prevent="deleteProtocolFiles"
                                             v-if="isProtocolAuthor"
                                         >
-                                            <i class="fa fa-trash-o">&nbsp;&nbsp;<span class="fileBtn">DELETE</span></i>
+                                            <i class="fa fa-trash-o">&nbsp;&nbsp;<span>DELETE</span></i>
                                         </a>                                    
                                     </q-item-main>
                                 </q-item>
@@ -78,11 +79,11 @@
                         <div class="protocolUploadDiv" v-if="isProtocolAuthor">
                             <form class="row">
                                 <br>
-                                <q-field label="Select a file to upload:" class="col-md-8 col-sm-12" style="margin-bottom: 10px;">
+                                <q-field label="Select a file to upload:" class="col-md-8 col-sm-12" style="margin-top: 10px; margin-bottom: 10px;">
                                     <input type="file" id="uploadFileForProtocol" style="width: 100%;"/>                                    
                                 </q-field>
                                 <q-field class="col col-sm-12">
-                                    <q-btn color="blue" small align="left" icon="fa-upload" @click.prevent="uploadProtocolFile">Add File</q-btn>
+                                    <q-btn color="blue" size="sm" align="left" icon="fa-upload" @click.prevent="uploadProtocolFile">&nbsp;&nbsp;Add File</q-btn>
                                 </q-field>
                             </form>
                         </div>
@@ -100,7 +101,7 @@
                                 <span style="font-size:1rem; " >
                                     {{index+1}}.&nbsp;{{keyword}}
                                 </span>
-                                <a v-bind:id="keyword" href="#" v-if="isProtocolAuthor" v-on:click.prevent="removeKeyword">
+                                <a v-bind:id="keyword" href="#" v-if="isProtocolAuthor" v-on:click.prevent="removeKeyword" class="form-link-wo-bg">
                                     <i class="fa fa-trash" ></i>                                    
                                 </a>
                             </span>                            
@@ -120,7 +121,7 @@
                                         <q-input type="text" class="" id="addKeywordInput" v-model="newKeyword" placeholder="Type new keyword here:" />
                                     </div>
                                     <div class="col">
-                                        <q-btn class="" color="blue" small icon="fa-key" @click.prevent="addKeyword">Add Keyword</q-btn>   
+                                        <q-btn class="" color="blue" size="sm" icon="fa-key" @click.prevent="addKeyword">&nbsp;&nbsp;Add Keyword</q-btn>   
                                     </div>
                                 </div>
                                 
@@ -172,8 +173,8 @@
                                     <q-input ref="addCommentInput" class="addNewTextarea" type="textarea" v-model="newComment" color="teal-9" :min-rows="3" :max-rows="8" />
                                 </q-field>            
                             </div>
-                            <div class="col text-center toggle-editor">
-                                <q-btn color="blue" small icon="fa-floppy-o" @click.prevent="addComment">Add Comment</q-btn>                                
+                            <div class="col text-center toggle-editor" style="margin-top: 20px">
+                                <q-btn color="blue" size="sm" icon="fa-floppy-o" @click.prevent="addComment">&nbsp;&nbsp;Add Comment</q-btn>                                
                             </div>
                         </form>
                     </fieldset>                
@@ -185,8 +186,8 @@
 </template>
 
 <script>
-    import {QCard, QCardTitle, QCardSeparator, QCardMain, QBtn, QField, QInput,QLayout,QList, QItem, QItemSide, QItemMain, QTooltip, QIcon} from 'quasar'
-    import ToggleTextarea from './elements/ToggleTextArea.vue'
+    import {QCard, QCardTitle, QCardSeparator, QCardMain, QTooltip} from 'quasar'
+    import ToggleTextarea from 'components/ToggleTextArea.vue'
     import VueTinymce from './Editor.vue'
     import { mapGetters, mapMutations } from 'vuex'
     
@@ -734,8 +735,8 @@
                 }
         },
         components: {
-            VueTinymce, QCard, QCardTitle, QCardSeparator, QCardMain, QBtn, QField, QInput, QLayout,QItem, QList, QItemSide, QItemMain,
-            ToggleTextarea, QTooltip, QIcon,
+            VueTinymce, ToggleTextarea,
+            QCard, QCardTitle, QCardSeparator, QCardMain, QTooltip
         },
         created: function() {
         
@@ -798,7 +799,7 @@
     }
 </script>
 
-<style>
+<style scoped>
 .q-card-title {
     height: 3em;
     font-weight: bold;
@@ -867,6 +868,7 @@ div.protocolUploadDiv .q-field-label-inner {
     font-family: Georgia, "Times New Roman", Times, serif;
     margin: 0 40px 0 40px;
     padding: 8px 8px 8px 8px;
+    text-decoration: none !important;
 }
 
 .del-comment-btn {
@@ -884,5 +886,26 @@ div.protocolUploadDiv .q-field-label-inner {
     font-family: Arial, Helvetica, sans-serif; 
     font-size: 11px; 
     font-weight: 500;
+}
+
+input[type="text"]
+{
+    font-size:.5em;
+}
+
+.protocol-file-list-text {
+    font-family: Arial, HelveticaNeueW01-45Ligh,HelveticaNeueW02-45Ligh,HelveticaNeueW10-45Ligh,sans-serif;
+    font-size: .75em;
+    color: #027be3;
+}
+
+a.form-link-wo-bg:hover{
+    color: #027be3;
+    font-weight: bold;
+}
+
+input[type="text"]
+{
+    font-size:.5em;
 }
 </style>

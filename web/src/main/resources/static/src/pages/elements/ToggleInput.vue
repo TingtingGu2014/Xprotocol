@@ -14,7 +14,7 @@
         </div>
         
         <div class="col toggle-display" style="display: none" ref="toggleDisplay">
-            <a id="displayLink" href="#" @click.prevent="toggleBtnClick">
+            <a @id="'displayLink' + name" href="#" @click.prevent="toggleBtnClick">
                 <q-field :label="label">
                     <span class="display-span" :style="displayStyles" >{{newValue}}</span>
                 </q-field>            
