@@ -74,7 +74,7 @@
                     <q-field label="User Authority Roles" class="col-12 q-field-short" >                    
                         <label  class="col btn label-user-role col-lg-3 float-left" v-for="(role, index) in roles.split(',')" v-if="role != ''" >
                             {{index+1}}.&nbsp;{{role}}
-                            <a v-bind:id="role" href="#" class="trash-can" v-on:click.prevent="removeRole">
+                            <a v-bind:id="role" href="#" class="form-link-wo-bg" v-on:click.prevent="removeRole">
                                 <i class="fa fa-trash" aria-hidden="true" v-if="role != 'regular' "></i>                                    
                             </a>&nbsp;&nbsp;                                
                         </label>                            
@@ -82,18 +82,18 @@
                 </div>
             </div>
             
-            <div class="row">
+            <div class="row" style="margin-top: 10px;">
                 <div class="col-md-6 col-sm-12 text-center">
                     <q-field  class="label-user-role" >
-                        <a href="#" class="trash-can" v-on:click.prevent="restoreRoles">
+                        <a href="#" class="form-link-with-bg" v-on:click.prevent="restoreRoles">
                             Restore roles&nbsp;&nbsp;&nbsp;<i class="fa fa-undo" aria-hidden="true"></i>                                    
                         </a>
                     </q-field>  
                 </div>
                 <div class="col-md-6 col-sm-12 text-center">
                     <q-field  class="btn label-user-role" >
-                        <a href="#" class="trash-can" v-on:click.prevent="displayRoles">
-                            Add other roles&nbsp;&nbsp;&nbsp;<i class="fa fa-user-plus" aria-hidden="true"></i>                                   
+                        <a href="#" class="form-link-with-bg" v-on:click.prevent="displayRoles">
+                            Add roles&nbsp;&nbsp;&nbsp;<i class="fa fa-user-plus" aria-hidden="true"></i>                                   
                         </a>
                     </q-field>
                 </div>
@@ -103,7 +103,7 @@
                 <div class="col  col-lg-9" role="group" aria-label="...">
                     <label  class="col btn label-user-role col-lg-3 " v-for="(role, index) in otherRoles.split(',')" v-if="role != ''">
                         {{index+1}}.&nbsp;{{role}}
-                        <a v-bind:id="role" href="#" class="trash-can" v-on:click.prevent="removeOtherRole">
+                        <a v-bind:id="role" href="#" class="form-link-wo-bg" v-on:click.prevent="removeOtherRole">
                             <i class="fa fa-plus-square" aria-hidden="true" v-if="role != 'regular' "></i>                                    
                         </a>&nbsp;&nbsp;                                
                     </label>                            
@@ -126,19 +126,6 @@
 
 <script>
     import { mapGetters, mapMutations } from 'vuex'
-    
-    var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
-    if(loggedIn != true){
-        document.location.href = '/login'
-    }
-    
-    var currentUrl = window.location.href
-    if(currentUrl.indexOf('admin/') >=0) {
-        var isAdminUser = this.$utils.isAdminUser();
-        if(!isAdminUser){
-            document.location.href = '/errors/403'
-        }
-    }
             
     export default {
         data: function() {
@@ -175,8 +162,22 @@
         },
         components: {
         },
+        beforeCreate: function() {
+            var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
+            if(loggedIn != true){
+                this.$router.push('login')
+                return false
+            }
+
+            var currentUrl = window.location.href
+            if(currentUrl.indexOf('admin/') >=0) {
+                var isAdminUser = this.$utils.isAdminUser();
+                if(!isAdminUser){
+                    this.$router.push('/errors/403')
+                }
+            }
+        },
         created: function() {
-//            var data = {"user":{"userId":1,"firstName":"Sooner","lastName":"Zhao","email":"tao.zhao@xprotocol.com","password":"123","alias":"soonerZhao","userUUID":"5ce824f0-bdfe-11e7-9696-0b2512d9785a","roles":"anonymous,admin,regular","createdDate":"2017-04-25","active":true},"userDetails":{"userDetailsId":1,"userId":1,"address":"2202 Houston Ave","city":"norman","state":"OK","zipcode":"73072","major":"biology","affiliation":"University of Oklahoma"}};
             var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'));
             if(loggedIn === false){
                 document.location.href = '/login';
@@ -228,18 +229,19 @@
             onSubmit: function (event) {
                 var qs = require('qs');
                 var userUUID = this.userUUID
+                var self = this
 
-                this.$utils.updateUserDetails(userUUID, qs.stringify(this.$data), true)
+                self.$utils.updateUserDetails(userUUID, qs.stringify(self.$data), true)
                 .then( (response) => {
                     if(response.status === 200){                        
                         var data = response.data
-                        this.resetUserProfileAdmin(data)
-                        this.$q.notify({message: `User profile has been saved.`, timeout: 3000, color: 'positive'})
+                        self.resetUserProfileAdmin(data)
+                        self.$q.notify({message: `User profile has been saved.`, timeout: 3000, color: 'positive'})
                     }
                             
                 })
                 .catch(function (error) {
-                    this.$q.notify({message: `Something is wrong in pulling user profile. Status: `+response.status, color: 'negative'})
+                    self.$q.notify({message: `Something is wrong in updating user profile. Status: `+error.toString(), color: 'negative'})
                     console.log(error);
                 });
             },           
