@@ -19,7 +19,7 @@
                                 :height='height'
                                 :width='width'
                             ></VueTinymce>    
-                            <div class="text-center" slot="footer" v-if="isProtocolAuthor">
+                            <div class="text-center" v-if="isProtocolAuthor">
                                 <q-btn size="sm" color="blue" style="margin-top:25px;" v-on:click.prevent="saveUserProtocol">
                                     <span><i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp;&nbsp;Save</span>                                        
                                 </q-btn>
@@ -36,7 +36,7 @@
                         <q-card-separator />
                         <q-card-main>
                             <p id="pbody" v-html="body" v-bind:style="{height: (Number(height)+145)+'px'}"></p>
-                            <div class="text-center" slot="footer" v-if="isProtocolAuthor">
+                            <div class="text-center" v-if="isProtocolAuthor">
                                 <q-btn size="sm" color="blue" v-on:click="toggleEditor" style="margin-top:5px;">
                                     <span v-if="showEditor"><i class="fa fa-window-close-o" aria-hidden="true"></i>&nbsp;&nbsp;Hide Editor</span>
                                     <span v-else><i class="fa fa-pencil-square-o" aria-hidden="true"></i>&nbsp;&nbsp;Show Editor</span>
@@ -251,8 +251,8 @@
                 }
                 return fileHtmls
             },
-            isProtocolAuthor: function(){       
-                return this.userUUID === this.protocolUserUUID
+            isProtocolAuthor: function(){                    
+                return this.userUUID === this.protocolUserUUID 
             },            
             isLoggedInUser: function(){
                 var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
@@ -283,18 +283,18 @@
                 protocolData.userUUID = this.protocolUserUUID
                 protocolData.userProtocolUUID = this.userProtocolUUID
                 
-                if(this.$utils.isEmpty(protocolData.userUUID) || protocolData.userUUID === 'new'){
-                    this.$toast.create.negative({html: 'User UUID cannot be empty!', duration: 3000})
+                if(this.$utils.isEmpty(protocolData.userUUID) || protocolData.userProtocolUUID === 'new'){                    
+                    this.$q.notify({message: `User UUID cannot be empty!`, color: 'negative'})
                     return false;
                 }
                 
-                if(this.$utils.isEmpty(protocolData.title)){
-                    this.$toast.create.negative({html: 'Protocol titile cannot be empty!', duration: 3000})
+                if(this.$utils.isEmpty(protocolData.title)){                    
+                    this.$q.notify({message: `Protocol titile cannot be empty!`, color: 'negative'})
                     return false;
                 }
                 
-                if(this.$utils.isEmpty(protocolData.userProtocolUUID) || protocolData.userProtocolUUID === 'new'){
-                    this.$toast.create.negative({html: 'Protocol UUID cannot be empty!', duration: 3000})
+                if(this.$utils.isEmpty(protocolData.userProtocolUUID) || protocolData.userProtocolUUID === 'new'){                    
+                    this.$q.notify({message: `Protocol UUID cannot be empty!`, color: 'negative'})
                     return false;
                 }
 
@@ -308,7 +308,7 @@
                     document.location.href = '/home'
                 })
                 .catch((err) => {
-                    alert("oops, something happened")
+                    this.$q.notify({message: `Cannot save this protocol with error: `+err.message, color: 'negative'})
                     console.log(err)
                 });
             },
@@ -331,12 +331,12 @@
             contentChange: function(content){
                 var refs = this.$refs
                 var protocolDiv = refs['protocolDiv']
-                if(this.$utils.isEmpty(protocolDiv)){
-                    this.$toast.create.negative({html: "Cannot get the protocol Div!", druation: 3000})
+                if(this.$utils.isEmpty(protocolDiv)){                    
+                    this.$q.notify({message: `Cannot get the protocol Div!`, color: 'negative'})
                 }                
                 var pbody = document.getElementById('pbody')
-                if(this.$utils.isEmpty(protocolDiv)){
-                    this.$toast.create.negative({html: "Cannot get the protocol display Div!", druation: 3000})
+                if(this.$utils.isEmpty(protocolDiv)){                    
+                    this.$q.notify({message: `Cannot get the pbody!`, color: 'negative'})
                     return false
                 } 
                 pbody.innerHTML = content
@@ -362,7 +362,7 @@
                         }
                     }
                 }
-                this.$toast.create.warning({html: "File "+ this.getFileOriginalNameFromFileKey(content) +" has been added successfully. It won't be saved until you click the 'Save' button."})
+                this.$q.notify({message: "File "+ this.getFileOriginalNameFromFileKey(content) +" has been added successfully. It won't be saved until you click the 'Save' button.", color: 'warning', timeout: 3000})                
             },
             toggleEditor: function(){
                 this.showEditor = !(this.showEditor)
@@ -372,7 +372,7 @@
             getFileOriginalNameFromFileKey(fileKey){
                 let fileKeyArr = fileKey.split('____')
                 if(this.$utils.isEmpty(fileKeyArr) || fileKeyArr.length != 2){
-                    this.$toast.create.negative({html: 'Invalid File Key!', duration: 3000})
+                    this.$q.notify({message: `Invalid file key!`, color: 'negative'})
                     return false
                 }
                 return fileKeyArr[1]
@@ -380,19 +380,19 @@
             uploadProtocolFile: function(event){
                 var url = '/api/users/' + this.protocolUserUUID + '/protocols/' + this.userProtocolUUID + '/files'
                 var fileInput = document.getElementById('uploadFileForProtocol')
-                if(this.$utils.isEmpty(fileInput)){
-                    this.$toast.create.negative({html: "Cannot get the file input field!", druation: 3000})
+                if(this.$utils.isEmpty(fileInput)){                    
+                    this.$q.notify({message: `Cannot get the file input field!`, color: 'negative', timeout: 3000})
                     return false
                 } 
                 var files = fileInput['files']
-                if(this.$utils.isEmpty(files)){
-                    this.$toast.create.negative({html: "No files selected!", druation: 3000})
+                if(this.$utils.isEmpty(files)){                    
+                    this.$q.notify({message: `No files selected!`, color: 'negative', timeout: 3000})
                     return false
                 }
                 var file = files[0]
                 var protocolFiles = this.files
-                if (this.$utils.isEmpty(file)) {
-                    Alert.create({html: "No files selected!", druation: 3000})
+                if (this.$utils.isEmpty(file)) {                    
+                    this.$q.notify({message: `No files selected!`, color: 'negative', timeout: 3000 })
                     return false
                 } else {
                     var originalName = file.name
@@ -415,15 +415,14 @@
                             this.setProtocolByUserUUIDANDProtocolUUID(protocol)
                             console.log(data)                    
                         })
-                        .catch((err) => {
-                            alert("oops, something happened")
+                        .catch((err) => {                            
+                            this.$q.notify({message: `Cannot upload the file, error: `+err.message, color: 'negative'})
                             console.log(err)
                         });
-                
-                        this.$toast.create.positive({html: 'File ' + originalName + ' has been successfully uploaded!', duration: 3000})
+                        this.$q.notify({message: 'File ' + originalName + ' has been successfully uploaded!', color: 'positive', timeout: 3000})                        
                     })
-                    .catch((err) => {
-                        this.$toast.create.negative({html: 'Somthing is wrong! error:'+err.message, duration: 3000})
+                    .catch((err) => {                        
+                        this.$q.notify({message: 'File loading is wrong with error:'+err.message, color: 'negative', timeout: 3000})                        
                         console.log(err)
                     });
                 }
@@ -438,7 +437,7 @@
                 if(this.$utils.isEmpty(target) || this.$utils.isEmpty(target.id)){
                     target = event.currentTarget
                     if(this.$utils.isEmpty(target) || this.$utils.isEmpty(target.id)){
-                        this.$toast.create.negative({html: 'Cannot find DOM target ID to delete protocol file!', duration: 3000})
+                        this.$q.notify({message: `Cannot find DOM target ID to delete protocol file!`, color: 'negative'})
                         return false
                     }
                 }
@@ -457,28 +456,28 @@
                         .then((data) => {
                             console.log(data) 
                             if(!this.$utils.isEmpty(data.status) && data.status.toString() === '200'){
-                                this.$toast.create.positive({html: 'Deleting file '+fileName+' succeed!', duration: 4000})
+                                this.$q.notify({message: `Deleting file '+fileName+' succeed!`+err.toString(), color: 'positive', timeout: 3000})
                             }
                             else{
-                                this.$toast.create.info({html: 'Deleting file '+fileName+' response status: '+data.status.toString(), duration: 4000})
+                                this.$q.notify({message: `Deleting file `+fileName+' failed with response status: '+data.status.toString(), color: 'negative'})                                
                             }
                         })
                         .catch((err) => {
-                            this.$toast.create.negative({html: 'Deleting protocol file failed!', duration: 3000})
+                            this.$q.notify({message: `Deleting protocol file failed! `+err.message, color: 'negative'})
                             console.log(err)
                         });
                     }
                 })
-                .catch((err) => {
-                    this.$toast.create.negative({html: 'Deleting protocol file not working!', duration: 3000})
+                .catch((err) => {                    
+                    this.$q.notify({message: `Deleting protocol file not working!`+err.message, color: 'negative'})
                     console.log(err)
                 });
                 return false
             },
             addKeyword: function(){
                 
-                if(this.$utils.isEmpty(this.newKeyword)){
-                    this.$toast.create.negative({html: 'Please type in something for a new keyword!', duration: 3000})
+                if(this.$utils.isEmpty(this.newKeyword)){                    
+                    this.$q.notify({message: `Please type in something for a new keyword!`, color: 'warning'})
                     return false
                 }
                 
@@ -496,8 +495,8 @@
                     this.setProtocolByUserUUIDANDProtocolUUID(data)
                     this.newKeyword = ''
                 })
-                .catch((err) => {
-                    alert("oops, something happened")
+                .catch((err) => {                    
+                    this.$q.notify({message: `Cannot save this protocol with error: `+err.toString(), color: 'negative'})
                     console.log(err)
                 });
                                 
@@ -520,17 +519,17 @@
                 this.$utils.saveUserProtocol(protocol)
                 .then((data) => { 
                     this.setProtocolByUserUUIDANDProtocolUUID(data)
-                    this.$toast.create.positive({html: 'Keyword has been deleted successfully.', duration: 3000})
+                    this.$q.notify({message: `Keyword has been deleted successfully.`, color: 'positive'})                    
                 })
-                .catch((err) => {
-                    this.$toast.create.negative({html: 'Deleting keyword failed.', duration: 3000})
+                .catch((err) => {                    
+                    this.$q.notify({message: `Cannot delete keyword. `+err.message, color: 'negative'})
                     console.log(err)
                 });
             },
             addComment: function(){
                 let newVal = this.newComment
                 if(this.$utils.isEmpty(newVal)){
-                    this.$toast.create.negative({html: 'Please type in something for a new comment!', duration: 3000})
+                    this.$q.notify({message: `Please type in something for a new comment!`, color: 'warning'})
                     return false
                 }
                 
@@ -558,8 +557,8 @@
                     console.log(data)                     
                     this.newComment = ''
                 })
-                .catch((err) => {
-                    alert("oops, something happened")
+                .catch((err) => {                    
+                    this.$q.notify({message: `Cannot save this comment with error: `+err.message, color: 'negative'})
                     console.log(err)
                 });
                 
@@ -574,8 +573,8 @@
                     console.log(data)   
                     this.setProtocolByUserUUIDANDProtocolUUID(protocol)
                 })
-                .catch((err) => {
-                    alert("oops, something happened")
+                .catch((err) => {                    
+                    this.$q.notify({message: `Cannot save this protocol with the new comment. Error: `+err.message, color: 'negative'})
                     console.log(err)
                 });
                 
@@ -584,21 +583,21 @@
             getCommentUserNameFromCommentKey(key){
                 var keyArr = key.split('____')
                 if(!keyArr || keyArr.length != 3){
-                    this.$toast.create.negative({html: 'The comment key: ' + key + ' is wrong!', duration: 3000})
+                    this.$q.notify({message: 'The comment key: ' + key + ' is wrong! Error: '+err.message, color: 'negative'})                    
                 }
                 return keyArr[1]
             },
             getCommentUserUUIDFromCommentKey(key){
                 var keyArr = key.split('____')
                 if(!keyArr || keyArr.length != 3){
-                    this.$toast.create.negative({html: 'The comment key: ' + key + ' is wrong!', duration: 3000})
+                    this.$q.notify({message: 'The comment key: ' + key + ' is wrong!', color: 'negative'})                    
                 }
                 return keyArr[0]
             },
             getCommentDateFromCommentKey(key){
                 var keyArr = key.split('____')
-                if(!keyArr || keyArr.length != 3){
-                    alert('The comment key: ' + key + ' is wrong!')
+                if(!keyArr || keyArr.length != 3){                    
+                    this.$q.notify({message: 'The comment key: ' + key + ' is wrong!', color: 'negative'})
                 }
                 var uuid = keyArr[2]
                 var date = this.$utils.getTimeFromTimeUUID(uuid)
@@ -611,8 +610,8 @@
                 }
                 var currentUserUUID = this.userUUID
                 var keyArr = commentKey.split('____')
-                if(!keyArr || keyArr.length != 3){
-                    alert('The comment key: ' + commentKey + ' is wrong!')
+                if(!keyArr || keyArr.length != 3){                    
+                    this.$q.notify({message: 'The comment key: ' + key + ' is wrong!', color: 'negative'})
                 }
                 var commentUserUUID = keyArr[0]
                 return currentUserUUID == commentUserUUID
@@ -638,14 +637,14 @@
             },          
             updateComment: function(newVal, key){
 
-                if(this.$utils.isEmpty(key)){
-                    this.$toast.create.negative({html: "Cannot get the comment key information!", druation: 3000})
+                if(this.$utils.isEmpty(key)){                    
+                    this.$q.notify({message: `Cannot get the comment key information!`, color: 'negative'})
                     return false
                 }            
                 
                 var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.protocolUserUUID, this.userProtocolUUID)
-                if(this.$utils.isEmpty(protocol)){
-                    this.$toast.create.negative({html: "Cannot find the protocol for this comment!", druation: 3000})
+                if(this.$utils.isEmpty(protocol)){                    
+                    this.$q.notify({message: `Cannot find the protocol for this comment!`, color: 'negative'})
                     return false
                 }
                 
@@ -659,8 +658,8 @@
                     console.log(data) 
                     this.setProtocolByUserUUIDANDProtocolUUID(protocol)
                 })
-                .catch((err) => {
-                    this.$toast.create.negative({html: "Cannot update protocol: " + this.userProtocolUUID + " comment : " + key, druation: 3000})
+                .catch((err) => {                    
+                    this.$q.notify({message: "Cannot update protocol: " + this.userProtocolUUID + " comment : " + key + '. Error:'+err.message, color: 'negative'})
                     console.log(err)
                 });
                 
@@ -679,8 +678,8 @@
                     console.log(data)
                     this.$set(this.comments, key, newVal)   
                 })
-                .catch((err) => {
-                    this.$toast.create.negative({html: "Cannot update protocol: " + this.userProtocolUUID + " comment : " + comment.commentUUID, druation: 3000})
+                .catch((err) => {                    
+                    this.$q.notify({message: "Cannot update protocol: " + this.userProtocolUUID + " comment : " + comment.commentUUID+'. Error:'+err.message, color: 'negative'})
                     console.log(err)
                 });
                 
@@ -690,16 +689,16 @@
                 if(del == false){
                     return false
                 } 
-                if(this.$utils.isEmpty(id)){
-                    this.$toast.create.negative({html: "Cannot find the comment ID!"})
+                if(this.$utils.isEmpty(id)){                    
+                    this.$q.notify({message: `Cannot find the comment ID!`, color: 'negative'})
                     return false
                 }
                 var keyArr = id.split('-edit-')
                 var commentKey = keyArr[0]
                 
                 var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.protocolUserUUID, this.userProtocolUUID)
-                if(this.$utils.isEmpty(protocol)){
-                    this.$toast.create.negative({html: "Cannot find the protocol for this comment!"})
+                if(this.$utils.isEmpty(protocol)){                    
+                    this.$q.notify({message: `Cannot find the protocol for this comment!`, color: 'negative'})
                     return false
                 }
                 
@@ -713,10 +712,10 @@
                 .then((data) => {
                     console.log(data) 
                     this.setProtocolByUserUUIDANDProtocolUUID(data)
-                    this.$toast.create.positive({html: 'Protocol with deleted comment saved', duration: 3000})
+                    this.$q.notify({message: `Protocol with deleted comment saved`, color: 'positive'})                    
                 })
                 .catch((err) => {
-                    this.$toast.create.negative({html: 'Cannot save the protocol with deleted comment', duration: 3000})
+                    this.$q.notify({message: `Cannot save the protocol with deleted comment. Error:`+err.message, color: 'negative'})                    
                     console.log(err)
                 });
                 
@@ -726,10 +725,10 @@
                 
                 this.$utils.deleteComment(userUUID, commentUUID)
                     .then((status) => {
-                        this.$toast.create.positive({html: 'Deleted the comment.', duration: 3000})                        
+                        this.$q.notify({message: `Deleted the comment `+commentUUID, color: 'positive'})                        
                     })
                     .catch((err) => {
-                        this.$toast.create.negative({html: 'Deleting comment failed', duration: 3000})
+                        this.$q.notify({message: `Deleting comment failed. Error:`+err.message, color: 'negative'})                        
                         console.log(err)
                     });
                 }
@@ -776,8 +775,8 @@
                 console.log(data)
                 this.resetUserProtocol(data)
             })
-            .catch((err) => {
-                alert("oops, something happened")
+            .catch((err) => {                
+                this.$q.notify({message: `Cannot get this protocol with error: `+err.message, color: 'negative'})
                 console.log(err)
             });
             
@@ -794,7 +793,9 @@
             }
             this.body = pbody.innerHTML
             var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.protocolUserUUID, this.userProtocolUUID)
-            protocol.body = pbody.innerHTML
+            if(!this.$utils.isEmpty(protocol)){
+                protocol.body = pbody.innerHTML
+            }
         }
     }
 </script>
