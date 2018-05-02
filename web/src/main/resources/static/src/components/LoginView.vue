@@ -1,7 +1,7 @@
 <template id="login-template">
     <div>
-        <div class="gt-md" v-if="inNavBar">
-            <form class="form-inline" v-if="loggedIn">        
+        <div class="gt-md" v-if="inNavBar" style="float:right">
+            <div class="row login-form" v-if="loggedIn">        
                 <router-link :to="{ name: 'userProfile', params: { userUUID: userInfo.userUUID }  }" class="link-with-bg" >
                     <span class="fa fa-user"></span>    
                     <span v-if="userInfo.alias">
@@ -12,17 +12,21 @@
                     </span>
                 </router-link>
 
-                 &nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;
                 <a href="#" v-on:click="logoutsubmit" class="link-with-bg"><span class="fa fa-sign-out"></span>&nbsp;Sign Out</a> 
-            </form>
-            <form class="form-inline" v-else>
-                <input type="email" class="form-control " placeholder="email" v-model='emaillogin'>
+                &nbsp;&nbsp;&nbsp;
+                <div style="order: 4" v-if="isAdminUser">
+                    <router-link :to="{ name: 'admin' }" class="link-with-bg"><i class="fa fa-sun-o"></i>&nbsp;Administrator</router-link>
+                </div>
+            </div>
+            <form class="row login-form" v-else>
+                <input type="email" class="col" placeholder="email" v-model='emaillogin'>
                 &nbsp;
-                <input type="password" class="form-control " placeholder="password" v-model="passwordlogin">
+                <input type="password" class="col" placeholder="password" v-model="passwordlogin">
                 &nbsp;
-                <a href="#" v-on:click="loginsubmit" class="link-with-bg"><span class="fa fa-sign-in"></span>&nbsp;Sign In</a> 
+                <a href="#" v-on:click="loginsubmit" class="col link-with-bg"><span class="fa fa-sign-in"></span>&nbsp;Sign In</a> 
                 &nbsp;&nbsp;             
-                <router-link :to="{ name: 'signUp'}" class="link-with-bg"><span class="fa fa-user"></span>&nbsp;Sign Up</router-link>
+                <router-link :to="{ name: 'signUp'}" class="col link-with-bg"><span class="fa fa-user"></span>&nbsp;Sign Up</router-link>
             </form>
         </div>
         <div class="relative-position lt-lg" v-else>
@@ -52,7 +56,6 @@
                         <input type="password" class="form-control " placeholder="password" v-model="passwordlogin">
                         &nbsp;
                         <a href="#" v-on:click="loginsubmit">&nbsp;Sign In</a> <br>
-
                     </form> 
                   </div>
                 </q-collapsible>
@@ -124,7 +127,7 @@
             loginsubmit: function (message, event) {
                 
                 if(this.$utils.isEmpty(this.emaillogin) || this.$utils.isEmpty(this.passwordlogin)){
-                    alert("Please fill your email and password before sign in.");
+                    this.$q.notify({message: `Please fill your email and password before sign in!`, color: 'negative'})
                     return;
                 }
                 
@@ -140,7 +143,7 @@
                     }                    
                 })
                 .catch((err) => {
-                    alert("oops, something happened during signing in!")
+                    this.$q.notify({message: `User sign in with error: `+err.message, color: 'negative'})
                     console.log(err)
                 });
                 
@@ -158,7 +161,7 @@
                     }                    
                 })
                 .catch((err) => {
-                    alert("oops, something happened during signing in!")
+                    this.$q.notify({message: `User sign out with error: `+err.message, color: 'negative'})
                     console.log(err)
                 });
             },
@@ -208,7 +211,7 @@
 </script>
 
 <style scoped>
-    input.form-control {
-        width: 100px !important;
-    }
+.login-form {
+    padding-bottom: 10px;
+}
 </style>

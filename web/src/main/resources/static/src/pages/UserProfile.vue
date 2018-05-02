@@ -6,7 +6,7 @@
             <div class="row">
                 <h6 class="mb-0">Your Profile:</h6>
             </div>
-            <div class="row">
+            <div class="row form-row">
                 <div class="q-field-short col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <q-field label="First Name" >
                         <q-input v-model="firstName" />
@@ -19,7 +19,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row form-row">
                 <div class="q-field-short col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <q-field label="Alias" >
                         <q-input v-model="alias" />
@@ -32,7 +32,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row form-row">
                 <div class="q-field-short col-lg-6 col-md-6 col-sm-12 col-xs-12">
                     <q-field label="Affiliation" >
                         <q-input v-model="affiliation" />
@@ -45,7 +45,7 @@
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row form-row">
                 <div class="q-field-long col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <q-field label="Street Address" >
                         <q-input v-model="address" />
@@ -68,12 +68,12 @@
                 </div>
             </div>
             
-            <div class="row">
+            <div class="row form-row" style="margin-top: 5px">
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <q-field label="User Authority Roles" class="col-12 q-field-short">
                         <input type="hidden" name="roles" v-model="roles"/>
                         <div style='margin-left:20px' class="text-left">
-                            <q-btn rounded outline small color="blue" v-if="role != ''" v-for="(role, index) in roles.split(',')" :key="index" @click.prevent="doNothing" style="margin-right:10px; margin-bottom: 10px;">
+                            <q-btn rounded outline size="small" color="primary" v-if="role != ''" v-for="(role, index) in roles.split(',')" :key="index" @click.prevent="doNothing" style="margin-right:10px; margin-bottom: 10px;">
                                 {{index+1}}.&nbsp;{{role}}
                             </q-btn>  
                         </div>
@@ -81,11 +81,11 @@
                 </div>
             </div>
             
-            <div class="row">
+            <div class="row form-row">
                 <div class="col text-center">
                     <br>
-                    <q-btn  color="blue" small icon="fa-floppy-o" v-on:click.prevent="onSubmit" style="margin-bottom: 15px; margin-right: 10px;">Save</q-btn>
-                    <q-btn  color="positive" small icon="fa-home" @click.prevent="backHome" style="margin-bottom: 15px; margin-right: 10px;">Back to Home</q-btn>
+                    <q-btn  color="blue" small icon="fa-floppy-o" v-on:click.prevent="onSubmit" style="margin-bottom: 15px; margin-right: 10px;">&nbsp;Save</q-btn>
+                    <q-btn  color="positive" small icon="fa-home" @click.prevent="backHome" style="margin-bottom: 15px; margin-right: 10px;">&nbsp;Back to Home</q-btn>
                 </div>
             </div>
         </form>

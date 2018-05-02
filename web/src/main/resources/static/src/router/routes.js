@@ -2,7 +2,7 @@
 export default [
     {
         path: '/',
-        component: () => import('layouts/default'),
+        component: () => import('layouts/Layout'),
         children: [
           { path: '', component: () => import('pages/Home') },
           { path: '/home', name: 'home', redirect: '/' },

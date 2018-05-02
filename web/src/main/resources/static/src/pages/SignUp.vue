@@ -104,7 +104,7 @@
             email: function(value) {
                 this.validate_email(value, 'email_message')
             },
-            '$route' (to, from) {console.log(to.meta.signUpType + ' === ' + from)
+            '$route' (to, from) {
                 this.path = to.meta.signUpType
             },
         },

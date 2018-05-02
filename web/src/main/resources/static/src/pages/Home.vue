@@ -47,7 +47,8 @@
     }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
+
     h4 {
         text-align: center;
     }
