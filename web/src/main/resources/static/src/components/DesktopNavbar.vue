@@ -1,6 +1,5 @@
 <template id="login-template">
     <div>
-        <!--<div class="row navbar-body">-->
         <div class="row navbar-body" style="padding-top: 9px; ">
             <div class="nav">
                 <ul>
@@ -108,8 +107,16 @@ body.other-page {
     background-color: #2d87a8;
 }
 
-body.home-page {
-    background-image: url("../statics/images/lili_flower.jpg"), url("../statics/images/church.jpg");
+@media screen and (min-width: 1200px){
+    body.home-page {
+        background-image: url("../statics/images/lili_flower.jpg"), url("../statics/images/church.jpg");
+    }
+}
+
+@media screen and (max-width: 1199px){
+    body.home-page {
+        background-image: url("../statics/images/church.jpg");
+    }
 }
 
 .navbar-body {
@@ -236,9 +243,5 @@ form input {
     color: #d5d9e0;
 }
 
-/* When the input field gets focus, change its width to 100% */
-input:focus {
-    outline-width: 0;
-}
 
 </style>

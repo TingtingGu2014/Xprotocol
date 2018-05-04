@@ -6,7 +6,6 @@ export default [
         children: [
           { path: '', component: () => import('pages/Home') },
           { path: '/home', name: 'home', redirect: '/' },
-          { path: '/index', name: 'index', component: () => import('pages/index') },
           { path: '/signup' , name: 'signUp', component: () => import('pages/SignUp'),  meta:{signUpType: 'signup'}},
           { path: '/userProfile/:userUUID' , name: 'userProfile', component: () => import('pages/UserProfile') },
           { path: '/admin/userProfile/:userUUID' , name: 'userProfileAdmin', component: () => import('pages/UserProfileAdmin')},

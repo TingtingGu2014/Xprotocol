@@ -29,11 +29,11 @@
                 <router-link :to="{ name: 'signUp'}" class="col link-with-bg"><span class="fa fa-user"></span>&nbsp;Sign Up</router-link>
             </form>
         </div>
-        <div class="relative-position lt-lg" v-else>
+        <div class="relative-position lt-xl" v-else>
             <q-list class="bottom" style="margin: auto;">
                 <q-collapsible icon="perm_identity" v-bind:label="getCurrentUserName"  v-if="loggedIn">
                   <div>
-                    <form class="form-inline">        
+                    <form class="">        
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         <router-link :to="{ name: 'userProfile', params: { userUUID: userInfo.userUUID }  }" >
                             <span class="fa fa-user"></span>    
@@ -49,7 +49,7 @@
                 </q-collapsible>
                 <q-collapsible icon="fa-sign-in" label="Log In" v-else>
                   <div>
-                    <form class="form-inline">
+                    <form class="">
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         <input type="email" class="form-control " placeholder="email" v-model='emaillogin'>
                         &nbsp;
@@ -60,7 +60,7 @@
                   </div>
                 </q-collapsible>
 
-                <q-collapsible icon="fa-user" label="Sign Up">
+                <q-collapsible icon="fa-user" label="Sign Up" onclick="javascript:alert('ok')">
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<router-link :to="{ name: 'signUp'}"><span class="fa fa-user"></span>&nbsp;Sign Up</router-link>
                 </q-collapsible>
 
@@ -80,6 +80,7 @@
     
     import { mapGetters, mapMutations } from 'vuex'    
     import { EventBus } from '../utils/EventBus.js';
+    import { ActionSheet } from 'quasar'
             
     export default {
         
@@ -118,7 +119,7 @@
             }),
             isAdminUser: function () {
                 return this.$utils.isAdminUser();
-            },
+            },            
         },
         components:{
             
