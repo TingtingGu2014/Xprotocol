@@ -29,9 +29,9 @@
                 <router-link :to="{ name: 'signUp'}" class="col link-with-bg"><span class="fa fa-user"></span>&nbsp;Sign Up</router-link>
             </form>
         </div>
-        <div class="relative-position lt-xl" v-else>
-            <q-list class="bottom" style="margin: auto;">
-                <q-collapsible icon="perm_identity" v-bind:label="getCurrentUserName"  v-if="loggedIn">
+        <div class="relative-position lt-xl" style="outline: none !important;width:100%;background-color: #2a7996; z-index: 10; border: 1px solid white;border-radius: 15px;" v-else>
+            <q-list class="bottom" style="margin: auto; ">
+                <q-collapsible icon="perm_identity" v-bind:label="getCurrentUserName"  @show="loginViewOpen" @hide="loginViewClose" v-if="loggedIn">
                   <div>
                     <form class="">        
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -47,30 +47,29 @@
                     </form>
                   </div>
                 </q-collapsible>
-                <q-collapsible icon="fa-sign-in" label="Log In" v-else>
-                  <div>
-                    <form class="">
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <input type="email" class="form-control " placeholder="email" v-model='emaillogin'>
-                        &nbsp;
-                        <input type="password" class="form-control " placeholder="password" v-model="passwordlogin">
-                        &nbsp;
-                        <a href="#" v-on:click="loginsubmit">&nbsp;Sign In</a> <br>
-                    </form> 
-                  </div>
-                </q-collapsible>
+                <div v-else>
+                    <q-collapsible icon="fa-sign-in" label="Log In"  class="row" @show="loginViewOpen" @hide="loginViewClose">                  
+                        <form class="">
+                            <input type="email" class="collapsible-input" placeholder="email" v-model='emaillogin'>                       
+                            <input type="password" class="collapsible-input" placeholder="password" v-model="passwordlogin">     
+                            <div class="row" style="float:right">
+                                <a href="#" class="link-with-bg singin-btn" v-on:click="loginsubmit" >&nbsp;Sign In</a> <br>
+                            </div>
+                        </form> 
 
-                <q-collapsible icon="fa-user" label="Sign Up" onclick="javascript:alert('ok')">
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<router-link :to="{ name: 'signUp'}"><span class="fa fa-user"></span>&nbsp;Sign Up</router-link>
-                </q-collapsible>
+                    </q-collapsible>
 
-                <q-collapsible icon="fa-sun-o" label="Admin" v-if="isAdminUser">
+                    <q-collapsible icon="fa-user" label="Sign Up"   @show="collapseLinkClick('signup')" >
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<router-link :to="{ name: 'signUp'}"><span class="fa fa-user"></span>&nbsp;Sign Up</router-link>
+                    </q-collapsible>
+                </div>
+                <q-collapsible icon="fa-sun-o" label="Admin"  @show="loginViewOpen" @hide="loginViewClose" v-if="isAdminUser">
                   <div>
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<router-link :to="{ name: 'userList' }" style='font-family: Arial'><span class="fa fa-users"></span>&nbsp;User List</router-link>                    
                   </div>
                 </q-collapsible>
                 
-                <q-collapsible icon="fa-home" label="Home" @open="goHome" ref='homeLink'></q-collapsible>
+                <q-collapsible icon="fa-home" label="Home"   @show="collapseLinkClick('home')" ref='homeLink'></q-collapsible>
             </q-list>                                                                                                                                                                                                                                                                                                                        
         </div>
     </div>
@@ -96,6 +95,7 @@
                 userInfo: null,
                 emaillogin: '',
                 passwordlogin: '',
+                showCollapseList: false,
             }
         },     
         computed: {
@@ -171,12 +171,15 @@
                 setDetailsFetched: 'userModule/setDetailsFetched',
                 setProtocols: 'protocolModule/setProtocols'
             }),
-            goHome: function(event){
-                let homeLink = this.$refs['homeLink']
-                if(!this.$utils.isEmpty(homeLink)){
-                    homeLink.close()
-                }
-                this.$router.push('/')
+            collapseLinkClick: function(path){
+                this.$emit('collapseLinkClick')                
+                this.$router.push('/'+path)
+//                return false
+            },
+            loginViewOpen(){
+                console.log(this)
+            },
+            loginViewClose(){
             }
         },
         created: function(){
@@ -202,6 +205,7 @@
                     localStorage.userInfo = ''
                 }
             }
+            this.showCollapseList = this.inNavBar
         },
     }
     
@@ -214,5 +218,20 @@
 <style scoped>
 .login-form {
     padding-bottom: 10px;
+}
+
+.q-list {
+    border: none;
+}
+
+.singin-btn{
+    margin: 10px 10px 0 0; 
+    border: 1px solid white;
+    padding: 5px;
+    border-radius: 15px;
+}
+
+.collapsible-input{
+    width: 90%;
 }
 </style>

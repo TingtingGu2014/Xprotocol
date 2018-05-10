@@ -24,7 +24,7 @@
             </ul>
         </div>
         <div class="row menu-list">
-            <login-view v-if="showMenuSheet" :inNavBar="false"></login-view>
+            <login-view v-if="showMenuSheet" :inNavBar="false" @collapseLinkClick="closeShowMenu"></login-view>
         </div>
     </div>
 
@@ -61,6 +61,9 @@
 //                    }
                 //}, 10000)
             },  
+            closeShowMenu: function(){
+                this.showMenuSheet = false
+            },
             searchProtocol: function(){
                 this.search = this.search + 'ok'
             },

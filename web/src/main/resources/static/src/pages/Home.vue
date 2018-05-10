@@ -36,7 +36,7 @@
             return {
                 userUUID: '', 
                 loggedIn: false,
-                searchBoxMarginTop: '55%',
+                searchBoxMarginTop: '75%',
             }
         },
         components: {
@@ -92,6 +92,7 @@
     input.search {
         width: 100%;
         outline: none;
+        z-index:1;
     }
 
 </style>
