@@ -55,11 +55,11 @@
             toggleShowMenu: function(){
                 let self = this
                 self.showMenuSheet = !self.showMenuSheet
-//                setTimeout(function(){
-//                    if(self.showMenuSheet === true){
-//                        self.showMenuSheet = false
-//                    }
-                //}, 10000)
+                setTimeout(function(){
+                    if(self.showMenuSheet === true){
+                        self.showMenuSheet = false
+                    }
+                }, 30000)
             },  
             closeShowMenu: function(){
                 this.showMenuSheet = false
@@ -104,7 +104,6 @@ body.other-page {
   font-size: 1.0em;
   line-height: 40px;
   height: 40px;
-  border-bottom: 1px solid #888;
   list-style-type: none;
 }
  
@@ -149,6 +148,7 @@ li.login-view {
   .nav li {
     display: inline-block;
     margin-right: -4px;
+    border-bottom: none;
   }
  
   /* Options 2 - Float

@@ -136,7 +136,6 @@ body.other-page {
   font-size: 1.0em;
   line-height: 40px;
   height: 40px;
-  border-bottom: 1px solid #888;
 }
  
 .nav a {

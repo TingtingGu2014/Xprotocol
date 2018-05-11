@@ -1,72 +1,117 @@
 <template id="sign-up-template">
     
-    <div class="row text-center" style="width:80%; margin: auto; margin-top: 7%; margin-bottom: 30px; overflow-y: auto" ref="signUpDiv">        
-        <form class="signUpForm" style="margin: auto;">
-            <div class="row">
-                <span style="margin-bottom: 15px;">Please sign in or register as a user to use XProtocol services.</span>
+    <div class=" " style="width: 80%; margin: auto; margin-top: 7%; margin-bottom: 30px; overflow-y: auto" ref="signUpDiv">        
+        <form class="col-12" style="">
+            <br>
+            <div class="row signup-form-heading" style="" v-if="isSignUpPath">Please register to use more XProtocol services:</div>
+            <div class="row signup-form-heading" style="" v-else>Please sign in to use more XProtocol services:</div>
+            <br>
+            <div class="row input-row" v-if="isSignUpPath">
+                <q-field
+                    class="col-md"
+                  :label-width="3"
+                  label="Email:"
+                  helper="A valid email address to contact"
+                      :error="$v.userEmail.$error"
+                      @blur="$v.userEmail.$touch"
+                >
+                    <q-input v-model="userEmail" color="white" type="email" suffix="" />
+                </q-field>
+                <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <q-field
+                    class="col-md"
+                    :label-width="3"
+                    label="Nick Name:"
+                    helper="Please give yourself a easily to remember nick name"
+                >
+                    <q-input dark color="white" v-model="alias" />
+                </q-field>
             </div>
-            <div class="row" v-if="path.lastIndexOf('signup') >= 0">
-                <div class="q-field-short col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                    <q-field label="Email:" >
-                        <q-input type="email" v-model="email" placeholder="" />
-                    </q-field>
-                    <span v-if="email.length > 1">{{ email_message }}</span>
-                </div>
-                <div class="q-field-short col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                    <q-field label="Nick Name:" >
-                        <q-input v-model="alias" />
-                    </q-field>
-                </div>
-            </div>
-            <div class="row" v-if="path.lastIndexOf('signin') >= 0 || path.lastIndexOf('login') >= 0">
-                <div class="q-field-long col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <q-field label="Email:" >
-                        <q-input type="email" v-model="email" placeholder="" />
-                    </q-field>
-                    <span v-if="email.length > 1">{{ email_message }}</span>
-                </div>
+            <div class="row input-row" v-else>
+                <q-field
+                    class="col-md"
+                  :label-width="3"
+                  label="Email:"
+                  helper="A valid email address to contact"
+                      :error="$v.userEmail.$error"
+                      @blur="$v.userEmail.$touch"
+                >
+                    <q-input v-model="userEmail" color="white" type="email" suffix="" />
+                </q-field>
             </div>
             <br>           
-            <div class="row" v-if="path.lastIndexOf('signup') >= 0">
-                <div class="q-field-short col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                    <q-field label="First Name:" >
-                        <q-input v-model="firstName" />
-                    </q-field>
-                </div>
-                <div class="q-field-short col-lg-6 col-md-6 col-sm-12 col-xs-12">
-                    <q-field label="Last Name:" >
-                        <q-input v-model="lastName" />
-                    </q-field>
-                </div>
+            <div class="row input-row" v-if="isSignUpPath">
+            
+                <q-field
+                    class="col-md"
+                  :label-width="3"
+                  label="First Name:"
+                  helper=""
+                >
+                    <q-input dark color="white" v-model="firstName" />
+                </q-field>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <q-field
+                    class="col-md"
+                    :label-width="3"
+                    label="Last Name:"
+                    helper=""
+                >
+                    <q-input dark color="white" v-model="lastName" />
+                </q-field>
             </div>
             <br>
-            <div class="row">
-                <div class="q-field-long col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <q-field label="Password:" v-if="path.lastIndexOf('signup') >= 0">
+            <div class="input-row">
+            
+                <div class="row" v-if="isSignUpPath">
+                    <q-field
+                        class="col-md"
+                      :label-width="3"
+                      label="Password:"    
+                      helper="Has to be at least 6 characters"
+                      :error="$v.userPassword.$error"
+                      @blur="$v.userPassword.$touch"
+                    >
+                        <q-input dark color="white" type="password" v-model="userPassword" />
+                    </q-field>
+                    
+                    <q-field
+                        class="col-md"
+                      :label-width="3"
+                      label="Confirm Password:"
+                      >
+                        <q-input dark color="white" type="password" v-model="userPassword2" />
+                    </q-field>
+                </div>
+<!--                    <q-field label="Password:" v-if="path.lastIndexOf('signup') >= 0">
                         <vue-password v-model="password" class="" :user-inputs="[email]" placeholder="Password"></vue-password>
+                    </q-field>-->
+                    
+                <div class="row" v-else>
+                    <q-field
+                        class="col-md"
+                      :label-width="3"
+                      label="Password:"    
+                      helper="Has to be at least 6 characters"
+                      :error="$v.userPassword.$error"
+                      @blur="$v.userPassword.$touch"
+                    >
+                        <q-input dark color="white" type="password" v-model="userPassword" />
                     </q-field>
-                    <q-field label="Password:" v-else>
-                        <q-input type="password" class="" v-model="password" />
-                    </q-field>
+                
                 </div>
-            </div>
-            <br>
-            <div class="row" v-if="path.lastIndexOf('signup') >= 0">
-                <div class="q-field-long col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                    <q-field label="Confirm Password:">
-                        <q-input type="password" class="" v-model="password2" />
-                    </q-field>
-                </div>
+
             </div>
             <br>
             <div class="row" style="maring: auto">
                 <div class="col text-center">
                     <br>
                     <q-btn  color="blue" small icon="fa-floppy-o" v-on:click.prevent="signupsubmit" style="margin-bottom: 15px; margin-right: 10px;">
-                        <span v-if="path.lastIndexOf('signup') >= 0">Sign Up</span>
-                        <span v-if="path.lastIndexOf('signin') >= 0 || path.lastIndexOf('login') >= 0">Sign In</span>
+                        <span v-if="isSignUpPath">&nbsp;Sign Up</span>
+                        <span v-else>&nbsp;Sign In</span>
                     </q-btn>
-                    <q-btn  color="blue" small icon="fa-home" @click.prevent="$router.push('/home')" style="margin-bottom: 15px; margin-right: 10px;">Cancel</q-btn>
+                    <q-btn  color="blue" small icon="fa-home" @click.prevent="$router.push('/home')" style="margin-bottom: 15px; margin-right: 10px;">&nbsp;Home</q-btn>
                 </div>
             </div>            
         </form>
@@ -78,20 +123,24 @@
     import { mapGetters, mapMutations } from 'vuex'
     import VuePassword from 'vue-password'
     import { EventBus } from '../utils/EventBus.js';
+    import { required, email, sameAs, minLength } from 'vuelidate/lib/validators'
     
     export default {
         data: function() {
             return {
-                email: '',
+                userEmail: '',
                 firstName: '',
                 lastName: '',
                 alias: '',
-                password: '',
-                password2: '',
+                userPassword: '',
+                userPassword2: '',
                 path: '',
             }
         },
         computed: {
+            isSignUpPath: function(){
+                return (!this.$utils.isEmpty(this.path) && this.path.lastIndexOf('signup') >= 0)
+            },
             ...mapGetters({
                 isUserDetailsFetched: 'userModule/isUserDetailsFetched',
                 getUserDetails: 'userModule/getUserDetails',
@@ -100,8 +149,21 @@
         components: {
             VuePassword
         },
+        validations: {
+            userEmail: {
+                required, email
+            },
+            userPassword: {
+                required,
+                minLength: minLength(6)
+            },
+            userPassword2: {
+                required,
+                sameAsPassword: sameAs('userPassword')
+            }
+        },
         watch: {
-            email: function(value) {
+            userEmail: function(value) {
                 this.validate_email(value, 'email_message')
             },
             '$route' (to, from) {
@@ -129,27 +191,7 @@
                     }
                 }
             }
-            var refs = this.$refs
-            for(var name in refs){
-                if(name === 'signUpDiv'){
-                    var userProfileDiv = refs[name]
-                    var shortFields = userProfileDiv.getElementsByClassName("q-field-short")
-                    if(!this.$utils.isEmpty(shortFields)){
-                        for(var i = 0; i < shortFields.length; i++){
-                            var labels = shortFields[i].getElementsByClassName("q-field-label")
-                            labels[0].classList.add("col-md-5");
-                        }
-                    }
-                    
-                    var longFields = userProfileDiv.getElementsByClassName("q-field-long")
-                    if(!this.$utils.isEmpty(longFields)){
-                        for(var i = 0; i < longFields.length; i++){
-                            var labels = longFields[i].getElementsByClassName("q-field-label")
-                            labels[0].classList.add("col-md-4");
-                        }
-                    }
-                }
-            }
+            
         },
         methods: {
             validate_email (value, email_message) {
@@ -163,12 +205,33 @@
             },
             signupsubmit: function (message, event) {
             
+                this.$v.userEmail.$touch()
+                
+                if (this.$v.userEmail.$error) {
+                    this.$q.notify('This is NOT a valid email.')
+                    return false
+                }
+                
+                this.$v.userPassword.$touch()
+                
+                if (this.$v.userPassword.$error) {
+                    this.$q.notify('This is NOT a valid password.')
+                    return false
+                }
+                
+                this.$v.userPassword2.$touch()
+                
+                if (this.$v.userPassword2.$error) {
+                    this.$q.notify('This is NOT a valid confirmation password.')
+                    return false
+                }
+            
                 if(this.path.lastIndexOf('signup') >= 0){
-                    if(this.$utils.isEmpty(this.email) || this.$utils.isEmpty(this.password) || this.$utils.isEmpty(this.password2)){
+                    if(this.$utils.isEmpty(this.userEmail) || this.$utils.isEmpty(this.userPassword) || this.$utils.isEmpty(this.userPassword2)){
                         Alert.create({html: `Please fill your email and password for registration.`, duration: 3000})
                         return false;
                     }
-                    if(this.password != this.password2){
+                    if(this.userPassword != this.userPassword2){
                         this.$q.notify({message: `The two passwords are different!`, timeout: 3000, color: 'negative'})
                         return false;
                     }
@@ -203,7 +266,7 @@
                     
                 }
                 else {
-                    this.$utils.signIn(this.email, this.password)                
+                    this.$utils.signIn(this.userEmail, this.userPassword)                
                     .then((data) => {
                         if(data){
                             EventBus.$emit('session-change', 'signIn');
@@ -232,9 +295,22 @@
 
 <style>
 
-div.q-field-short, div.q-field-long {
-    padding-left: 25px;
-    padding-right: 25px;
+div.signup-form-heading {
+    text-align: left; color: #d5d9e0; font-weight: bold; font-size: 1.2em;
+}
+
+div.input-row{
+    margin-top: 2em;
+}
+
+@media screen and (min-width: 1200px){
+    q-field{
+        margin-right: 1em;
+    }
+}
+
+@media screen and (max-width: 1199px){
+    
 }
 
 </style>

@@ -79,7 +79,6 @@
     
     import { mapGetters, mapMutations } from 'vuex'    
     import { EventBus } from '../utils/EventBus.js';
-    import { ActionSheet } from 'quasar'
             
     export default {
         
