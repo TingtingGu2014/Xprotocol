@@ -120,8 +120,7 @@
 
 <script>
 
-    import { mapGetters, mapMutations } from 'vuex'
-    import VuePassword from 'vue-password'
+    import { mapGetters, mapMutations } from 'vuex'    
     import { EventBus } from '../utils/EventBus.js';
     import { required, email, sameAs, minLength } from 'vuelidate/lib/validators'
     
@@ -147,7 +146,7 @@
             })
         },
         components: {
-            VuePassword
+            
         },
         validations: {
             userEmail: {
@@ -155,12 +154,13 @@
             },
             userPassword: {
                 required,
-                minLength: minLength(6)
+                minLength: minLength(3)
             },
             userPassword2: {
                 required,
                 sameAsPassword: sameAs('userPassword')
-            }
+            },
+            
         },
         watch: {
             userEmail: function(value) {
@@ -219,27 +219,19 @@
                     return false
                 }
                 
-                this.$v.userPassword2.$touch()
-                
-                if (this.$v.userPassword2.$error) {
-                    this.$q.notify('This is NOT a valid confirmation password.')
-                    return false
-                }
-            
-                if(this.path.lastIndexOf('signup') >= 0){
-                    if(this.$utils.isEmpty(this.userEmail) || this.$utils.isEmpty(this.userPassword) || this.$utils.isEmpty(this.userPassword2)){
-                        Alert.create({html: `Please fill your email and password for registration.`, duration: 3000})
-                        return false;
+                if(this.isSignUpPath === true){
+                    this.$v.userPassword2.$touch()
+
+                    if (this.$v.userPassword2.$error) {
+                        this.$q.notify('This is NOT a valid confirmation password.')
+                        return false
                     }
-                    if(this.userPassword != this.userPassword2){
-                        this.$q.notify({message: `The two passwords are different!`, timeout: 3000, color: 'negative'})
-                        return false;
-                    }
+                    
                     if(this.$utils.isEmpty(this.alias) && (this.$utils.isEmpty(this.firstName) || this.$utils.isEmpty(this.lastName))) {
                         this.$q.notify({message: `Your name and nick name cannot be empty at the same time!`, timeout: 3000, color: 'negative'})
                         return false;
                     }
-                }                
+                }              
 
                 if (event){
                     event.preventDefault()

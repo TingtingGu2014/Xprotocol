@@ -170,7 +170,7 @@
     }
     .display-p {
         white-space: pre-wrap;
-        background: #e6f7ff;
+//        background: #e6f7ff;
         color: #133913;
         font-family: Georgia, "Times New Roman", Times, serif;
         margin: 0 30px 0 30px;

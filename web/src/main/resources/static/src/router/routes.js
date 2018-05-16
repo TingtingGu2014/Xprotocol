@@ -6,6 +6,7 @@ export default [
         children: [
           { path: '', component: () => import('pages/Home') },
           { path: '/home', name: 'home', redirect: '/' },
+          { path: '/users/:userUUID', name: 'userHome', component: () => import('pages/UserHome') },
           { path: '/signup' , name: 'signUp', component: () => import('pages/SignUp'),  meta:{signUpType: 'signup'}},
           { path: '/userProfile/:userUUID' , name: 'userProfile', component: () => import('pages/UserProfile') },
           { path: '/admin/userProfile/:userUUID' , name: 'userProfileAdmin', component: () => import('pages/UserProfileAdmin')},
@@ -16,12 +17,11 @@ export default [
           { path: '/signin' , name: 'signin', component: () => import('pages/SignUp'), meta:{signUpType: 'login'}},
           { path: '/userList', name: 'userList', component: () => import('pages/UserList') },
           { path: '/invalidsession', redirect: 'errors/440'},
-          { path: '/expiredsession', redirect: 'errors/440'},
-          { path: '/errors/:errorCode', name: 'errors', component: () => import('pages/Errors')},
+          { path: '/expiredsession', redirect: 'errors/440'},          
           { path: '*', redirect: 'errors/404'},
         ]
     },
-
+    { path: '/errors/:errorCode', name: 'errors', component: () => import('pages/Errors')},
     { // Always leave this as last one
       path: '*', redirect: 'errors/404'
     },

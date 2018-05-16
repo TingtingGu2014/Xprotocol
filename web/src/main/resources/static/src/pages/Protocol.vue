@@ -2,10 +2,9 @@
         <div style="width:90%; margin: auto; " ref="protocolDiv" id="protocolDiv">
             <div class="row">   
                 <div class="col-lg-6 col-md-12" v-if="showEditor">
-                    <div class="q-card " style="margin-top: 50px" v-bind:style="{ height: (Number(height)+350)+'px'}">
-                        <q-card-title style="font-family: Georgia, 'Times New Roman', Times, serif; ">
-                            <q-input v-model="title" placeholder="Add some text..."  />
-                          <!--<h4 class="card-header mb-3 text-center" style="font-weight: bolder; font-size: 15px; color: midnightblue">{{title}}</h4>-->                          
+                    <div class="q-card " style="margin: 80px 10px 0 10px; background-color: #278596;" v-bind:style="{ height: (Number(height)+350)+'px'}">
+                        <q-card-title style="font-family: Georgia, 'Times New Roman', Times, serif; color: #d5d9e0;">
+                            <q-input v-model="title" placeholder="Add some text..."  />                         
                         </q-card-title>
                         <q-card-separator />
                         <q-card-main>
@@ -29,8 +28,8 @@
                 </div>
 
                 <div class="col-md-12" v-bind:class="{ 'col-lg-6' :  showEditor }">
-                    <q-card style="margin-top: 50px" v-bind:style="{height: (Number(height)+350)+'px'}">
-                        <q-card-title style="font-family: Georgia, 'Times New Roman', Times, serif; ">
+                    <q-card style="margin: 80px 10px 0 10px; background-color: #278596;" v-bind:style="{height: (Number(height)+350)+'px'}" >
+                        <q-card-title style="font-family: Georgia, 'Times New Roman', Times, serif; color: #d5d9e0;">
                             {{title}}                          
                         </q-card-title>
                         <q-card-separator />
@@ -53,31 +52,37 @@
                         <legend>Protocol Associated Files</legend>
                         <div class="displayFileDiv">
                             <q-list highlight style="padding-left: 10%">
-                                <q-item v-if="!files || files.length == 0">There are no file associated with this protocol</q-item>
-                                <q-item dense highlight="false" v-else v-for="fileInfo in displayFiles" :key="fileInfo.currentName" style="margin: 0 4rem 2rem 0">
+                                <q-item v-if="!files || files.length == 0">There are no files associated with this protocol</q-item>
+                                <q-item dense 
+                                    highlight="false" 
+                                    v-else 
+                                    v-for="fileInfo in displayFiles" 
+                                    :key="fileInfo.currentName" 
+                                    style="margin: 0 4rem 2rem 0; color: #d5d9e0"
+                                >
                                     <q-item-side left>
                                         <img :src="fileInfo.currentName" class="responsive" alt="Protocol file without preview" width="40em">
                                     </q-item-side>
                                     <q-item-main>
-                                        <a :href="fileInfo.currentName + '?name='+fileInfo.originalName" target="_blank" class="form-link-wo-bg protocol-file-list-text">
-                                            <i class="fa fa-download" style="font-">&nbsp;&nbsp;<span>DOWNLOAD</span></i>
+                                        <a :href="fileInfo.currentName + '?name='+fileInfo.originalName" target="_blank" class="form-link-wo-bg protocol-file-list-link">
+                                        <i class="fa fa-download" style="font-">&nbsp;&nbsp;<span class="protocol-file-list-link-text">DOWNLOAD</span></i>
                                         </a>        
                                         &nbsp;&nbsp;&nbsp;&nbsp;
-                                        <a class="imgDelBtn form-link-wo-bg protocol-file-list-text" href="javascript:void(0)" 
+                                        <a class="imgDelBtn form-link-wo-bg protocol-file-list-link" href="javascript:void(0)" 
                                             :id="fileInfo.currentName" 
                                             :name="fileInfo.originalName" 
                                             @click.prevent="deleteProtocolFiles"
                                             v-if="isProtocolAuthor"
                                         >
-                                            <i class="fa fa-trash-o">&nbsp;&nbsp;<span>DELETE</span></i>
+                                            <i class="fa fa-trash-o">&nbsp;&nbsp;<span class="protocol-file-list-link-text">DELETE</span></i>
                                         </a>                                    
                                     </q-item-main>
                                 </q-item>
                             </q-list>
                         </div>
                         
-                        <div class="protocolUploadDiv" v-if="isProtocolAuthor">
-                            <form class="row">
+                        <div class="protocolUploadDiv row" style="padding-top: 1em" v-if="">
+                            <form class="col-5 "  style="margin: auto">
                                 <br>
                                 <q-field label="Select a file to upload:" class="col-md-8 col-sm-12" style="margin-top: 10px; margin-bottom: 10px;">
                                     <input type="file" id="uploadFileForProtocol" style="width: 100%;"/>                                    
@@ -272,6 +277,8 @@
                 
                 return true
             },
+        },
+        watch: {
         },
         methods: {
             saveEditor: function(event){
@@ -724,14 +731,14 @@
                 var userUUID = this.userUUID
                 
                 this.$utils.deleteComment(userUUID, commentUUID)
-                    .then((status) => {
-                        this.$q.notify({message: `Deleted the comment `+commentUUID, color: 'positive'})                        
-                    })
-                    .catch((err) => {
-                        this.$q.notify({message: `Deleting comment failed. Error:`+err.message, color: 'negative'})                        
-                        console.log(err)
-                    });
-                }
+                .then((status) => {
+                    this.$q.notify({message: `Deleted the comment `+commentUUID, color: 'positive'})                        
+                })
+                .catch((err) => {
+                    this.$q.notify({message: `Deleting comment failed. Error:`+err.message, color: 'negative'})                        
+                    console.log(err)
+                });
+            },                
         },
         components: {
             VueTinymce, ToggleTextarea,
@@ -807,10 +814,13 @@
     text-align: center;
 }
 
+.q-list {
+    color: #d5d9e0;
+}
+
 .layout-footer {
     height: 3em;
 }
-
 
 .protocolUpdt{
     margin-bottom: 15px;
@@ -873,7 +883,7 @@ div.protocolUploadDiv .q-field-label-inner {
 }
 
 .del-comment-btn {
-    border: 2px solid #2196f3; 
+    border: 2px solid lightgreen; 
     padding: 2px 10px 2px 10px;
     background-color: #2196f3; 
     color: white;
@@ -894,10 +904,14 @@ input[type="text"]
     font-size:.5em;
 }
 
-.protocol-file-list-text {
-    font-family: Arial, HelveticaNeueW01-45Ligh,HelveticaNeueW02-45Ligh,HelveticaNeueW10-45Ligh,sans-serif;
-    font-size: .75em;
-    color: #027be3;
+.protocol-file-list-link {
+    font-size: 1em;
+    color: #d5d9e0;
+}
+
+.protocol-file-list-link-text {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
 }
 
 a.form-link-wo-bg:hover{
@@ -908,5 +922,18 @@ a.form-link-wo-bg:hover{
 input[type="text"]
 {
     font-size:.5em;
+}
+
+input #addKeywordInput {
+    color: #d5d9e0;
+    font-size: .5em;
+}
+
+.badge-info {
+    color: #d5d9e0;
+}
+
+fieldset {
+    background-color: #278596;
 }
 </style>

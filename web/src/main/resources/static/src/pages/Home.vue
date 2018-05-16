@@ -66,6 +66,11 @@
             if(this.loggedIn === true) {
                 try{
                     let userInfo = JSON.parse(localStorage.userInfo)
+                    if(this.$utils.isEmpty(userInfo) || this.$utils.isEmpty(userInfo.userUUID)){
+                        this.$q.notify({message: `User session information has error!`, color: 'negative'})
+                        return false
+                    }
+                    
                     this.userUUID = userInfo.userUUID
                 }
                 catch(err) {

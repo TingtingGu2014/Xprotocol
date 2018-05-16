@@ -88,7 +88,6 @@
             
             if(this.$utils.isEmpty(userUUID)){
                 var message = 'User UUID cannot be empty!'
-                alert(message)
                 sessionStorage.errorMessage = message
                 document.location.href = '/errors/400'
                 return false
