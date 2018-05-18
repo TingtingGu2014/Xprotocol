@@ -200,19 +200,6 @@ form input {
     padding: 0 20px 0 20px;
 }
 
-::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
-    color: #d5d9e0;
-    opacity: 1; /* Firefox */
-}
-
-:-ms-input-placeholder { /* Internet Explorer 10-11 */
-    color: #d5d9e0;
-}
-
-::-ms-input-placeholder { /* Microsoft Edge */
-    color: #d5d9e0;
-}
-
 div.menu-list {
     position: absolute;        
     text-align: left;

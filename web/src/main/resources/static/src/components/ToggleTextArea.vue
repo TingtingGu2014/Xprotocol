@@ -171,7 +171,7 @@
     .display-p {
         white-space: pre-wrap;
 //        background: #e6f7ff;
-        color: #133913;
+//        color: #133913;
         font-family: Georgia, "Times New Roman", Times, serif;
         margin: 0 30px 0 30px;
         padding: 8px 8px 8px 8px;
@@ -186,7 +186,7 @@
         text-decoration: none;        
     }
     [id^="displayLink"]:hover {
-        color: #027be3;
+//        color: #027be3;
         font-weight: bold;
     }
 </style>

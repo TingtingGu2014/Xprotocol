@@ -50,7 +50,7 @@
                 <br><br>
                     <fieldset class="text-center" style="width:100%;">
                         <legend>Protocol Associated Files</legend>
-                        <div class="displayFileDiv">
+                        <div class="displayFileDiv" >
                             <q-list highlight style="padding-left: 10%">
                                 <q-item v-if="!files || files.length == 0">There are no files associated with this protocol</q-item>
                                 <q-item dense 
@@ -61,7 +61,7 @@
                                     style="margin: 0 4rem 2rem 0; color: #d5d9e0"
                                 >
                                     <q-item-side left>
-                                        <img :src="fileInfo.currentName" class="responsive" alt="Protocol file without preview" width="40em">
+                                        <img :src="fileInfo.currentName" class="responsive" alt="No preview" width="40em">
                                     </q-item-side>
                                     <q-item-main>
                                         <a :href="fileInfo.currentName + '?name='+fileInfo.originalName" target="_blank" class="form-link-wo-bg protocol-file-list-link">
@@ -82,7 +82,14 @@
                         </div>
                         
                         <div class="protocolUploadDiv row" style="padding-top: 1em" v-if="">
-                            <form class="col-5 "  style="margin: auto">
+                        <uploader 
+                            :name="protocolUploader" 
+                            :url="protocolFileUploadUrl" 
+                            :isMultiple=true
+                            :headers="{ 'X-XSRF-TOKEN' :  getCsrfCookie }"
+                            @uploadFileDone="updateProtocolAfterFileUpload"
+                        ></uploader>
+<!--                            <form class="col-5 "  style="margin: auto">
                                 <br>
                                 <q-field label="Select a file to upload:" class="col-md-8 col-sm-12" style="margin-top: 10px; margin-bottom: 10px;">
                                     <input type="file" id="uploadFileForProtocol" style="width: 100%;"/>                                    
@@ -90,7 +97,7 @@
                                 <q-field class="col col-sm-12">
                                     <q-btn color="blue" size="sm" align="left" icon="fa-upload" @click.prevent="uploadProtocolFile">&nbsp;&nbsp;Add File</q-btn>
                                 </q-field>
-                            </form>
+                            </form>-->
                         </div>
                     </fieldset>
                 </div>
@@ -123,7 +130,7 @@
                                 <br>
                                 <div class="row" style="font-size:2rem;width:50%;margin: auto">
                                     <div class="col-8">
-                                        <q-input type="text" class="" id="addKeywordInput" v-model="newKeyword" placeholder="Type new keyword here:" />
+                                        <input type="text" id="addKeywordInput" v-model="newKeyword"placeholder="Type new keyword here:" />
                                     </div>
                                     <div class="col">
                                         <q-btn class="" color="blue" size="sm" icon="fa-key" @click.prevent="addKeyword">&nbsp;&nbsp;Add Keyword</q-btn>   
@@ -193,7 +200,8 @@
 <script>
     import {QCard, QCardTitle, QCardSeparator, QCardMain, QTooltip} from 'quasar'
     import ToggleTextarea from 'components/ToggleTextArea.vue'
-    import VueTinymce from './Editor.vue'
+    import VueTinymce from 'components/Editor.vue'
+    import Uploader from 'components/Uploader.vue'
     import { mapGetters, mapMutations } from 'vuex'
     
     var FileUtils = require('../utils/FileUtils')
@@ -235,23 +243,16 @@
                 if(!this.$utils.isEmpty(files)){
                     for(var i = 0; i < files.length; i++){
                         var fileArr = files[i].split('____')
-                        var originalName = fileArr[1]
+                        var originalName = fileArr[1].replace(/_wsws_/g, ' ')
                         var currentName = fileArr[0]
-                        var fileRowHtml = '<span>' + originalName + '</span>'
-                        var originalNameArr = originalName.split('.')
-                        var fileExtension = ''
-                        if(originalNameArr.length === 2){
-                            fileExtension = originalNameArr[1].toLowerCase()
-                            if(this.$utils.isEmpty(fileExtension)){
-                                fileExtension = 'none'
-                            }
-                            let fileInfo = new Object()
-                            fileInfo.currentName = currentName
-                            fileInfo.originalName = originalName
-                            fileInfo.extension = fileExtension
-                                               
-                            fileHtmls.push(fileInfo)
-                        }
+                        var fileRowHtml = '<span>' + originalName + '</span>'                        
+                        var fileExtension = originalName.split('.').pop()
+                        let fileInfo = new Object()
+                        fileInfo.currentName = currentName
+                        fileInfo.originalName = originalName
+                        fileInfo.extension = fileExtension
+
+                        fileHtmls.push(fileInfo)
                     }
                 }
                 return fileHtmls
@@ -277,6 +278,12 @@
                 
                 return true
             },
+            protocolFileUploadUrl: function(){
+                return '/api/users/'+this.userUUID+'/protocols/'+this.userProtocolUUID+'/files'
+            },
+            getCsrfCookie: function(){
+                return this.$utils.readCookie('XSRF-TOKEN')
+            }
         },
         watch: {
         },
@@ -435,7 +442,44 @@
                 }
                 
             },
+//            uploadFileDone: function(file, xhr){
+//                console.log('*** file upload done ***')
+//                console.log(file)
+//                console.log(xhr.getResponseHeader("timeVal"))
+                
+            //},
+            updateProtocolAfterFileUpload: function(file, xhr){
+                if(xhr.status != 200){
+                    return xhr.getResponseHeader("newName")
+                }
+                var originalName = xhr.getResponseHeader("originalName")
+                var newName = xhr.getResponseHeader("newName")         
+                let data = JSON.parse(xhr.responseText)
+                let newFileVal = data['location'] + '____' + originalName   
+                if(this.$utils.isEmpty(this.files)){
+                    this.files = []
+                }
+                this.files.push(newFileVal)
+
+                // Update protocol in the storage:
+                var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.protocolUserUUID, this.userProtocolUUID)
+                if(this.$utils.isEmpty(protocol.files)){
+                    protocol.files = []
+                }
+
+                this.$utils.saveUserProtocol(protocol)
+                .then((data) => {
+                    this.setProtocolByUserUUIDANDProtocolUUID(protocol)
+                    console.log(data)                    
+                })
+                .catch((err) => {                            
+                    this.$q.notify({message: `Cannot save the protocol after uploading the file, error: `+err.message, color: 'negative'})
+                    console.log(err)
+                });
+                this.$q.notify({message: 'File ' + originalName + ' has been successfully uploaded!', color: 'positive', timeout: 3000})   
+            },
             deleteProtocolFiles: function(event){
+                var vm = this
                 var del = confirm('Are you sure to delete this file?')
                 if(del == false){
                     return event.preventDefault()
@@ -449,35 +493,41 @@
                     }
                 }
                 var location = target.id
-                var fileName = target.name
+                var originalName = target.name
                 
                 FileUtils.deleteProtocolFile(location)
-                .then((data) => {
-                    console.log(data) 
-                    if(data.toString() == '200'){
-                        this.files = this.$utils.removeArrayElementByValue(this.files, location+'____'+fileName)
-                        var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.protocolUserUUID, this.userProtocolUUID)
-                        protocol.files = this.files
+                .then((response) => {
+                    let status = response.status
+                    let customizedStatus = parseInt(response.data.status)
+                    if(vm.$utils.isEmpty(status)){
+                        throw error("Cannot get status code from response!")
+                    }
+                    if(customizedStatus >= 550){
+                        vm.$q.notify({message: `Deleting protocol file not working:`+response.data.message, color: 'negative'})
+                    }
+                    if(status == '200' || customizedStatus >= 550){
+                        let fileName = originalName.replace(/\s/g, '_wsws_')
+                        let files = vm.files
+                        if(!vm.$utils.isEmpty(files) && files.length > 0){
+                            files = vm.$utils.removeArrayElementByValue(files, location+'____'+fileName)
+                        }
+                        var protocol = vm.getProtocolsByUserUUIDANDProtocolUUID(vm.protocolUserUUID, vm.userProtocolUUID)
+                        protocol.files = files
+                        vm.files = files
                         
-                        this.$utils.saveUserProtocol(protocol)
+                        vm.$utils.saveUserProtocol(protocol)
                         .then((data) => {
-                            console.log(data) 
-                            if(!this.$utils.isEmpty(data.status) && data.status.toString() === '200'){
-                                this.$q.notify({message: `Deleting file '+fileName+' succeed!`+err.toString(), color: 'positive', timeout: 3000})
-                            }
-                            else{
-                                this.$q.notify({message: `Deleting file `+fileName+' failed with response status: '+data.status.toString(), color: 'negative'})                                
-                            }
+                            vm.$q.notify({message: `Deleting file: `+originalName+` succeed!`, color: 'positive', timeout: 3000})
                         })
                         .catch((err) => {
-                            this.$q.notify({message: `Deleting protocol file failed! `+err.message, color: 'negative'})
-                            console.log(err)
+                            vm.$q.notify({message: `Deleting protocol file failed! `+err.message, color: 'negative'})
+                            console.log(error.response)
                         });
                     }
                 })
-                .catch((err) => {                    
-                    this.$q.notify({message: `Deleting protocol file not working!`+err.message, color: 'negative'})
-                    console.log(err)
+                .catch((error) => {                    
+                    vm.$q.notify({message: `Deleting protocol file not working!`+err.message, color: 'negative'})
+                    console.log(error.response)
                 });
                 return false
             },
@@ -738,10 +788,11 @@
                     this.$q.notify({message: `Deleting comment failed. Error:`+err.message, color: 'negative'})                        
                     console.log(err)
                 });
-            },                
+            },   
+            
         },
         components: {
-            VueTinymce, ToggleTextarea,
+            VueTinymce, ToggleTextarea, Uploader,
             QCard, QCardTitle, QCardSeparator, QCardMain, QTooltip
         },
         created: function() {
@@ -875,7 +926,7 @@ div.protocolUploadDiv .q-field-label-inner {
 .commentBody {
     white-space: pre-wrap;
     background: #e6f7ff;
-    color: #133913;
+    color: #d5d9e0;
     font-family: Georgia, "Times New Roman", Times, serif;
     margin: 0 40px 0 40px;
     padding: 8px 8px 8px 8px;
@@ -935,5 +986,25 @@ input #addKeywordInput {
 
 fieldset {
     background-color: #278596;
+}
+
+.display-p {
+    color: #d5d9e0 !important;
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: #d5d9e0;
+    font-size: 1em;
+    opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: #d5d9e0;
+    font-size: 1em;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+    color: #d5d9e0;
+    font-size: 1em;
 }
 </style>

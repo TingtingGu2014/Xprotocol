@@ -71,6 +71,7 @@ public class XprotocolWebUtils {
     
     public static String getProtocolFilePath(String editorUploadDirPath, String userUUID, String userProtocolUUID, String fileBaseName) throws IOException{
         String path = null;
+        
         File upldDirFile = new File(editorUploadDirPath + File.separator + userUUID + File.separator + userProtocolUUID);
         if(!upldDirFile.isDirectory()){
             throw new IOException("The editor file upload directory is wrong: "+editorUploadDirPath+"/"+userUUID+"/"+userProtocolUUID);
@@ -83,6 +84,9 @@ public class XprotocolWebUtils {
         
         // If cannot find, try the temp file folder
         File tempUpldDirFile = new File(editorUploadDirPath + File.separator + userUUID + File.separator + userProtocolUUID + File.separator + "temp");
+        if(!tempUpldDirFile.exists()){
+            tempUpldDirFile.mkdirs();
+        }
         if(!tempUpldDirFile.isDirectory()){
             throw new IOException("The editor file upload directory is wrong: "+editorUploadDirPath+"/"+userUUID+"/"+userProtocolUUID+"/temp");
         }
