@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-export const imageExtensions = ['bmp','tif','tiff','gif','jpeg','jpg','jif','jfif','jp2','jpx','j2k','j2c','pcd','png','pdf']
+export const IMAGE_EXTENSIONS = ['bmp','tif','tiff','gif','jpeg','jpg','jif','jfif','jp2','jpx','j2k','j2c','pcd','png','pdf']
 
 export function isEmpty(obj){
     if(obj === null || typeof obj === 'undefined' || obj === ''){

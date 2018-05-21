@@ -1,5 +1,7 @@
 import axios from 'axios'
-import { Alert, Toast } from 'quasar'
+
+export const MAXIMUM_PROTOCOL_FILE_NUMBER = 3
+export const MAXIMUM_PROTOCOL_FILE_SIZE = 25
 
 export function deleteProtocolFile(location){
     return axios({

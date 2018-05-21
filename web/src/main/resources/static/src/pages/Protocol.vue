@@ -51,8 +51,8 @@
                     <fieldset class="text-center" style="width:100%;">
                         <legend>Protocol Associated Files</legend>
                         <div class="displayFileDiv" >
-                            <q-list highlight style="padding-left: 10%">
-                                <q-item v-if="!files || files.length == 0">There are no files associated with this protocol</q-item>
+                            <q-list highlight class="row">
+                                <q-item v-if="!files || files.length == 0" style="margin:auto">There are no files associated with this protocol</q-item>
                                 <q-item dense 
                                     highlight="false" 
                                     v-else 
@@ -82,22 +82,18 @@
                         </div>
                         
                         <div class="protocolUploadDiv row" style="padding-top: 1em" v-if="">
-                        <uploader 
-                            :name="protocolUploader" 
-                            :url="protocolFileUploadUrl" 
-                            :isMultiple=true
-                            :headers="{ 'X-XSRF-TOKEN' :  getCsrfCookie }"
-                            @uploadFileDone="updateProtocolAfterFileUpload"
-                        ></uploader>
-<!--                            <form class="col-5 "  style="margin: auto">
-                                <br>
-                                <q-field label="Select a file to upload:" class="col-md-8 col-sm-12" style="margin-top: 10px; margin-bottom: 10px;">
-                                    <input type="file" id="uploadFileForProtocol" style="width: 100%;"/>                                    
-                                </q-field>
-                                <q-field class="col col-sm-12">
-                                    <q-btn color="blue" size="sm" align="left" icon="fa-upload" @click.prevent="uploadProtocolFile">&nbsp;&nbsp;Add File</q-btn>
-                                </q-field>
-                            </form>-->
+                            <uploader 
+                                ref="uploader"
+                                :name="'protocolUploader'" 
+                                :url="protocolFileUploadUrl" 
+                                :fileSizeLimit="getFileSizeLimit"
+                                :fileCountLimit="fileCountLimit"
+                                :isMultiple=true
+                                :isDisabled="fileCountLimit <= 0"
+                                :headers="{ 'X-XSRF-TOKEN' :  getCsrfCookie }"
+                                @uploadFileDone="updateProtocolAfterFileUpload"
+                                style="margin:auto"
+                            ></uploader>
                         </div>
                     </fieldset>
                 </div>
@@ -205,6 +201,7 @@
     import { mapGetters, mapMutations } from 'vuex'
     
     var FileUtils = require('../utils/FileUtils')
+    var ProtocolUtils = require('../utils/ProtocolUtils')
     var userInfo = JSON.parse(localStorage.userInfo)
     var userUUID = !userInfo ? '' : userInfo.userUUID
     
@@ -283,7 +280,17 @@
             },
             getCsrfCookie: function(){
                 return this.$utils.readCookie('XSRF-TOKEN')
-            }
+            },
+            fileCountLimit: function(){
+                let length = 0
+                if(!this.$utils.isEmpty(this.files)){
+                    length = this.files.length
+                }
+                return ProtocolUtils.MAXIMUM_PROTOCOL_FILE_NUMBER - length
+            },
+            getFileSizeLimit: function(){
+                return ProtocolUtils.MAXIMUM_PROTOCOL_FILE_SIZE
+            },
         },
         watch: {
         },
@@ -391,63 +398,7 @@
                 }
                 return fileKeyArr[1]
             },
-            uploadProtocolFile: function(event){
-                var url = '/api/users/' + this.protocolUserUUID + '/protocols/' + this.userProtocolUUID + '/files'
-                var fileInput = document.getElementById('uploadFileForProtocol')
-                if(this.$utils.isEmpty(fileInput)){                    
-                    this.$q.notify({message: `Cannot get the file input field!`, color: 'negative', timeout: 3000})
-                    return false
-                } 
-                var files = fileInput['files']
-                if(this.$utils.isEmpty(files)){                    
-                    this.$q.notify({message: `No files selected!`, color: 'negative', timeout: 3000})
-                    return false
-                }
-                var file = files[0]
-                var protocolFiles = this.files
-                if (this.$utils.isEmpty(file)) {                    
-                    this.$q.notify({message: `No files selected!`, color: 'negative', timeout: 3000 })
-                    return false
-                } else {
-                    var originalName = file.name
-                    var newName = 'blobid' + (new Date()).getTime() + '.' + file.name.split('.').pop()                
-                    this.$utils.uploadFile(url, file, newName)
-                    .then((data) => {
-                        
-                        let newFileVal = data['location'] + '____' + originalName
-                        protocolFiles.push(newFileVal)
-                
-                        // Update protocol in the storage:
-                        var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.protocolUserUUID, this.userProtocolUUID)
-                        if(this.$utils.isEmpty(protocol.files)){
-                            protocol.files = []
-                        }
-                        protocol.files.push(newFileVal)
-
-                        this.$utils.saveUserProtocol(protocol)
-                        .then((data) => {
-                            this.setProtocolByUserUUIDANDProtocolUUID(protocol)
-                            console.log(data)                    
-                        })
-                        .catch((err) => {                            
-                            this.$q.notify({message: `Cannot upload the file, error: `+err.message, color: 'negative'})
-                            console.log(err)
-                        });
-                        this.$q.notify({message: 'File ' + originalName + ' has been successfully uploaded!', color: 'positive', timeout: 3000})                        
-                    })
-                    .catch((err) => {                        
-                        this.$q.notify({message: 'File loading is wrong with error:'+err.message, color: 'negative', timeout: 3000})                        
-                        console.log(err)
-                    });
-                }
-                
-            },
-//            uploadFileDone: function(file, xhr){
-//                console.log('*** file upload done ***')
-//                console.log(file)
-//                console.log(xhr.getResponseHeader("timeVal"))
-                
-            //},
+            
             updateProtocolAfterFileUpload: function(file, xhr){
                 if(xhr.status != 200){
                     return xhr.getResponseHeader("newName")
@@ -459,13 +410,13 @@
                 if(this.$utils.isEmpty(this.files)){
                     this.files = []
                 }
-                this.files.push(newFileVal)
 
                 // Update protocol in the storage:
                 var protocol = this.getProtocolsByUserUUIDANDProtocolUUID(this.protocolUserUUID, this.userProtocolUUID)
                 if(this.$utils.isEmpty(protocol.files)){
                     protocol.files = []
                 }
+                protocol.files.push(newFileVal)
 
                 this.$utils.saveUserProtocol(protocol)
                 .then((data) => {
