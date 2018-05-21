@@ -57,8 +57,9 @@
                                     highlight="false" 
                                     v-else 
                                     v-for="fileInfo in displayFiles" 
+                                    class="col-5"
                                     :key="fileInfo.currentName" 
-                                    style="margin: 0 4rem 2rem 0; color: #d5d9e0"
+                                    style="margin: .5em 4rem 2rem 1em; color: #d5d9e0"
                                 >
                                     <q-item-side left>
                                         <img :src="fileInfo.currentName" class="responsive" alt="No preview" width="40em">
@@ -106,7 +107,7 @@
                         <div class="row" v-if="keywords && keywords.length > 0">
    
                             <span  class="col-md-4 col-lg-3 col-sm-6 text-left" v-for="(keyword, index) in keywords" >
-                                <span style="font-size:1rem; " >
+                                <span style="font-size:1rem; color: #d5d9e0;" >
                                     {{index+1}}.&nbsp;{{keyword}}
                                 </span>
                                 <a v-bind:id="keyword" href="#" v-if="isProtocolAuthor" v-on:click.prevent="removeKeyword" class="form-link-wo-bg">
@@ -125,7 +126,7 @@
                                 
                                 <br>
                                 <div class="row" style="font-size:2rem;width:50%;margin: auto">
-                                    <div class="col-8">
+                                    <div class="col-7">
                                         <input type="text" id="addKeywordInput" v-model="newKeyword"placeholder="Type new keyword here:" />
                                     </div>
                                     <div class="col">
@@ -917,7 +918,7 @@ input[type="text"]
 }
 
 a.form-link-wo-bg:hover{
-    color: #027be3;
+    color: #90ee90;
     font-weight: bold;
 }
 
@@ -937,10 +938,6 @@ input #addKeywordInput {
 
 fieldset {
     background-color: #278596;
-}
-
-.display-p {
-    color: #d5d9e0 !important;
 }
 
 ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */

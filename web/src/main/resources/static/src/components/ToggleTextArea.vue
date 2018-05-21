@@ -176,6 +176,7 @@
         margin: 0 30px 0 30px;
         padding: 8px 8px 8px 8px;
         over-flow: auto;
+        color: white;
     }
     .textarea-class {
         border-bottom: 1px solid #b4e1f7;
