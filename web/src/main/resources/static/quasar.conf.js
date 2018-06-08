@@ -36,7 +36,7 @@ module.exports = function (ctx) {
     },
     devServer: {
       // https: true,
-      port: 7070,
+      port: ctx.mode.cordova ? 4566 : 7070,
       open: true // opens browser window automatically
     },
     // framework: 'all' --- includes everything; for dev only!

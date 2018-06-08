@@ -1,6 +1,5 @@
-import axios from 'axios'
 
-export const IMAGE_EXTENSIONS = ['bmp','tif','tiff','gif','jpeg','jpg','jif','jfif','jp2','jpx','j2k','j2c','pcd','png','pdf']
+import {axiosInstance} from './AxiosConfig'
 
 export function isEmpty(obj){
     if(obj === null || typeof obj === 'undefined' || obj === ''){
@@ -63,7 +62,7 @@ export function getUserDetails(userUUID, isAdmin = false) {
     else{
         url = '/api/users/'+userUUID+'/userDetails'
     }
-    return axios({
+    return axiosInstance.axios({
         method: 'get',
         dataType: 'json',
         url: url,
@@ -83,7 +82,7 @@ export function getUserDetails(userUUID, isAdmin = false) {
 }
 
 export function getUserListByAdmin(){
-    return axios({
+    return axiosInstance.axios({
         method: 'get',
         url: '/api/admin/users',
         dataType: 'json',
@@ -161,7 +160,7 @@ export function getUserName(){
 }
 
 export function signUp(data) {
-    return axios({
+    return axiosInstance.axios({
         method: 'POST',
         url: '/api/signUp',
         dataType: 'json',
@@ -190,16 +189,17 @@ export function signUp(data) {
 }
 
 export function signIn(email, password) {
-    return axios({
-        method: 'post',
-        url: '/api/signIn',
-        dataType: 'json',
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
-        auth: {
-            username: email,
-            password: password,
-        },
-    })
+    console.log(axiosInstance)
+    return axiosInstance.post(
+        '/api/signIn',
+        {},
+        {
+            auth: {
+                username: email,
+                password: password,
+            },
+        }
+    )
     .then( (response) => {
         var status = response.status;
         if(status == 200 || status == "200"){
@@ -218,8 +218,7 @@ export function signIn(email, password) {
 }
 
 export function signOut() {
-    return axios({
-        method: 'post',
+    return axiosInstance.post({
         url: '/api/logout',
         dataType: 'json',
     })
@@ -330,8 +329,7 @@ export function getArraydifferences(strArr1, strArr2){
 }
 
 export function getAllUserRoles() {
-    return axios({
-        method: 'get',
+    return axiosInstance.get({
         url: '/api/admin/roles',
         dataType: 'json',
         headers: {'X-Requested-With': 'XMLHttpRequest'},
@@ -373,8 +371,7 @@ export function getUserProtocol(userUUID, userProtocolUUID){
         url = '/api/users/' + userUUID +'/protocols/'+userProtocolUUID
     }
     
-    return axios({
-        method: 'get',
+    return axiosInstance.get({
         url: url,
         dataType: 'json',
         headers: {'X-Requested-With': 'XMLHttpRequest'},
@@ -432,8 +429,7 @@ export function saveUserProtocol(protocol){
         url = '/api/users/' + userUUID +'/protocols/'+userProtocolUUID
     }
     
-    return axios({
-        method: 'post',
+    return axiosInstance.axios({
         url: url,
         dataType: 'json',
         data: protocol,
@@ -491,7 +487,7 @@ export function saveComment(comment){
         url = '/api/users/' + userUUID +'/comments/'+commentUUID
     }
     
-    return axios({
+    return axiosInstance.axios({
         method: 'post',
         url: url,
         dataType: 'json',
@@ -537,7 +533,7 @@ export function deleteComment(userUUID, commentUUID){
         url = '/api/users/' + userUUID +'/comments/'+commentUUID
     }
     
-    return axios({
+    return axiosInstance.axios({
         method: 'delete',
         url: url,
         dataType: 'json',
@@ -565,7 +561,7 @@ export function getProtocolsByUserUUID(userUUID){
         return false
     }
     
-    return axios({
+    return axiosInstance.axios({
         method: 'get',
         url: '/api/users/'+userUUID+'/protocols',
         dataType: 'json',
@@ -591,7 +587,7 @@ export function getCommentsByUserUUID(userUUID){
         return false
     }
     
-    return axios({
+    return axiosInstance.axios({
         method: 'get',
         url: '/api/users/'+userUUID+'/comments',
         dataType: 'json',

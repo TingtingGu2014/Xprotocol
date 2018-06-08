@@ -1,6 +1,6 @@
 {
-  "name": "quasar-app",
-  "productName": "Quasar App",
+  "name": "xprotocol-test-app-1.0",
+  "productName": "XProtocolTestApp1.0",
   "version": "1.0.0",
   "private": true,
   "cordovaId": "com.xprotocol.quasar.app",
