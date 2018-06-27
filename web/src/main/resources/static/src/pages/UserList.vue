@@ -45,9 +45,10 @@
             }
         },
         beforeCreate: function(){
-            var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
+            var loggedIn = localStorage.loggedIn == "true"
             if(loggedIn != true){
                 this.$router.push('/login')
+                return false
             }
 
             var isAdminUser = this.$utils.isAdminUser();
@@ -56,7 +57,7 @@
             }
         },
         beforeMount: function(){
-            this.$utils.getUserListByAdmin()
+            this.$userUtils.getUserListByAdmin()
             .then((data) => {
                 if(data){
                     for(var i in data) {
@@ -71,9 +72,9 @@
                     this.tableData = data
                 }                    
             })
-            .catch((err) => {
-                Alert.create({html: 'oops, something happened during pulling out the user list!'})
+            .catch((err) => {                
                 console.log(err)
+                this.$q.notify({message: "Cannot load the user list. Error: "+err.message, duration: 3000, color: "negative"})
             });
         },
         components: {

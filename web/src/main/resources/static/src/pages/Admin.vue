@@ -28,10 +28,10 @@
 
         },
         beforeCreate: function(){
-            var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
-            loggedIn = true
+            var loggedIn = localStorage.loggedIn == "true"
             if(loggedIn != true){
                 this.$router.push({path: '/login'})
+                return false
             }
 
             var isAdminUser = this.$utils.isAdminUser();

@@ -135,7 +135,7 @@
                     event.preventDefault()
                 }
                 
-                this.$utils.signIn(this.emaillogin, this.passwordlogin)                
+                this.$userUtils.signIn(this.emaillogin, this.passwordlogin)                
                 .then((data) => {
                     if(data){
                         EventBus.$emit('session-change', 'signIn');
@@ -153,7 +153,7 @@
                     event.preventDefault()
                 }
                 
-                this.$utils.signOut()
+                this.$userUtils.signOut()
                 .then((data) => {
                     if(data){                            
                         EventBus.$emit('session-change', 'signOut');
@@ -182,14 +182,17 @@
             }
         },
         created: function(){
-            let loggedIn = this.$utils.readCookie('loggedIn')
-            this.loggedIn = loggedIn == 'true' ? true : false
+            if(localStorage.loggedIn == "true"){
+                this.loggedIn = true
+            }
             if(this.loggedIn !== true){
+                console.log("\n *** Not logged in ***\n")
                 localStorage.userInfo = null
                 localStorage.protocolListCount = null
                 this.userInfo = null
             }
             else {
+                console.log("\n *** User has logged in ***\n")
                 try{
                     if(!this.$utils.isEmpty(localStorage.userInfo)){
                         this.userInfo = JSON.parse(localStorage.userInfo)

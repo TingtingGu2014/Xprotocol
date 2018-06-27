@@ -1,5 +1,7 @@
 
-import {axiosInstance} from './AxiosConfig'
+import axios from 'axios'
+import { Notify } from 'quasar'
+import {SERVER_IP, SERVER_PORT} from './Constants'
 
 export function isEmpty(obj){
     if(obj === null || typeof obj === 'undefined' || obj === ''){
@@ -29,89 +31,95 @@ export function removeArrayElementByValue(array, element) {
 }
 
 // The following three functions are from https://scotch.io/tutorials/easily-create-read-and-erase-cookies-with-jquery 
-export function createCookie(name,value,days) {
+export function createCookie(name,value,days) {    
     if (days) {
         var date = new Date();
         date.setTime(date.getTime()+(days*24*60*60*1000));
         var expires = "; expires="+date.toGMTString();
     }
     else var expires = "";
-    document.cookie = name+"="+value+expires+"; path=/";
+    var cookies = document.cookie;
+    if(isEmpty(cookies)){
+        cookieMaster.setCookieValue(SERVER_IP+':'+SERVER_PORT, name, value,
+        function() {
+            Notify.create({message: `Cookie created!`, timeout: 3000, color: 'positive'})
+        },
+        function(error) {
+            Notify.create({message: `Error created!`, timeout: 3000, color: 'negative'})
+        })
+    }
+    else{
+        document.cookie = name+"="+value+expires+"; path=/";
+    }    
 }
 
 export function readCookie(name) {
+    let cookies = document.cookie
+    if(isEmpty(cookies)){
+        return getCookieFromMaster(name)
+        .then((data) => {
+            if(isEmpty(data) || isEmpty(data.cookieValue)){
+                return false
+            }
+            else{
+                return data.cookieValue
+            }
+        })
+        .catch((error) => {
+            console.log('error: ' + error)
+            return false
+        })
+    }
+    else{
+        return getCookieFromDocument(name)
+                .then((data) => {
+                    return data
+                })
+                .catch((error) => {
+                    console.log('error: ' + error)
+                    return null
+                })
+    }
+}
+
+export function getCookieFromDocument(name){
+    var cookie = null
     var nameEQ = name + "=";
     var ca = document.cookie.split(';');
     for(var i=0;i < ca.length;i++) {
         var c = ca[i];
         while (c.charAt(0)==' ') c = c.substring(1,c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        if (c.indexOf(nameEQ) == 0){
+            cookie = c.substring(nameEQ.length,c.length)
+        }
     }
-    return null;
+    return Promise.resolve(cookie);
+}
+
+export function getCookieFromMaster(name){
+    return new Promise((resolve, reject) => {
+        cookieMaster.getCookieValue(SERVER_IP+':'+SERVER_PORT, name, function(data) {
+            resolve(data);
+        },
+        (error) => {
+            reject(error);
+        })
+    });
 }
 
 export function eraseCookie(name) {
     createCookie(name,"",-1);
 }
 
-export function getUserDetails(userUUID, isAdmin = false) {
-    let url = ''
-    if(isAdmin === true){
-        url = '/api/admin/users/'+userUUID+'/userDetails'
-    }
-    else{
-        url = '/api/users/'+userUUID+'/userDetails'
-    }
-    return axiosInstance.axios({
-        method: 'get',
-        dataType: 'json',
-        url: url,
-    }).then( (response) => {
-        if(response.status === 200){
-            return response.data;
-        }
-        else{
-            this.$q.notify({message: `Something is wrong in pulling user profile.`, timeout: 3000})
-            return null
-        }     
-    })
-    .catch(function (error) {
-        this.$q.notify({message: error.message, timeout: 3000})
-        console.log(error);
-    });
-}
-
-export function getUserListByAdmin(){
-    return axiosInstance.axios({
-        method: 'get',
-        url: '/api/admin/users',
-        dataType: 'json',
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
-    })
-    .then( (response) => {
-        var status = response.status;
-        var data = response.data
-        if(status == 200 || status == "200"){
-            return data
-        }
-        else{
-            this.$q.notify("not 200");
-        }                                   
-    })
-    .catch( (error) => {
-        console.log(error);
-    });  
-}
-
 export function updateUserDetails(userUUID, profile, isAdmin = false){
     
     if(isEmpty(userUUID)){
-        this.$q.notify({message: 'User UUID cannot be empty!'})
+        Notify.create({message: `User UUID cannot be empty!!`, timeout: 3000, color: 'negative'})
         return null
     }
     
     if(isEmpty(profile)){
-        this.$q.notify({message: 'User profile data cannot be empty!'})
+        Notify.create({message: `User profile data cannot be empty!!`, timeout: 3000, color: 'negative'})
         return null
     }
     
@@ -125,14 +133,14 @@ export function updateUserDetails(userUUID, profile, isAdmin = false){
         
     return axios.post(url, profile)
     .then( (response) => {
-        if(response.status === 200){
-            this.$q.notify({message: 'Your profile information has been updated!', timeout: 3000})
+        if(response.status === 200){            
+            Notify({message: 'Your profile information has been updated!', timeout: 3000, color: 'negative'})
             return response.data
         }
 
     })
-    .catch(function (error) {
-        this.$q.notify({message: 'Your profile is NOT updated, sorry!', timeout: 3000})
+    .catch(function (error) {        
+        Notify({message: 'Your profile is NOT updated, sorry!', timeout: 3000, color: 'negative'})
         console.log(error);
     });
 }
@@ -157,98 +165,6 @@ export function getUserName(){
         userName = userInfo.email
     }
     return userName
-}
-
-export function signUp(data) {
-    return axiosInstance.axios({
-        method: 'POST',
-        url: '/api/signUp',
-        dataType: 'json',
-        data: data,
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-        },
-    })
-    .then( (response) => {
-        var status = response.status;
-        var responseData = response.data;
-
-        if(status == 200){
-            localStorage.userInfo = JSON.stringify(responseData) 
-            return responseData
-        }
-        else{
-            this.$q.notify({message: "Error status : " + status + "\nError message: "+response.message, druation: 3000})
-            return false;
-        }                                   
-      })
-      .catch( (error) => {
-            this.$q.notify({message: error.message, druation: 3000})
-            console.log(error);
-      });     
-}
-
-export function signIn(email, password) {
-    console.log(axiosInstance)
-    return axiosInstance.post(
-        '/api/signIn',
-        {},
-        {
-            auth: {
-                username: email,
-                password: password,
-            },
-        }
-    )
-    .then( (response) => {
-        var status = response.status;
-        if(status == 200 || status == "200"){
-            var data = response.data
-            localStorage.userInfo = JSON.stringify(data) 
-            return data
-        }
-        else{
-            this.$q.notify("not 200");
-            return;
-        }                                   
-    })
-    .catch( (error) => {
-        console.log(error);
-    });      
-}
-
-export function signOut() {
-    return axiosInstance.post({
-        url: '/api/logout',
-        dataType: 'json',
-    })
-    .then( (response) => {
-        var status = response.status;
-        var data = response.data;
-
-        if(status == 200 || status == 204){
-            localStorage.userEmail = ''
-            localStorage.userName = ''
-            localStorage.userUUID = ''
-            localStorage.userInfo = ''
-            var loggedIn = readCookie('loggedIn')
-            if(loggedIn == 'true'){
-                eraseCookie('loggedIn')
-            }
-            this.loggedIn = false
-            this.userEmail = ''
-            this.userAlias = ''
-            this.userUUID = ''
-            document.location.href = '/home'
-            return data
-        }
-        else{
-            this.$q.notify("not 200 "+status);
-        }                                   
-      })
-      .catch( (error) => {
-        console.log(error);
-      });
 }
 
 export function isAdminUser () {
@@ -328,38 +244,10 @@ export function getArraydifferences(strArr1, strArr2){
     return res1
 }
 
-export function getAllUserRoles() {
-    return axiosInstance.get({
-        url: '/api/admin/roles',
-        dataType: 'json',
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
-    })
-    .then( (response) => {
-        var status = response.status;
-        if(status == 200 || status == "200"){  
-            var roleNames = ''
-            var roles = response.data
-            for(var i = 0; i < roles.length; i++){
-                if(roles[i].hasOwnProperty("roleName")){
-                    roleNames += roles[i].roleName + ","
-                }
-            }
-            roleNames = roleNames.substr(0,roleNames.length-1)
-            return roleNames
-        }
-        else{
-            this.$q.notify("status " + status + ", cannot get the roles!");
-        }                                   
-    })
-    .catch( (error) => {
-        console.log(error);
-    }); 
-}
-
 export function getUserProtocol(userUUID, userProtocolUUID){
     
     if(isEmpty(userProtocolUUID)){
-        this.$q.notify('The protocol UUID is empty!')
+        Notify.create({message: `Protocol UUID cannot be empty!!`, timeout: 3000, color: 'negative'})
         return false
     }
     
@@ -371,7 +259,7 @@ export function getUserProtocol(userUUID, userProtocolUUID){
         url = '/api/users/' + userUUID +'/protocols/'+userProtocolUUID
     }
     
-    return axiosInstance.get({
+    return axios.get({
         url: url,
         dataType: 'json',
         headers: {'X-Requested-With': 'XMLHttpRequest'},
@@ -382,7 +270,7 @@ export function getUserProtocol(userUUID, userProtocolUUID){
             return response.data
         }
         else{
-            this.$q.notify("status " + status + ", cannot get the roles!");
+            Notify.create({message: `status " + status + ", cannot get the roles!`, timeout: 3000, color: 'negative'})
         }                                   
     })
     .catch( (error) => {
@@ -393,7 +281,7 @@ export function getUserProtocol(userUUID, userProtocolUUID){
 export function saveUserProtocol(protocol){
     
     if(isEmpty(protocol)){
-        this.$q.notify('The protocol data is empty!')
+        Notify.create({message: `Protocol data is empty!`, timeout: 3000, color: 'negative'})
         return false
     }
     
@@ -429,19 +317,19 @@ export function saveUserProtocol(protocol){
         url = '/api/users/' + userUUID +'/protocols/'+userProtocolUUID
     }
     
-    return axiosInstance.axios({
-        url: url,
-        dataType: 'json',
-        data: protocol,
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
-    })
+    return axios.post(
+        url,
+        {   
+            protocol 
+        }
+    )
     .then( (response) => {
         var status = response.status;
         if(status == 200 || status == "200"){              
             return response.data
         }
         else{
-            this.$q.notify("status " + status + ", cannot get the protocol information!");
+            Notify.create({message: `status ` + status + `, cannot get the protocol information!`, timeout: 3000, color: 'negative'})
         }                                   
     })
     .catch( (error) => {
@@ -454,7 +342,7 @@ export function saveUserProtocol(protocol){
 export function saveComment(comment){
     
     if(isEmpty(comment)){
-        this.$q.notify('The comment data is empty!')
+        Notify.create({message: `The comment data is empty!`, timeout: 3000, color: 'negative'})
         return false
     }
     
@@ -487,20 +375,14 @@ export function saveComment(comment){
         url = '/api/users/' + userUUID +'/comments/'+commentUUID
     }
     
-    return axiosInstance.axios({
-        method: 'post',
-        url: url,
-        dataType: 'json',
-        data: comment,
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
-    })
+    return axios.post( url, { comment} )
     .then( (response) => {
         var status = response.status;
         if(status == 200 || status == "200"){              
             return response.data
         }
         else{
-            this.$q.notify("status " + status + ", cannot get the comment information!");
+            Notify.create({message: `status ` + status + `, cannot get the comment information!`, timeout: 3000, color: 'negative'})
         }                                   
     })
     .catch( (error) => {
@@ -533,20 +415,14 @@ export function deleteComment(userUUID, commentUUID){
         url = '/api/users/' + userUUID +'/comments/'+commentUUID
     }
     
-    return axiosInstance.axios({
-        method: 'delete',
-        url: url,
-        dataType: 'json',
-        data: null,
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
-    })
+    return axios.delete( url )
     .then( (response) => {
         var status = response.status;
         if(status == 200 || status == "200"){              
             return response.status
         }
         else{
-            this.$q.notify("status " + status + ", cannot delete the comment!");
+            Notify.create({message: `status ` + status + `, cannot delete the comment!`, timeout: 3000, color: 'negative'})
         }                                   
     })
     .catch( (error) => {
@@ -557,23 +433,18 @@ export function deleteComment(userUUID, commentUUID){
 
 export function getProtocolsByUserUUID(userUUID){
     if(isEmpty(userUUID)){
-        this.$q.notify('The user UUID is empty!')
+        Notify.create({message: `The user UUID is empty!`, timeout: 3000, color: 'negative'})
         return false
     }
     
-    return axiosInstance.axios({
-        method: 'get',
-        url: '/api/users/'+userUUID+'/protocols',
-        dataType: 'json',
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
-    })
+    return axios.get( '/api/users/'+userUUID+'/protocols')
     .then( (response) => {
         var status = response.status;
         if(status == 200 || status == "200"){              
             return response.data
         }
         else{
-            this.$q.notify("status " + status + ", cannot get the protocols!");
+            Notify.create({message: `status ` + status + `, cannot get the protocols!`, timeout: 3000, color: 'negative'})
         }                                   
     })
     .catch( (error) => {
@@ -583,23 +454,18 @@ export function getProtocolsByUserUUID(userUUID){
 
 export function getCommentsByUserUUID(userUUID){
     if(isEmpty(userUUID)){
-        this.$q.notify('The user UUID is empty!')
+        Notify.create({message: `The user UUID is empty!`, timeout: 3000, color: 'negative'})
         return false
     }
     
-    return axiosInstance.axios({
-        method: 'get',
-        url: '/api/users/'+userUUID+'/comments',
-        dataType: 'json',
-        headers: {'X-Requested-With': 'XMLHttpRequest'},
-    })
+    return axios.get('/api/users/'+userUUID+'/comments')
     .then( (response) => {
         var status = response.status;
         if(status == 200 || status == "200"){              
             return response.data
         }
         else{
-            this.$q.notify("status " + status + ", cannot get the protocols!");
+            Notify.create({message: `status ` + status + `, cannot get the protocols!`, timeout: 3000, color: 'negative'})
         }                                   
     })
     .catch( (error) => {
@@ -662,7 +528,7 @@ export function uploadFile(url, file, newFileName){
             return response.data
         }
         else{
-            this.$q.notify( "Cannot upload the file "+file.name);
+            Notify.create({message: `Cannot upload the file ` + file.name, timeout: 3000, color: 'negative'})
         }                                   
     })
     .catch( (error) => {

@@ -163,7 +163,7 @@
         components: {
         },
         beforeCreate: function() {
-            var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
+            var loggedIn = localStorage.loggedIn == "true"
             if(loggedIn != true){
                 this.$router.push('login')
                 return false
@@ -177,14 +177,14 @@
                 }
             }
         },
-        created: function() {
-            var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'));
+        created: function() {            
+            var loggedIn = localStorage.loggedIn == "true"
             if(loggedIn === false){
                 document.location.href = '/login';
             }
             else{
                 var userUUID = this.userUUID
-                this.$utils.getUserDetails(userUUID, true)
+                this.$userUtils.getUserDetails(userUUID, true)
                 .then((data) => {
                     console.log(data)
                     if(data){
@@ -196,8 +196,8 @@
                     } 
                 })
                 .catch((err) => {
-                    Alert.create({html: 'oops, something happened during pulling out user profile!'})
                     console.log(err)
+                    this.$q.notify({message: "Something is wrong when pulling out the user profile. Error: "+err.message, duration: 3000, color: "negative"})
                 });
                 
             }
@@ -231,7 +231,7 @@
                 var userUUID = this.userUUID
                 var self = this
 
-                self.$utils.updateUserDetails(userUUID, qs.stringify(self.$data), true)
+                self.$userUtils.updateUserDetails(userUUID, qs.stringify(self.$data), true)
                 .then( (response) => {
                     if(response.status === 200){                        
                         var data = response.data

@@ -34,7 +34,7 @@
         },
         created: function(){
 
-            this.loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
+            this.loggedIn = localStorage.loggedIn == "true"
             if(this.loggedIn === true) {
                 try{
                     let userInfo = JSON.parse(localStorage.userInfo)

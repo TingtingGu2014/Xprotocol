@@ -240,7 +240,7 @@
                 var qs = require('qs');
                 var url = '';
                 if(this.path.lastIndexOf('signup') >= 0) {
-                    this.$utils.signUp(qs.stringify(this.$data))
+                    this.$userUtils.signUp(qs.stringify(this.$data))
                     .then((data) => {
                         if(data){
                             EventBus.$emit('session-change', 'signIn');
@@ -258,7 +258,7 @@
                     
                 }
                 else {
-                    this.$utils.signIn(this.userEmail, this.userPassword)                
+                    this.$userUtils.signIn(this.userEmail, this.userPassword)                
                     .then((data) => {
                         if(data){
                             EventBus.$emit('session-change', 'signIn');
@@ -267,8 +267,8 @@
                         }                    
                     })
                     .catch((err) => {
-                        alert("oops, something happened during signing in!")
                         console.log(err)
+                        this.$q.notify({message: "Cannot sign up now. Error: "+err.message, duration: 3000, color: "negative"})
                     });
                   
                 }

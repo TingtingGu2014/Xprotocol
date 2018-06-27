@@ -27,25 +27,26 @@
                 setUserDetails: 'userModule/setUserDetails',
                 setDetailsFetched: 'userModule/setDetailsFetched',
             }),
-            clearStoreData: function () {                
-                var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
-                if(loggedIn !== true){
-                    this.$utils.signOut()
+            clearStoreData: function () {             
+                this.$utils.readCookie('loggedIn')
                     .then((data) => {
-                        if(data){                            
-                            EventBus.$emit('session-change', 'signOut');
-                        }                    
+                        if(this.$utils.isEmpty(data) || data != "true"){
+                            this.$userUtils.signOut()
+                            .then((data) => {
+                                EventBus.$emit('session-change', 'signOut');                 
+                            })
+                            .catch((err) => {
+                                console.log(err)
+                            });
+                            console.log('   ***  the user store and the protocol store have been cleared ***  ')
+                        }
+                        else{
+                            console.log(' === the cookie monitor thread is running now ===')
+                        }
                     })
-                    .catch((err) => {
-                        alert("oops, something happened during signing in!")
-                        console.log(err)
-                    });
-                    console.log('   ***  the user store and the protocol store have been cleared ***  ')
-                }
-                else{
-                    console.log(' === the cookie monitor thread is running now ===')
-                }
-                return false
+                    .catch((error) => {
+                        this.$q.notify({message: 'Something is wrong when clear store data. error: '+error.message, timeout: 3000, color: 'negative'})
+                    })
             },
         },
         created: function() {
@@ -60,13 +61,28 @@
                     this.setProtocols(null)
                     this.setUserDetails(null)
                     this.setDetailsFetched(false)
+                    localStorage.loggedIn = "false"
                     window.clearInterval(this.cookieTimer)
                 }
             });
-            var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
-            if(loggedIn == true){
-                this.cookieTimer = window.setInterval(this.clearStoreData, 2000)
-            }
+            this.$utils.readCookie('loggedIn')
+            .then((data) => {
+                if(data == "true"){
+                    this.cookieTimer = window.setInterval(this.clearStoreData, 2000)
+                }
+                else if(localStorage.loggedIn == "true"){
+                    this.setProtocols(null)
+                    this.setUserDetails(null)
+                    this.setDetailsFetched(false)
+                    localStorage.loggedIn = "false"
+                    if(this.cookieTimer){
+                        window.clearInterval(this.cookieTimer)
+                    }
+                }
+            })
+            .catch((error) => {
+                this.$q.notify({message: 'Something is wrong when reading loggedIn cookie. error: '+error.message, timeout: 3000, color: 'negative'})
+            })
                         
         }      
     }

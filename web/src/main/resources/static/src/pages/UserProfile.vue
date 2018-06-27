@@ -125,7 +125,7 @@
         },
         created: function() {           
             
-            var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'));
+            var loggedIn = localStorage.loggedIn == "true"
             if(loggedIn === false){
                 document.location.href = '/login';
             }
@@ -140,7 +140,7 @@
                 }
                 var detailsFetched = this.isUserDetailsFetched
                 if(!detailsFetched == true){
-                    this.$utils.getUserDetails(userInfo.userUUID)                
+                    this.$userUtils.getUserDetails(userInfo.userUUID)                
                     .then((data) => {
                         console.log(data)
                         if(data){
@@ -148,7 +148,7 @@
                         }                    
                     })
                     .catch((err) => {
-                        Alert.create({html: 'oops, something happened during pulling out your profile!'})
+                        this.$q.notify({message: `Something is wrong in pulling user profile. Status: `+err.message, color: 'negative', duration: 3000})
                         console.log(err)
                     });
                     
@@ -181,9 +181,10 @@
             
         },
         beforeCreate: function(){
-            var loggedIn = !this.$utils.isEmpty(this.$utils.readCookie('loggedIn'))
+            var loggedIn = localStorage.loggedIn == "true"
             if(loggedIn != true){
-                document.location.href = '/login'
+                this.$router.push('login')
+                return false
             }
             var currentUrl = window.location.href
             if(currentUrl.indexOf('admin/') >=0) {
@@ -230,14 +231,14 @@
                     console.log(err.message)
                 }
                 
-                this.$utils.updateUserDetails(userInfo.userUUID, qs.stringify(this.$data))                
+                this.$userUtils.updateUserDetails(userInfo.userUUID, qs.stringify(this.$data))                
                 .then((data) => {
                     if(data){
                         this.resetUserProfile(data)
                     }                    
                 })
                 .catch((err) => {
-                    Alert.create({html: 'oops, something happened during pulling out your profile!'})
+                    this.$q.notify({message: `Something is wrong in saving user profile. Status: `+err.message, color: 'negative', duration: 3000})
                     console.log(err)
                 });
                     
