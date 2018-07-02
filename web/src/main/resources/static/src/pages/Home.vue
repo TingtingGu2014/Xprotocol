@@ -78,6 +78,32 @@
                     localStorage.userInfo = ''
                 }
             }
+            
+            this.$utils.readCookie('XSRF-TOKEN')
+            .then((data) => {
+                if(this.$utils.isEmpty(data)){
+//                    this.$router.go()
+                    this.$reqUtils.getHomePage()
+                    .then((data) => {
+                        location.reload(true)
+                        return false
+                    })
+                    .catch((error) => {
+                        this.$q.notify({message: error.message, color: 'negative'})
+                    })
+                    this.$q.notify({message: `xsrf cookie empty!`, color: 'negative'})
+                }
+                else{
+                    this.$q.notify({message: `xsrf cookie: `+data, color: 'positive'})
+                    let xsrf = localStorage.xsrf
+                    if(this.$utils.isEmpty(xsrf) || xsrf != data){
+                        localStorage.xsrf = data
+                    }
+                }                
+            })
+            .catch((error) => {
+                console.log(`Cannot read XSRF cookie!`)
+            })
         },
     }
 </script>

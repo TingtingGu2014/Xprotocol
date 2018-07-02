@@ -18,11 +18,10 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Iterator;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.FileCopyUtils;
@@ -139,5 +138,18 @@ public class XprotocolWebUtils {
         
         inputStream.close();
         outputStream.close();
+    }
+    
+    public static String getHttpRequestCookieByName(String name, HttpServletRequest request){
+        Cookie[] cookies = request.getCookies();
+        if(null == cookies || cookies.length == 0){
+            return null;
+        }
+        for(Cookie ck : cookies){
+            if(name.equals(ck.getName())){
+                return ck.getValue();                
+            }
+        }
+        return null;
     }
 }

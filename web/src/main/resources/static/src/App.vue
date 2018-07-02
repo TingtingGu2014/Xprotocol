@@ -42,11 +42,19 @@
                         }
                         else{
                             console.log(' === the cookie monitor thread is running now ===')
+                            this.$utils.readCookie('loggedIn')
+                            .then((data) => {
+                                let xsrf = localStorage.xsrf
+                                if(this.$utils.isEmpty(xsrf) || xsrf != data){
+                                    localStorage.xsrf = data
+                                }
+                            })
+                            .catch((error) => {console.log('Cannot read the XSRF cookie. Error: '+error.message)})
                         }
                     })
                     .catch((error) => {
                         this.$q.notify({message: 'Something is wrong when clear store data. error: '+error.message, timeout: 3000, color: 'negative'})
-                    })
+                    })                
             },
         },
         created: function() {
@@ -62,6 +70,7 @@
                     this.setUserDetails(null)
                     this.setDetailsFetched(false)
                     localStorage.loggedIn = "false"
+                    localStorage.xsrf = ''
                     window.clearInterval(this.cookieTimer)
                 }
             });

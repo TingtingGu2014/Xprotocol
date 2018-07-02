@@ -59,7 +59,7 @@ export function readCookie(name) {
         return getCookieFromMaster(name)
         .then((data) => {
             if(isEmpty(data) || isEmpty(data.cookieValue)){
-                return false
+                return null
             }
             else{
                 return data.cookieValue
@@ -67,7 +67,7 @@ export function readCookie(name) {
         })
         .catch((error) => {
             console.log('error: ' + error)
-            return false
+            return null
         })
     }
     else{
@@ -102,6 +102,43 @@ export function getCookieFromMaster(name){
             resolve(data);
         },
         (error) => {
+            reject(error);
+        })
+    });
+}
+
+export function clearLoggedInCookie() {
+    let cookies = document.cookie
+    if(isEmpty(cookies)){
+        return clearCookiesFromMaster()
+        .then((data) => {
+            return true
+        })
+        .catch((error) => {
+            console.log('error: ' + error)
+            return false
+        })
+    }
+    else{
+        return eraseCookie('loggedIn')
+                .then(() => {
+                    return true
+                })
+                .catch((error) => {
+                    console.log('error: ' + error)
+                    return false
+                })
+    }
+}
+
+export function clearCookiesFromMaster(){
+    return new Promise((resolve, reject) => {
+        cookieMaster.clearCookies( 
+        ()=> {
+            resolve('UIWebView cookies have been cleared');
+        },
+        (error) => {
+            console.log(error)
             reject(error);
         })
     });
