@@ -35,7 +35,7 @@
                   <div>
                     <form class="">        
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <router-link :to="{ name: 'userProfile', params: { userUUID: userInfo.userUUID }  }" >
+                        <router-link v-on:click.native="collapseLinkChildLinkClicked" :to="{ name: 'userProfile', params: { userUUID: userInfo.userUUID }  }" >
                             <span class="fa fa-user"></span>    
                             <span>
                                 &nbsp;&nbsp;Your Profile
@@ -59,17 +59,17 @@
 
                     </q-collapsible>
 
-                    <q-collapsible icon="fa-user" label="Sign Up"   @show="collapseLinkClick('signup')" >
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<router-link :to="{ name: 'signUp'}"><span class="fa fa-user"></span>&nbsp;Sign Up</router-link>
+                    <q-collapsible icon="fa-user" label="Sign Up"   @show="collapseClick('signup')" >
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<router-link v-on:click.native="collapseLinkChildLinkClicked" :to="{ name: 'signUp'}"><span class="fa fa-user"></span>&nbsp;Sign Up</router-link>
                     </q-collapsible>
                 </div>
                 <q-collapsible icon="fa-sun-o" label="Admin"  @show="loginViewOpen" @hide="loginViewClose" v-if="isAdminUser">
                   <div>
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<router-link :to="{ name: 'userList' }" style='font-family: Arial'><span class="fa fa-users"></span>&nbsp;User List</router-link>                    
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<router-link v-on:click.native="collapseLinkChildLinkClicked" :to="{ name: 'userList' }" style='font-family: Arial'><span class="fa fa-users"></span>&nbsp;User List</router-link>                    
                   </div>
                 </q-collapsible>
                 
-                <q-collapsible icon="fa-home" label="Home"   @show="collapseLinkClick('home')" ref='homeLink'></q-collapsible>
+                <q-collapsible icon="fa-home" label="Home"   @show="collapseClick('home')" ref='homeLink'></q-collapsible>
             </q-list>                                                                                                                                                                                                                                                                                                                        
         </div>
     </div>
@@ -135,11 +135,13 @@
                     event.preventDefault()
                 }
                 
+                this.$emit('collapseLinkClickCompleted')
+                
                 this.$userUtils.signIn(this.emaillogin, this.passwordlogin)                
                 .then((data) => {
-                    if(data){
+                    if(!this.$utils.isEmpty(data)){
                         EventBus.$emit('session-change', 'signIn');
-                        location.reload();
+                        location.reload(true)
                     }                    
                 })
                 .catch((err) => {
@@ -153,27 +155,31 @@
                     event.preventDefault()
                 }
                 
+                this.$emit('collapseLinkClickCompleted')
+                
                 this.$userUtils.signOut()
                 .then((data) => {
-                    if(data){                            
-                        EventBus.$emit('session-change', 'signOut');
-                        location.reload();
-                    }                    
+                    EventBus.$emit('session-change', 'signOut');                    
+                    location.reload(true)                   
                 })
                 .catch((err) => {
                     this.$q.notify({message: `User sign out with error: `+err.message, color: 'negative'})
                     console.log(err)
                 });
+                
             },
             ...mapMutations({                
                 setUserDetails: 'userModule/setUserDetails',
                 setDetailsFetched: 'userModule/setDetailsFetched',
                 setProtocols: 'protocolModule/setProtocols'
             }),
-            collapseLinkClick: function(path){
-                this.$emit('collapseLinkClick')                
+            collapseClick: function(path){
+                this.$emit('collapseLinkClickCompleted')              
                 this.$router.push('/'+path)
 //                return false
+            },
+            collapseLinkChildLinkClicked: function(){
+                this.$emit('collapseLinkClickCompleted')
             },
             loginViewOpen(){
                 console.log(this)

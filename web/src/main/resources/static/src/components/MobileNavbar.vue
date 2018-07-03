@@ -24,7 +24,7 @@
             </ul>
         </div>
         <div class="row menu-list">
-            <login-view v-if="showMenuSheet" :inNavBar="false" @collapseLinkClick="closeShowMenu"></login-view>
+            <login-view v-if="showMenuSheet" :inNavBar="false" @collapseLinkClickCompleted="closeShowMenu"></login-view>
         </div>
     </div>
 
