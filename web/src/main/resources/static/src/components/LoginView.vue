@@ -1,46 +1,45 @@
 <template id="login-template">
     <div>
-        <div class="gt-md" v-if="inNavBar">
-            <form class="form-inline" v-if=loggedIn>        
-                <!--<router-link to="/profile/userId">Go to notfound</router-link>-->
-                <router-link :to="{ name: 'userProfile', params: { userUUID: userUUID }  }" >
-                <!--<a href="#" v-on:click="getUserDetails">--> 
+        <div class="gt-md" v-if="inNavBar" style="float:right">
+            <div class="row login-form" v-if="loggedIn">        
+                <router-link :to="{ name: 'userProfile', params: { userUUID: userInfo.userUUID }  }" class="link-with-bg" >
                     <span class="fa fa-user"></span>    
-                    <span v-if="userAlias">
-                        {{userAlias}}
+                    <span v-if="userInfo.alias">
+                        {{userInfo.alias}}
                     </span>
                     <span v-else>
-                        {{userEmail}}
+                        {{userInfo.email}}
                     </span>
-                <!--</a>-->
                 </router-link>
 
-                 &nbsp;&nbsp;
-                <a href="#" v-on:click="logoutsubmit"><span class="fa fa-sign-out"></span>&nbsp;Sign Out</a> 
-            </form>
-            <form class="form-inline" v-else>
-                <input type="email" class="form-control " placeholder="email" v-model='emaillogin'>
+                &nbsp;&nbsp;&nbsp;
+                <a href="#" v-on:click="logoutsubmit" class="link-with-bg"><span class="fa fa-sign-out"></span>&nbsp;Sign Out</a> 
+                &nbsp;&nbsp;&nbsp;
+                <div style="order: 4" v-if="isAdminUser">
+                    <router-link :to="{ name: 'admin' }" class="link-with-bg"><i class="fa fa-sun-o"></i>&nbsp;Administrator</router-link>
+                </div>
+            </div>
+            <form class="row login-form" v-else>
+                <input type="email" class="col" placeholder="email" v-model='emaillogin'>
                 &nbsp;
-                <input type="password" class="form-control " placeholder="password" v-model="passwordlogin">
+                <input type="password" class="col" placeholder="password" v-model="passwordlogin">
                 &nbsp;
-                <a href="#" v-on:click="loginsubmit"><span class="fa fa-sign-in"></span>&nbsp;Sign In</a> 
+                <a href="#" v-on:click="loginsubmit" class="col link-with-bg"><span class="fa fa-sign-in"></span>&nbsp;Sign In</a> 
                 &nbsp;&nbsp;             
-                <router-link :to="{ name: 'signUp'}"><span class="fa fa-user"></span>&nbsp;Sign Up</router-link>
+                <router-link :to="{ name: 'signUp'}" class="col link-with-bg"><span class="fa fa-user"></span>&nbsp;Sign Up</router-link>
             </form>
         </div>
-        <div class="relative-position lt-lg" v-else>
-            <q-list class="bottom" style="margin: auto;">
-                <q-collapsible icon="perm_identity" v-bind:label="getCurrentUserName"  v-if="loggedIn">
+        <div class="relative-position lt-xl" style="outline: none !important;width:100%;background-color: #2a7996; z-index: 10; border: 1px solid white;border-radius: 15px;" v-else>
+            <q-list class="bottom" style="margin: auto; ">
+                <q-collapsible icon="perm_identity" v-bind:label="getCurrentUserName"  @show="loginViewOpen" @hide="loginViewClose" v-if="loggedIn">
                   <div>
-                    <form class="form-inline">        
+                    <form class="">        
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <router-link :to="{ name: 'userProfile', params: { userUUID: userUUID }  }" >
-                        <!--<a href="#" v-on:click="getUserDetails">--> 
+                        <router-link v-on:click.native="collapseLinkChildLinkClicked" :to="{ name: 'userProfile', params: { userUUID: userInfo.userUUID }  }" >
                             <span class="fa fa-user"></span>    
                             <span>
                                 &nbsp;&nbsp;Your Profile
                             </span>
-                        <!--</a>-->
                         </router-link>
 
                          &nbsp;&nbsp;
@@ -48,63 +47,39 @@
                     </form>
                   </div>
                 </q-collapsible>
-                <q-collapsible icon="fa-sign-in" label="Log In" v-else>
+                <div v-else>
+                    <q-collapsible icon="fa-sign-in" label="Log In"  class="row" @show="loginViewOpen" @hide="loginViewClose">                  
+                        <form class="">
+                            <input type="email" class="collapsible-input" placeholder="email" v-model='emaillogin'>                       
+                            <input type="password" class="collapsible-input" placeholder="password" v-model="passwordlogin">     
+                            <div class="row" style="float:right">
+                                <a href="#" class="link-with-bg singin-btn" v-on:click="loginsubmit" >&nbsp;Sign In</a> <br>
+                            </div>
+                        </form> 
+
+                    </q-collapsible>
+
+                    <q-collapsible icon="fa-user" label="Sign Up"   @show="collapseClick('signup')" >
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<router-link v-on:click.native="collapseLinkChildLinkClicked" :to="{ name: 'signUp'}"><span class="fa fa-user"></span>&nbsp;Sign Up</router-link>
+                    </q-collapsible>
+                </div>
+                <q-collapsible icon="fa-sun-o" label="Admin"  @show="loginViewOpen" @hide="loginViewClose" v-if="isAdminUser">
                   <div>
-                    <form class="form-inline">
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <input type="email" class="form-control " placeholder="email" v-model='emaillogin'>
-                        &nbsp;
-                        <input type="password" class="form-control " placeholder="password" v-model="passwordlogin">
-                        &nbsp;
-                        <a href="#" v-on:click="loginsubmit">&nbsp;Sign In</a> <br>
-
-                    </form> 
-                  </div>
-                </q-collapsible>
-
-                <q-collapsible icon="fa-user" label="Sign Up">
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<router-link :to="{ name: 'signUp'}"><span class="fa fa-user"></span>&nbsp;Sign Up</router-link>
-                </q-collapsible>
-
-                <q-collapsible icon="fa-sun-o" label="Admin" v-if="isAdminUser">
-                  <div>
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<router-link :to="{ name: 'userList' }" style='font-family: Arial'><span class="fa fa-users"></span>&nbsp;User List</router-link>                    
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<router-link v-on:click.native="collapseLinkChildLinkClicked" :to="{ name: 'userList' }" style='font-family: Arial'><span class="fa fa-users"></span>&nbsp;User List</router-link>                    
                   </div>
                 </q-collapsible>
                 
-                <q-collapsible icon="fa-home" label="Home" @open="goHome" ref='homeLink'></q-collapsible>
+                <q-collapsible icon="fa-home" label="Home"   @show="collapseClick('home')" ref='homeLink'></q-collapsible>
             </q-list>                                                                                                                                                                                                                                                                                                                        
         </div>
     </div>
 </template>     
 
 <script>
-    import {
-        QList,
-        QCollapsible,
-    } from 'quasar'
     
     import { mapGetters, mapMutations } from 'vuex'    
     import { EventBus } from '../utils/EventBus.js';
-    
-    var Utils = require('../utils/Utils')
-    
-    var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
-    var userInfo = null
-    if(loggedIn !== true){
-        localStorage.userInfo = null
-        localStorage.protocolListCount = null
-    }
-    else {
-        try{
-            userInfo = JSON.parse(localStorage.userInfo)
-        }
-        catch(err) {
-            console.log(err.message)
-            localStorage.userInfo = ''
-        }
-    }
-                
+            
     export default {
         
         props: {
@@ -115,22 +90,18 @@
         },
         data: function () {
             return {
-                loggedIn: loggedIn,
-                userEmail: (Utils.isEmpty(userInfo) || Utils.isEmpty(userInfo.email)) ? '' : userInfo.email,
-                userAlias: (Utils.isEmpty(userInfo) || Utils.isEmpty(userInfo.alias)) ? '' : userInfo.alias,
-                userUUID: (Utils.isEmpty(userInfo) || Utils.isEmpty(userInfo.userUUID)) ? '' : userInfo.userUUID,
+                loggedIn: false,
+                userInfo: null,
                 emaillogin: '',
                 passwordlogin: '',
+                showCollapseList: false,
             }
         },     
         computed: {
             reloadUserInfo: function() {
-                try{
-                    userInfo = JSON.parse(localStorage.userInfo)
-                    if(!Utils.isEmpty(userInfo)){
-                        this.userEmail = Utils.isEmpty(userInfo.email) ? '' : userInfo.email
-                        this.userAlias = Utils.isEmpty(userInfo.alias) ? '' : userInfo.alias
-                        this.userUUID = Utils.isEmpty(userInfo.userUUID) ? '' : userInfo.userUUID
+                try{                    
+                    if(!this.$utils.isEmpty(localStorage.userInfo)){
+                        this.userInfo = JSON.parse(localStorage.userInfo)
                     }
                 }
                 catch(err) {
@@ -139,24 +110,24 @@
                 }
             },
             getCurrentUserName(){
-                return Utils.getUserName()
+                return this.$utils.getUserName()
             },
             ...mapGetters({
                 isUserDetailsFetched: 'userModule/isUserDetailsFetched',
                 getUserDetails: 'userModule/getUserDetails',
             }),
             isAdminUser: function () {
-                return Utils.isAdminUser();
-            },
+                return this.$utils.isAdminUser();
+            },            
         },
         components:{
-            QCollapsible,QList,
+            
         },
         methods: {
             loginsubmit: function (message, event) {
                 
-                if(Utils.isEmpty(this.emaillogin) || Utils.isEmpty(this.passwordlogin)){
-                    alert("Please fill your email and password before sign in.");
+                if(this.$utils.isEmpty(this.emaillogin) || this.$utils.isEmpty(this.passwordlogin)){
+                    this.$q.notify({message: `Please fill your email and password before sign in!`, color: 'negative'})
                     return;
                 }
                 
@@ -164,15 +135,17 @@
                     event.preventDefault()
                 }
                 
-                Utils.signIn(this.emaillogin, this.passwordlogin)                
+                this.$emit('collapseLinkClickCompleted')
+                
+                this.$userUtils.signIn(this.emaillogin, this.passwordlogin)                
                 .then((data) => {
-                    if(data){
+                    if(!this.$utils.isEmpty(data)){
                         EventBus.$emit('session-change', 'signIn');
-                        document.location.href = '/home';
+                        location.reload(true)
                     }                    
                 })
                 .catch((err) => {
-                    alert("oops, something happened during signing in!")
+                    this.$q.notify({message: `User sign in with error: `+err.message, color: 'negative'})
                     console.log(err)
                 });
                 
@@ -182,30 +155,66 @@
                     event.preventDefault()
                 }
                 
-                Utils.signOut()
+                this.$emit('collapseLinkClickCompleted')
+                
+                this.$userUtils.signOut()
                 .then((data) => {
-                    if(data){                            
-                        EventBus.$emit('session-change', 'signOut');
-                    }                    
+                    EventBus.$emit('session-change', 'signOut');                    
+                    location.reload(true)                   
                 })
                 .catch((err) => {
-                    alert("oops, something happened during signing in!")
+                    this.$q.notify({message: `User sign out with error: `+err.message, color: 'negative'})
                     console.log(err)
                 });
+                
             },
             ...mapMutations({                
                 setUserDetails: 'userModule/setUserDetails',
                 setDetailsFetched: 'userModule/setDetailsFetched',
                 setProtocols: 'protocolModule/setProtocols'
             }),
-            goHome: function(event){
-                let homeLink = this.$refs['homeLink']
-                if(!this.$utils.isEmpty(homeLink)){
-                    homeLink.close()
-                }
-                this.$router.push('/')
+            collapseClick: function(path){
+                this.$emit('collapseLinkClickCompleted')              
+                this.$router.push('/'+path)
+//                return false
+            },
+            collapseLinkChildLinkClicked: function(){
+                this.$emit('collapseLinkClickCompleted')
+            },
+            loginViewOpen(){
+                console.log(this)
+            },
+            loginViewClose(){
             }
-        }
+        },
+        created: function(){
+            if(localStorage.loggedIn == "true"){
+                this.loggedIn = true
+            }
+            if(this.loggedIn !== true){
+                console.log("\n *** Not logged in ***\n")
+                localStorage.userInfo = null
+                localStorage.protocolListCount = null
+                this.userInfo = null
+            }
+            else {
+                console.log("\n *** User has logged in ***\n")
+                try{
+                    if(!this.$utils.isEmpty(localStorage.userInfo)){
+                        this.userInfo = JSON.parse(localStorage.userInfo)
+                    }
+                    else{
+                        this.loggedIn = false
+                        this.$utils.createCookie('loggedIn', false, 30)
+                    }
+                }
+                catch(err) {
+                    console.log(err.message)
+                    localStorage.userInfo = ''
+                }
+            }
+            this.showCollapseList = this.inNavBar
+        },
     }
     
     function make_base_auth(user, password) {
@@ -215,7 +224,22 @@
 </script>
 
 <style scoped>
-    input.form-control {
-        width: 100px !important;
-    }
+.login-form {
+    padding-bottom: 10px;
+}
+
+.q-list {
+    border: none;
+}
+
+.singin-btn{
+    margin: 10px 10px 0 0; 
+    border: 1px solid white;
+    padding: 5px;
+    border-radius: 15px;
+}
+
+.collapsible-input{
+    width: 90%;
+}
 </style>

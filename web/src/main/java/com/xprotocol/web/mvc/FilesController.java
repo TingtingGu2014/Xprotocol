@@ -8,23 +8,25 @@ package com.xprotocol.web.mvc;
 import com.xprotocol.persistence.model.User;
 import com.xprotocol.web.config.XprotocolWebUtils;
 import com.xprotocol.web.exceptions.FilePathNotExistsException;
+import com.xprotocol.web.exceptions.FileUploadingException;
 import com.xprotocol.web.exceptions.InvalidProtocolFileException;
 import com.xprotocol.web.exceptions.UserNotLoggedInException;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,14 +51,19 @@ public class FilesController {
     @Value("${editor.fileUploadPath}")
     private String editorFileUploadPath;
     
+    @Value("${code.customized.fileDoesNotExist}")
+    private int codeFileDoesNotExist;
+    
     @PostMapping("/api/users/{userUUID}/protocols/{protocolUUID}/files")
-    public ResponseEntity<?> uploadProtocolFiles(
+    public ResponseEntity<?> uploadProtocolFiles(            
             @RequestParam("file") MultipartFile uploadfile, 
             @PathVariable("userUUID") String userUUID, 
             @PathVariable("protocolUUID") String userProtocolUUID) 
     {
         
         String location = null;
+        String newName = null;
+        String originalName = null;
 
         if (uploadfile.isEmpty()) {
             return new ResponseEntity("please select a file!", HttpStatus.BAD_REQUEST);
@@ -75,16 +82,30 @@ public class FilesController {
             if(null == currentUserUUID || !currentUserUUID.equals(userUUID)){
                 throw new UserNotLoggedInException("You have to log in to be able to upload files!");
             }
-            saveUploadedFiles(Arrays.asList(uploadfile), userUUID, userProtocolUUID);
-            String fileName = uploadfile.getOriginalFilename();           
-            location = "/api/users/"+userUUID+"/protocols/"+userProtocolUUID+"/files/"+fileName;
+            Map<String, String> nameMap = saveUploadedFiles(Arrays.asList(uploadfile), userUUID, userProtocolUUID);
+            for (Map.Entry<String, String> entry : nameMap.entrySet()) {
+                originalName = entry.getKey();
+                newName = entry.getValue();
+                if(newName.startsWith("Error")){
+                    throw new FileUploadingException(newName);
+                }
+                location = "/api/users/"+userUUID+"/protocols/"+userProtocolUUID+"/files/"+newName;
+                break;
+            }
+            
         } catch (IOException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (UserNotLoggedInException ex) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } catch (FileUploadingException ex) {
+            Logger.getLogger(FilesController.class.getName()).log(Level.SEVERE, null, ex);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity("{\"location\":\"" + location +"\"}", new HttpHeaders(), HttpStatus.OK);
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("newName", newName);
+        headers.add("originalName", originalName);
+        return new ResponseEntity("{\"location\":\"" + location +"\"}", headers, HttpStatus.OK);
 
     }
 
@@ -138,6 +159,9 @@ public class FilesController {
             @PathVariable("fileName") String fileName) throws IOException{
         try {
             String filePath = XprotocolWebUtils.getProtocolFilePath(editorFileUploadPath, userUUID, userProtocolUUID, fileName);
+            if(null == filePath){
+                throw new FilePathNotExistsException(("Cannot find file:"+fileName));
+            }
             File protocolFile = new File(filePath);
             if(!protocolFile.exists() || protocolFile.isDirectory()){
                 throw new InvalidProtocolFileException("Protocol file does not exist or it is a directory!");
@@ -151,6 +175,8 @@ public class FilesController {
             }
         } catch (InvalidProtocolFileException ex) {
             response.sendError(400, "Invalid protocol file: " + ex.getMessage());
+        } catch (FilePathNotExistsException ex) {
+            response.sendError(codeFileDoesNotExist, ex.getMessage());
         }
     }
    
@@ -197,23 +223,37 @@ public class FilesController {
 //    }
 
     //save file
-    private void saveUploadedFiles(List<MultipartFile> files, String userUUID, String userProtocolUUID) throws IOException {
+    private Map<String, String> saveUploadedFiles(List<MultipartFile> files, String userUUID, String userProtocolUUID) throws IOException {
         
+        Map<String, String> nameMap = new HashMap<>();
         for (MultipartFile file : files) {
 
             if (file.isEmpty()) {
                 continue;
             }
-
-            byte[] bytes = file.getBytes();            
-            String fileName = file.getOriginalFilename();
-            String fileFolderPath = editorFileUploadPath + File.separator + userUUID + File.separator + userProtocolUUID + File.separator + "temp";
-            File fileFolderPathFile = new File(fileFolderPath);
-            if(!fileFolderPathFile.exists()){
-                fileFolderPathFile.mkdirs();
+            try{
+                byte[] bytes = file.getBytes();    
+                
+                String fileName = file.getOriginalFilename().replace(" ", "_wsws_");
+                long timeVal = new Timestamp(System.currentTimeMillis()).getTime();
+                String extention = FilenameUtils.getExtension(fileName);
+                extention = extention.equals("") ? "" : "." + extention;
+                String newName = "blobid" + Long.toString(timeVal) + extention; 
+                
+                String fileFolderPath = editorFileUploadPath + File.separator + userUUID + File.separator + userProtocolUUID + File.separator + "temp";
+                File fileFolderPathFile = new File(fileFolderPath);
+                if(!fileFolderPathFile.exists()){
+                    fileFolderPathFile.mkdirs();
+                }
+                Path path = Paths.get(fileFolderPath + File.separator + newName);
+                Files.write(path, bytes);
+                
+                nameMap.put(fileName, newName);
             }
-            Path path = Paths.get(fileFolderPath + File.separator + fileName);
-            Files.write(path, bytes);
+            catch(IOException ex){
+                nameMap.put(file.getOriginalFilename(), "Error: "+ex.getMessage());
+            }
         }
+        return nameMap;
     }
 }

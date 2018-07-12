@@ -1,27 +1,21 @@
 <template>
-  <!-- Don't drop "q-app" class -->
   <div id="q-app">
-        <Navbar></Navbar>
-        <router-view
-            class="view"
-            keep-alive
-            transition
-            transition-mode="out-in">
-        </router-view> 
+    
+    <router-view
+        class="view"
+        keep-alive
+        transition
+        transition-mode="out-in">
+    </router-view> 
   </div>
 </template>
 
 <script>
-    import axios from 'axios'
-    import Navbar from './components/Navbar.vue';
+    import {EventBus} from './utils/EventBus.js'
     import { mapGetters, mapMutations } from 'vuex'
-    import { EventBus } from './utils/EventBus.js';
-    
-    var Utils = require('./utils/Utils')
     
     export default {
-	name: 'app',
-        components: {Navbar},
+        name: 'App',
         data() {
             return {
                 cookieTimer: null,
@@ -33,28 +27,38 @@
                 setUserDetails: 'userModule/setUserDetails',
                 setDetailsFetched: 'userModule/setDetailsFetched',
             }),
-            clearStoreData: function () {                
-                var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
-                if(loggedIn !== true){
-                    Utils.signOut()
+            clearStoreData: function () {             
+                this.$utils.readCookie('loggedIn')
                     .then((data) => {
-                        if(data){                            
-                            EventBus.$emit('session-change', 'signOut');
-                        }                    
+                        if(this.$utils.isEmpty(data) || data != "true"){
+                            this.$userUtils.signOut()
+                            .then((data) => {
+                                EventBus.$emit('session-change', 'signOut');                 
+                            })
+                            .catch((err) => {
+                                console.log(err)
+                            });
+                            console.log('   ***  the user store and the protocol store have been cleared ***  ')
+                        }
+                        else{
+                            console.log(' === the cookie monitor thread is running now ===')
+                            this.$utils.readCookie('loggedIn')
+                            .then((data) => {
+                                let xsrf = localStorage.xsrf
+                                if(this.$utils.isEmpty(xsrf) || xsrf != data){
+                                    localStorage.xsrf = data
+                                }
+                            })
+                            .catch((error) => {console.log('Cannot read the XSRF cookie. Error: '+error.message)})
+                        }
                     })
-                    .catch((err) => {
-                        alert("oops, something happened during signing in!")
-                        console.log(err)
-                    });
-                    console.log('   ***  the user store and the protocol store have been cleared ***  ')
-                }
-                else{
-                    console.log(' === the cookie monitor thread is running now ===')
-                }
-                return false
+                    .catch((error) => {
+                        this.$q.notify({message: 'Something is wrong when clear store data. error: '+error.message, timeout: 3000, color: 'negative'})
+                    })                
             },
         },
         created: function() {
+        
             EventBus.$on('session-change', (changeAct) => {
                 if(changeAct == 'signIn'){
                     console.log(`${changeAct} just kicked in`)
@@ -65,19 +69,36 @@
                     this.setProtocols(null)
                     this.setUserDetails(null)
                     this.setDetailsFetched(false)
+                    localStorage.loggedIn = "false"
+                    localStorage.xsrf = ''
                     window.clearInterval(this.cookieTimer)
                 }
             });
-            var loggedIn = !Utils.isEmpty(Utils.readCookie('loggedIn'))
-            if(loggedIn == true){
-                this.cookieTimer = window.setInterval(this.clearStoreData, 2000)
-            }
-        }
+            this.$utils.readCookie('loggedIn')
+            .then((data) => {
+                if(data == "true"){
+                    this.cookieTimer = window.setInterval(this.clearStoreData, 2000)
+                }
+                else if(localStorage.loggedIn == "true"){
+                    this.setProtocols(null)
+                    this.setUserDetails(null)
+                    this.setDetailsFetched(false)
+                    localStorage.loggedIn = "false"
+                    if(this.cookieTimer){
+                        window.clearInterval(this.cookieTimer)
+                    }
+                }
+            })
+            .catch((error) => {
+                this.$q.notify({message: 'Something is wrong when reading loggedIn cookie. error: '+error.message, timeout: 3000, color: 'negative'})
+            })
+                        
+        }      
     }
 </script>
 
 <style>
-    input {
+	input {
         -webkit-border-radius: 10px; 
 
         /* Firefox 1-3.6 */
@@ -96,7 +117,7 @@
     }
     
     fieldset {
-        border:1px solid #4dffc3;
+        border:1px solid d5d9e0;
         border-radius: 5px;
         box-shadow: 0 0 3px rgba(0,0,0,.3);
     }
@@ -116,7 +137,7 @@
     }
     
     .q-card {
-        border:1px solid #4dffc3;
+        border:1px solid #d5d9e0;
         border-radius: 5px;
         box-shadow: 0 0 3px rgba(0,0,0,.3);
     }

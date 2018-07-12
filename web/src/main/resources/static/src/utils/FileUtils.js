@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { Alert, Toast } from 'quasar'
 
 export function deleteProtocolFile(location){
     return axios({
@@ -9,9 +8,11 @@ export function deleteProtocolFile(location){
         headers: {'X-Requested-With': 'XMLHttpRequest'},
     })
     .then( (response) => {
+        console.log(response)
         return response
     })
     .catch( (error) => {
-        return error
+        console.log(error.response)
+        return error.response
     });
 }

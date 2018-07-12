@@ -2,50 +2,48 @@
     
     <div class="row" style="width:80%; margin: auto; margin-top: 7%; margin-bottom: 30px; overflow-y: auto" >
         <div class="row text-center">
-            <span class="q-table-title">List of Your Recent Comments</span>
+            <span class="q-table-title">Your Recent Comments</span>
         </div>
-        <q-data-table
+        <q-table
             :data="tableDataForDisplay"
-            :config="configs"
+            :pagination.sync="pagination"
             :columns="columns"
-            style="overflow-x: scroll"
+            style="width: 100%"
         >
-            <template slot="col-protocolTitle" scope="cell">
-                <table-router-link :linkData = "cell.data"></table-router-link>                
-            </template>
-        </q-data-table>
+            <q-td slot="body-cell-protocolTitle" slot-scope="props" :props="props">
+                <router-link 
+                    :to="{ name: 'protocol', params: { userUUID: props.row.protocolUserUUID,  userProtocolUUID: props.row.protocolUUID }}"
+                    class="qtable-item-link"
+                >
+                    {{props.row.protocolTitle}}
+                </router-link>
+            </q-td>
+            
+            <q-td slot="body-cell-content" slot-scope="props" :props="props" class="comment-content-td">
+                {{ props.row.content }}
+            </q-td>
+        </q-table>
     </div>
 </template>
 
 <script>
-    import {QDataTable} from 'quasar'
-    import { mapGetters, mapMutations } from 'vuex'
-    import TableRouterLink from './elements/TableRouterLink.vue'
     
-    var Utils = require('../utils/Utils')
+    import { mapGetters, mapMutations } from 'vuex'
     
     export default {
         data: function() {
             return {
                 columns: [
-                    {field: 'protocolTitle', label: 'Protocols', width: '120px', sort: true, filter: true},
-                    {field: 'content', label: 'Comments', width: '120px', filter: true},
-                    {field: 'time', label: 'Time', width: '80px', filter: true},                                       
+                    {field: 'protocolTitle', name: 'protocolTitle', label: 'Protocols', align: 'left', sortable: true, filter: true},
+                    {field: 'content', name: 'content', label: 'Comments', align: 'left', sortable: true, filter: true},
+                    {field: 'time', name: 'time', label: 'Time', align: 'left', sortable: true, filter: true},                                       
                 ], 
                 rawData: [],
-                configs: {
-                    rowHeight: '50px',
-                    bodyStyle: {
-  //                    maxHeight: '500px'
-                    },
-                    pagination: {
-                      rowsPerPage: 15,
-                      options: [10, 15, 30, 50]
-                    },
-                    messages: {
-                      noData: '<i>warning</i> You do not have any comments to show.',
-                      noDataAfterFiltering: '<i>warning</i> No comments made'
-                    },
+                pagination: {
+                    sortBy: null, 
+                    descending: false,
+                    page: 1,
+                    rowsPerPage: 10
                 }
             }
         },
@@ -55,24 +53,15 @@
         computed: {
             tableDataForDisplay: function(){
                 var items = []
-                if(!Utils.isEmpty(this.rawData)){
+                if(!this.$utils.isEmpty(this.rawData)){
                     for(var i = 0; i < this.rawData.length; i++){
                         items[i] = {}
                         var row = this.rawData[i]
                         for (var key in row) {
                             let value = row[key]
                             if('commentUUID' == key){
-                                var date = Utils.getTimeFromTimeUUID(value)
-                                items[i].time = Utils.outputDateTime(date)
-                            }
-                            else if('protocolTitle' == key){
-                                var templateData = {}
-                                templateData.label = row.protocolTitle
-                                templateData.name = 'userProtocol'
-                                templateData.params = {}
-                                templateData.params.userUUID = row.userUUID
-                                templateData.params.userProtocolUUID = row.protocolUUID
-                                items[i].protocolTitle = templateData
+                                var date = this.$utils.getTimeFromTimeUUID(value)
+                                items[i].time = this.$utils.outputDateTime(date)
                             }
                             else{
                                 items[i][key] = value
@@ -93,17 +82,16 @@
         
             var userUUID = this.userUUID
             
-            if(Utils.isEmpty(userUUID)){
+            if(this.$utils.isEmpty(userUUID)){
                 var message = 'User UUID cannot be empty!'
-                alert(message)
                 sessionStorage.errorMessage = message
                 document.location.href = '/errors/400'
                 return false
             }
             
-            Utils.getCommentsByUserUUID(userUUID)
+            this.$utils.getCommentsByUserUUID(userUUID)
             .then((data) => {
-                console.log(data)                
+//                console.log(data)                
                 this.rawData = data
             })
             .catch((err) => {
@@ -112,18 +100,24 @@
             });
         },
         components: {
-            TableRouterLink, QDataTable
         },
     }
 </script>
 
 <style>
 
-.q-table-title{
-    font-size: 2.0vw;
-    font-family: Helvetica, Arial, Verdana;
-    padding: 5px 0px 5px 0px;
-    margin: auto;
+.q-table thead th {
+
+    white-space: normal;
+}
+
+.q-table tbody td {
+
+    white-space: normal;
+}
+
+.comment-content-td {
+    width: 50%;
 }
 
 </style>
