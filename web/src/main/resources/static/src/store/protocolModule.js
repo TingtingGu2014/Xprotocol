@@ -47,6 +47,11 @@ const protocolModule = {
                 }
             }
             return null
+        },
+        getRecentProtocolToUsers: state => () => {
+            var protocols = state.protocols
+            let recentProtocolToUsers = protocols['recentProtocolToUsers']
+            return recentProtocolToUsers
         }
   },
   mutations: {
@@ -99,6 +104,10 @@ const protocolModule = {
         protocols[protocol.userUUID] = protocolsByUser;
         state.protocols = protocols
     },
+    setRecentProtocolToUsers(state, recentProtocolToUsers) {
+        var protocols = state.protocols
+        protocols['recentProtocolToUsers'] = recentProtocolToUsers
+    }
   }
 }
 

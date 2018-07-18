@@ -9,6 +9,7 @@ import com.xprotocol.persistence.dao.UserRepository;
 import com.xprotocol.persistence.model.User;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -82,6 +83,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserByUUID(String userUUIDStr) {
         return userRepo.findUserByUUID(userUUIDStr);
+    }
+    
+    @Override
+    public List<User> findUsersByUUIDs(List<UUID> userUUIDs) {
+        return userRepo.findUsersByUUIDs(userUUIDs);
     }
 
     @Override

@@ -9,6 +9,8 @@
             <CommentList v-if="loggedIn"
                 :userUUID = "userUUID"
             ></CommentList>
+            
+            <ProtocolToUserList></ProtocolToUserList>
         </div>
         <!-- This search box appears on small screens -->
         <div class="lt-md search-row-small" v-bind:style="{marginTop: searchBoxMarginTop, width: '87%'}">
@@ -29,6 +31,7 @@
 
     import ProtocolList from 'components/ProtocolList.vue'
     import CommentList from 'components/CommentList.vue'    
+    import ProtocolToUserList from 'components/ProtocolToUserList.vue'
     
     export default {
         name: 'home',
@@ -40,7 +43,7 @@
             }
         },
         components: {
-            ProtocolList, CommentList,
+            ProtocolList, CommentList, ProtocolToUserList
         },
         watch: {
             searchBoxMarginTop: function() {

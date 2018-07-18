@@ -4,6 +4,7 @@ import com.xprotocol.persistence.model.User;
 import com.xprotocol.utils.UtilsHelper;
 import com.xprotocol.utils.UtilsStringHelper;
 import java.util.ArrayList;
+import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -15,12 +16,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @Repository
 public class UserRepository {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    
+//    @Autowired
+//    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Transactional(readOnly=true)
     public List<User> findAll() {
@@ -83,6 +89,30 @@ public class UserRepository {
                     "WHERE userUUID=? " +
                     "GROUP BY userId;", 
                     new Object[]{UtilsHelper.getBytesFromUUID(userUUID)}, new UserRowMapper());
+        }
+        catch(EmptyResultDataAccessException ex) {
+            return null;
+        }
+    }
+    
+    @Transactional(readOnly=true)
+    public List<User> findUsersByUUIDs(List<UUID> userUUIDs) {
+        NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
+        List<byte[]> uuidObjList = new ArrayList<>();
+        userUUIDs.forEach((uuid) -> {
+            uuidObjList.add(UtilsHelper.getBytesFromUUID(uuid));
+        });
+//        Map<String, List> paramMap = Collections.singletonMap("uuids", uuidObjList);   
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("uuids", uuidObjList);
+        try{
+            return namedParameterJdbcTemplate.query(
+                    "SELECT users.*, GROUP_CONCAT(roleName SEPARATOR ',') AS roles FROM users " +
+                    "LEFT JOIN userRoles ON users.userId = userRoles.userId " +
+                    "LEFT JOIN roles ON userRoles.roleId = roles.roleId " +
+                    "WHERE userUUID IN (:uuids) " +
+                    "GROUP BY userId;", 
+                    parameters, new UserRowMapper());
         }
         catch(EmptyResultDataAccessException ex) {
             return null;
