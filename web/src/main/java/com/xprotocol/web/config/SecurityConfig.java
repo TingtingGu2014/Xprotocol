@@ -72,6 +72,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/login", "/signin", "/signup", "/api/signUp", "/api/signIn", "/errors/**").permitAll()
             .antMatchers("/api/invalidsession", "/api/sessionexpires").permitAll()
             .antMatchers(HttpMethod.GET, "/api/users/{^[\\\\d]$}/protocols/{\\w+}").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/protocolToUsers").permitAll()
 //            .antMatchers(HttpMethod.GET, "/api/users/{^[\\\\d]$}/protocols").permitAll()
             .antMatchers("/api/admin/**").hasAuthority("admin")
             .anyRequest().authenticated()

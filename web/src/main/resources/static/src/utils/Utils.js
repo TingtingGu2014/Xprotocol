@@ -49,7 +49,9 @@ export function createCookie(name,value,days) {
         })
     }
     else{
-        document.cookie = name+"="+value+expires+"; path=/";
+        return Promise.resolve(function(resolve, reject) {
+            document.cookie = name+"="+value+expires+"; path=/"
+        });        
     }    
 }
 
@@ -145,7 +147,7 @@ export function clearCookiesFromMaster(){
 }
 
 export function eraseCookie(name) {
-    createCookie(name,"",-1);
+    return createCookie(name,"",-1);
 }
 
 export function updateUserDetails(userUUID, profile, isAdmin = false){
@@ -200,6 +202,26 @@ export function getUserName(){
     }
     else {
         userName = userInfo.email
+    }
+    return userName
+}
+
+export function getUserNameFromUserObj(userObj){
+    var userName = ''
+    if(isEmpty(userObj)){
+        throw "Cannot get user name from empty user object!"
+    }
+    if(!isEmpty(userObj.alias)){
+        userName = userObj.alias
+    }
+    else if(!isEmpty(userObj.firstName)){
+        userName = userObj.firstName
+        if(!isEmpty(userObj.lastName)){
+            userName += ' ' + userObj.lastName
+        }
+    }
+    else {
+        userName = userObj.email
     }
     return userName
 }

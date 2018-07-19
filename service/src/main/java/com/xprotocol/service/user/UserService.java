@@ -8,6 +8,7 @@ package com.xprotocol.service.user;
 import com.xprotocol.persistence.model.User;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  *
@@ -32,6 +33,8 @@ public interface UserService {
     User findUserById(int userId);
     
     User findUserByUUID(String userUUIDStr);
+    
+    List<User> findUsersByUUIDs(List<UUID> userUUIDs);
     
     User setCurrentLoggedinUser(User user);
     

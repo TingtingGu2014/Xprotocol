@@ -46,7 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @ComponentScan("com.xprotocol.service")
-public class UserProtocolController {
+public class ProtocolController {
     
     @Value("${editor.fileUploadPath}")
     private String editorFileUploadPath;
@@ -103,21 +103,21 @@ public class UserProtocolController {
             try {
                 response.sendError(400, "Incomplete or invalid user and or protocol information!");
             } catch (IOException ex1) {
-                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+                Logger.getLogger(ProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
         catch(UserNotLoggedInException ex){
             try {
                 response.sendError(400, "Incomplete or invalid user and or protocol information!");
             } catch (IOException ex1) {
-                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+                Logger.getLogger(ProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
         catch(Exception ex){
             try {
                 response.sendError(500, "Server error: " + ex.getMessage());
             } catch (IOException ex1) {
-                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+                Logger.getLogger(ProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
         return protocol;
@@ -165,14 +165,14 @@ public class UserProtocolController {
             try {
                 response.sendError(400, "Incomplete or invalid user registration information!"+ex.getMessage());
             } catch (IOException ex1) {
-                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+                Logger.getLogger(ProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
         catch(IOException | InvalidCommentKeyException ex){
             try {
                 response.sendError(500, "Server error: " + ex.getMessage());
             } catch (IOException ex1) {
-                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+                Logger.getLogger(ProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
         return protocol;
@@ -268,14 +268,14 @@ public class UserProtocolController {
             try {
                 response.sendError(403, ex.getMessage());
             } catch (IOException ex1) {
-                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+                Logger.getLogger(ProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
         catch(IncompleteCommentInformationException ex){
             try {
                 response.sendError(400, "Incomplete or invalid user registration information!"+ex.getMessage());
             } catch (IOException ex1) {
-                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+                Logger.getLogger(ProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
         return null;
@@ -304,21 +304,21 @@ public class UserProtocolController {
             try {
                 response.sendError(403, ex.getMessage());
             } catch (IOException ex1) {
-                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+                Logger.getLogger(ProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
         catch(IncompleteCommentInformationException ex){
             try {
                 response.sendError(400, "Incomplete or invalid user registration information!"+ex.getMessage());
             } catch (IOException ex1) {
-                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+                Logger.getLogger(ProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
         catch(Exception ex){
             try {
                 response.sendError(500, ex.getMessage());
             } catch (IOException ex1) {
-                Logger.getLogger(UserProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
+                Logger.getLogger(ProtocolController.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
     }

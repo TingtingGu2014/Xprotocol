@@ -11,3 +11,5 @@ web/src/main/resources/static/dist/
 cassandra/.*
 package-lock.json
 yarn.lock
+/service/nbproject/
+/cassandra/nbproject/

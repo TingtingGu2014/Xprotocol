@@ -113,8 +113,8 @@
                 localStorage.protocolListCount = Object.keys(data).length
             })
             .catch((err) => {
-                alert("oops, something happened")
                 console.log(err)
+                this.$q.notify({message: "Cannot load the protocols. Error: "+err.message, duration: 3000, color: "negative"})
             });
         },
         components: {
